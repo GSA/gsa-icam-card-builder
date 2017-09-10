@@ -1,5 +1,5 @@
-# GSA PIV Signer
-The GSA-PIV-Signer signs CHUID and CBEFF containers and updates Security Object containers 
+# gsa-icam-card-builder
+The GSA-ICAM-Card-Builder signs CHUID and CBEFF containers and updates Security Object containers 
 for FIPS 201-2 PIV and PIV-I cards.  This software was originally derived from the GSA PKCS7
 signing tool.  The  original work was unable to:
 
@@ -276,7 +276,7 @@ Work remaining to be done if we want this to be really close to perfect:
   4. Test out some stronger algorithms.
   5. Add .config files for legacy (Gen 1 and 2) ICAM cards.
   
- See the [list of issues](https://github.com/bob-fontana/gsa-piv-signer/issues) for
+ See the [list of issues](https://github.com/bob-fontana/gsa-icam-card-builder/issues) for
  more information.
 
 ## Source code
@@ -285,4 +285,3 @@ as the artifacts needed to build, debug, and run this tool from with Eclipse.
 You can either clone the GitHub directory, you can download the appropriate
 "GSA-PIV-Signer-devel-vM.m.b" ZIP file and unzip it.  Then use Eclipse to
 import the file into a new Java project.
- 
