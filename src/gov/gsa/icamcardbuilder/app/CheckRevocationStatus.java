@@ -1,4 +1,4 @@
-package gov.gsa.pivsigner.app;
+package gov.gsa.icamcardbuilder.app;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

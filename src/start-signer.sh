@@ -6,7 +6,7 @@
 # "-noverify" option to get around the issue.  The risk is that the bytecode 
 # isn't being verified.
 
-java -classpath lib -Dlog4j.configurationFile=resources/log4j2.xml -jar GSA-PIV-Signer.jar gov.gsa.pivsigner.app.Gui
+java -classpath lib -Dlog4j.configurationFile=resources/log4j2.xml -jar GSA-ICAM-Card-Builder.jar gov.gsa.icamcardbuilder.app.Gui
 
 echo -n "Press <RETURN> to close this window: "
 read ans

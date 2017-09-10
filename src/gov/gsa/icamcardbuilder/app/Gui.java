@@ -1,4 +1,4 @@
-package gov.gsa.pivsigner.app;
+package gov.gsa.icamcardbuilder.app;
 
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
@@ -69,7 +69,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 public class Gui extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	protected final static String version = "1.8.1";
+	protected final static String version = "1.8.4";
 	protected static boolean debug = true;
 	protected static Logger logger;
 	protected static String decodedPath;
@@ -890,7 +890,7 @@ public class Gui extends JPanel {
 
 	private void aboutMenuActionPerformed(java.awt.event.ActionEvent evt) {
 		JOptionPane.showMessageDialog(frame,
-				"The GSA PIV Signing Tool is a free tool provided by the General\n"
+				"The GSA ICAM Card Builder Tool is a free tool provided by the General\n"
 						+ " Services Administration (GSA). The primary use of this tool\n"
 						+ " is intended for users to be able to digitally sign CBEFFs and\n"
 						+ " CHUIDs using a .p12 file containing the content signing key for\n"
@@ -900,7 +900,7 @@ public class Gui extends JPanel {
 						+ "Legion of the Bouncy Castle at:\n\n" + "   https://www.bouncycastle.org.\n\n"
 						+ "This tool uses libraries from Apache Software Foundation Commons\n"
 						+ "and Log4j2. Apache Software Foundation is at:\n\n" + "    http://www.apache.org/\n\n",
-				"About the GSA PIV Signing Tool", 1);
+				"About the GSA Card Builder Tool", 1);
 
 	}
 
@@ -971,7 +971,7 @@ public class Gui extends JPanel {
 		}
 
 		// Create and set up the window.
-		frame = new JFrame("GSA PIV Signing Tool " + version);
+		frame = new JFrame("GSA ICAM Card Builder " + version);
 
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		URL iconURL = ClassLoader.getSystemResource("resources/icon.png");

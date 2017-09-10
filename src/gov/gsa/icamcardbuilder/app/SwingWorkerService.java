@@ -1,4 +1,4 @@
-package gov.gsa.pivsigner.app;
+package gov.gsa.icamcardbuilder.app;
 
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;

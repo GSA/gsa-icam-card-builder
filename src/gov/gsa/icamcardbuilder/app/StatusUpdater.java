@@ -1,6 +1,6 @@
-package gov.gsa.pivsigner.app;
+package gov.gsa.icamcardbuilder.app;
 
-import static gov.gsa.pivsigner.app.Gui.status;
+import static gov.gsa.icamcardbuilder.app.Gui.status;
 
 import javax.swing.SwingWorker;
 

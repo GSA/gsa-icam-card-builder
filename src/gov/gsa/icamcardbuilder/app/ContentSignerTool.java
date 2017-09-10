@@ -1,7 +1,7 @@
-package gov.gsa.pivsigner.app;
+package gov.gsa.icamcardbuilder.app;
 
-import static gov.gsa.pivsigner.app.Gui.dateFormat;
-import static gov.gsa.pivsigner.app.Gui.logger;
+import static gov.gsa.icamcardbuilder.app.Gui.dateFormat;
+import static gov.gsa.icamcardbuilder.app.Gui.logger;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -18,7 +17,6 @@ import java.security.Provider;
 import java.security.Security;
 import java.security.Signature;
 import java.security.SignatureException;
-import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -88,7 +86,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.Store;
 
-import gov.gsa.pivsigner.app.Utils;
+import gov.gsa.icamcardbuilder.app.Utils;
 import sun.security.rsa.SunRsaSign;
 
 public class ContentSignerTool {

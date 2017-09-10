@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="zipfile" name="Create distro for project gsa-piv-signer">
+<project default="zipfile" name="Create distro for project gsa-icam-card-builder">
 	<property name="dir.buildfile" value="." />
 	<property name="dir.jarfile" value="${dir.buildfile}/bin/" />
 	<property name="dir.distro" value="${dir.buildfile}/distro/" />
 	<target name="staging" depends="jarfile">
-		<delete file="${dir.distro}/GSA-PIV-signer.jar" />
+		<delete file="${dir.distro}/gsa-icam-card-builder.jar" />
 		<mkdir dir="${dir.distro}" />
 		<mkdir dir="${dir.distro}/lib/" />
 		<mkdir dir="${dir.distro}/cards/" />
@@ -67,9 +67,9 @@
 		</copy>
 	</target>
 	<target name="jarfile" depends="classes">
-		<jar destfile="${dir.jarfile}/GSA-PIV-Signer.jar">
+		<jar destfile="${dir.jarfile}/gsa-icam-card-builder.jar">
 			<manifest>
-				<attribute name="Main-Class" value="gov.gsa.pivsigner.app.Gui" />
+				<attribute name="Main-Class" value="gov.gsa.icamcardbuilder.app.Gui" />
 				<attribute name="Class-Path" value=". lib/log4j-api-2.8.2.jar lib/log4j-core-2.8.2.jar lib/bccore-jdk15on-157.jar lib/bcmail-jdk15on-157.jar lib/bcpg-jdk15on-157.jar lib/bcpkix-jdk15on-157.jar lib/bcprov-jdk15on-157.jar lib/bctls-jdk15on-157.jar" />
 			</manifest>
 			<fileset dir="${dir.jarfile}" />
@@ -77,11 +77,11 @@
 	</target>
 	<path id="classpath">
 		<fileset dir="${dir.buildfile}/lib" includes="**/*.jar"/>
-		<fileset dir="${dir.buildfile}/src/gov/gsa/pivsigner/app/" includes="**/*.class"/>
+		<fileset dir="${dir.buildfile}/src/gov/gsa/icamcardbuilder/app/" includes="**/*.class"/>
 	</path>
 	<target name="classes">
 		<javac includeantruntime="false" 
-			debug="on" srcdir="${dir.buildfile}/src/gov/gsa/pivsigner/app/" 
+			debug="on" srcdir="${dir.buildfile}/src/gov/gsa/icamcardbuilder/app/" 
 			destdir="${dir.buildfile}/bin"
 			target="1.8">
 			<classpath refid="classpath"/>
@@ -100,10 +100,10 @@
 		<delete dir="${dir.distro}/" />
 	</target>
 	<target name="zipfile" depends="distclean,staging,javadocs">
-		<zip destfile="${dir.jarfile}/GSA-PIV-Signer.zip" basedir="${dir.distro}" />
+		<zip destfile="${dir.jarfile}/gsa-icam-card-builder.zip" basedir="${dir.distro}" />
 		<copy todir="${dir.distro}/">
 			<fileset dir="${dir.jarfile}/">
-				<include name="**/GSA-PIV-Signer.zip" />
+				<include name="**/gsa-icam-card-builder.zip" />
 			</fileset>
 		</copy>
 	</target>
@@ -111,7 +111,7 @@
 		<javadoc access="private" author="true" classpath="" destdir="${dir.distro}/doc/"
 			doctitle="GSA PIV Signing Tool" nodeprecated="false"
 			nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false"
-			packagenames="gov.gsa.pivsigner.app"
+			packagenames="gov.gsa.icamcardbuilder.app"
 			source="1.8" sourcepath="src" splitindex="true" use="true" version="true">
 			<link href="http://download.oracle.com/javase/8/docs/api/" />
 			<link href="http://docs.oracle.com/javase/8/docs/jre/api/security/smartcardio/spec/" />
@@ -119,7 +119,7 @@
 		</javadoc>
 	</target>
 	<target name="source" depends="javadocs">
-		<zip destfile="${dir.jarfile}/GSA-PIV-Signer-devel.zip" >
+		<zip destfile="${dir.jarfile}/gsa-icam-card-builder-devel.zip" >
 			<zipfileset dir="${dir.buildfile}/src/" prefix="src/" />
 			<zipfileset dir="${dir.buildfile}/cards/" prefix="cards/" />
 			<zipfileset dir="${dir.buildfile}/certutils/" prefix="certutils/" />
@@ -139,7 +139,7 @@
 		</zip>
 		<copy todir="${dir.distro}/" >
 			<fileset dir="${dir.jarfile}/" >
-				<include name="**/GSA-PIV-Signer-devel.zip" />
+				<include name="**/gsa-icam-card-builder-devel.zip" />
 			</fileset>
 		</copy>
 	</target>

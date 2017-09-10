@@ -1,22 +1,21 @@
-package gov.gsa.pivsigner.app;
+package gov.gsa.icamcardbuilder.app;
 import org.apache.logging.log4j.LogManager;
 
-import static gov.gsa.pivsigner.app.Gui.dateFormat;
-import static gov.gsa.pivsigner.app.Gui.logger;
+import static gov.gsa.icamcardbuilder.app.Gui.dateFormat;
+import static gov.gsa.icamcardbuilder.app.Gui.logger;
 
 import java.util.Date;
 
 @SuppressWarnings("serial")
-public class DateParserException extends Exception {
+public class TlvParserException extends Exception {
 
 	private String message = null;
 	
-	public DateParserException (String errorMessage, String className) {
+	public TlvParserException (String errorMessage, String className) {
 		super();
 		logger = LogManager.getLogger(className);
 		this.message = errorMessage;
 		logger.error(message);
 		Gui.status.append(dateFormat.format(new Date()) + " - " + message + "\n");
-		Gui.errors = true;
 	}
 }

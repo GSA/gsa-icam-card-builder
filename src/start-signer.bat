@@ -5,6 +5,6 @@ REM Oracle since a lot of code broke.  If using an earlier JDK, inser the
 REM "-noverify" option to get around the issue.  The risk is that the bytecode isn't being
 REM verified.
 
-java -classpath lib -Dlog4j.configurationFile=resources/log4j2.xml -jar GSA-PIV-Signer.jar gov.gsa.pivsigner.app.Gui
+java -classpath lib -Dlog4j.configurationFile=resources/log4j2.xml -jar GSA-ICAM-Card-Builder.jar gov.gsa.icamcardbuilder.app.Gui
 
 pause

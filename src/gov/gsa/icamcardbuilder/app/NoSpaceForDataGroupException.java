@@ -1,8 +1,8 @@
-package gov.gsa.pivsigner.app;
+package gov.gsa.icamcardbuilder.app;
 import org.apache.logging.log4j.LogManager;
 
-import static gov.gsa.pivsigner.app.Gui.dateFormat;
-import static gov.gsa.pivsigner.app.Gui.logger;
+import static gov.gsa.icamcardbuilder.app.Gui.dateFormat;
+import static gov.gsa.icamcardbuilder.app.Gui.logger;
 
 import java.util.Date;
 
