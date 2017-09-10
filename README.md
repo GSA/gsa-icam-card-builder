@@ -276,11 +276,12 @@ written after you've used one of the tools in this kit.
 ## Things Remaining to be Done
 Work remaining to be done if we want this to be really close to perfect:
 
-  1. Add a Verify button and the functionality behind it.
-  2. Write a user guide.
-  3. Create an installer.
-  4. Test out some stronger algorithms.
-  5. Add .config files for legacy (Gen 1 and 2) ICAM cards.
+  1. Add a data populator function
+  2. Add a Verify button and the functionality behind it.
+  3. Write a user guide.
+  4. Create an installer.
+  5. Test out some stronger algorithms.
+  6. Add .config files for legacy (Gen 1 and 2) ICAM cards.
   
  See the [list of issues](https://github.com/bob-fontana/gsa-icam-card-builder/issues) for
  more information.
