@@ -37,11 +37,13 @@ To create a reference implementation, we created eight new ICAM test cards:
 | 37 | Golden FIPS 201-2 PIV PPS F=512 D=64 |
 | 39 | Golden FIPS 201-2 Fed PIV-I
 | 46 | Golden FIPS 201-2 PIV |
+| 47 | Golden FIPS 201-2 PIV SAN Order |
 | 49 | FIPS 201-2 Facial Image CBEFF Expired |
 | 50 | FIPS 201-2 Facial Image CBEFF Expires before CHUID |
 | 51 | FIPS 201-2 Fingerprint CBEFF Expired |
 | 52 | FIPS 201-2 Fingerprint CBEFF Expires before CHUID |
-| 47 | Golden FIPS 201-2 PIV SAN Order |
+| 53 | FIPS 201-2 Large Card Auth Cert (2160 bytes) |
+
 
 The artifacts used to create these cards are included beneath
 the `cards` directory.  The objects in each card's subdirectory can be encoded
