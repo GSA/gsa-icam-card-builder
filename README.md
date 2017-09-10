@@ -221,7 +221,7 @@ on each ICAM card.
 Change directory to the directory created by the GSA-PIV-Signer-vX.x ZIP file and 
 run the following command:
 
-`java -classpath lib -jar GSA-PIV-Signer.jar gov.gsa.pivsigner.app.Gui`
+`java -classpath lib -jar GSA-ICAM-Card-Builder.jar gov.gsa.icamcardbuilder.app.Gui`
 
 The scripts `start-signer.bat` and `start-signer.sh` will do this for you.
 
