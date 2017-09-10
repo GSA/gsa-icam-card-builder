@@ -243,6 +243,10 @@ it to the directory containing the other objects you plan to encode.  If using
 Windows, Cygwin is recommended.  Ensure that your Perl implementation includes
 the Date::Calc package.
 
+Use the `mkall.sh` script to create all of the Gen 3 certificates in one
+batch.  This script also copies the certificates to the appropriate card
+directories so they are ready to write to the card.
+
 ### Re-sign your signed objects
 Next, use the `start-signer.sh` or `start-signer.bat` script to start up the GSA
 PIV Signer tool.  Use the *File -> Open* menu option to choose a properties file from
@@ -285,5 +289,5 @@ Work remaining to be done if we want this to be really close to perfect:
 A source code ZIP file is provided.  It includes all of the source as well
 as the artifacts needed to build, debug, and run this tool from with Eclipse.
 You can either clone the GitHub directory, you can download the appropriate
-"GSA-PIV-Signer-devel-vM.m.b" ZIP file and unzip it.  Then use Eclipse to
+"GSA-ICAM-Card-Builder-devel-vM.m.b" ZIP file and unzip it.  Then use Eclipse to
 import the file into a new Java project.
