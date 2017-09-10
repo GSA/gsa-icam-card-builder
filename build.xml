@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="zipfile" name="Create distro for project gsa-piv-signer">
+	<property name="dir.buildfile" value="." />
+	<property name="dir.jarfile" value="${dir.buildfile}/bin/" />
+	<property name="dir.distro" value="${dir.buildfile}/distro/" />
+	<target name="staging" depends="jarfile">
+		<delete file="${dir.distro}/GSA-PIV-signer.jar" />
+		<mkdir dir="${dir.distro}" />
+		<mkdir dir="${dir.distro}/lib/" />
+		<mkdir dir="${dir.distro}/cards/" />
+		<mkdir dir="${dir.distro}/config/" />
+		<mkdir dir="${dir.distro}/doc/" />
+		<mkdir dir="${dir.distro}/logs/" />
+		<mkdir dir="${dir.distro}/certutils/" />
+		<mkdir dir="${dir.distro}/cards/ICAM Card Objects/" />
+
+		<copy todir="${dir.distro}/">
+			<fileset dir="${dir.jarfile}/">
+				<include name="**/*.jar" />
+			</fileset>
+		</copy>
+		<copy todir="${dir.distro}/resources/">
+			<fileset dir="${dir.buildfile}/src/resources/">
+				<include name="**/*.png" />
+				<include name="**/*.xml" />
+			</fileset>
+		</copy>
+		<copy todir="${dir.distro}/">
+			<fileset dir="${dir.buildfile}/src/">
+				<include name="**/*.sh" />
+				<include name="**/*.bat" />
+			</fileset>
+		</copy>
+		<copy todir="${dir.distro}/lib">
+			<fileset dir="${dir.buildfile}/lib">
+				<include name="**/*.jar" />
+			</fileset>
+		</copy>
+		<copy todir="${dir.distro}/config">
+			<fileset dir="${dir.buildfile}/config">
+				<include name="**/*.properties" />
+			</fileset>
+		</copy>
+		<copy todir="${dir.distro}/lib">
+			<fileset dir="${dir.buildfile}/lib" excludes="**/*.jar"/>
+		</copy>
+		<copy todir="${dir.distro}/certutils/">
+			<fileset dir="${dir.buildfile}/certutils/">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+		<copy todir="${dir.distro}/cards/ICAM Card Objects/">
+			<fileset dir="${dir.buildfile}/cards/ICAM Card Objects/">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+		<copy todir="${dir.distro}/">
+			<fileset dir="${dir.buildfile}/">
+				<include name="README.*" />
+				<include name="LICENSE.*" />
+			</fileset>
+		</copy>
+		<copy todir="${dir.distro}/doc">
+			<fileset dir="${dir.buildfile}/doc">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+	</target>
+	<target name="jarfile" depends="classes">
+		<jar destfile="${dir.jarfile}/GSA-PIV-Signer.jar">
+			<manifest>
+				<attribute name="Main-Class" value="gov.gsa.pivsigner.app.Gui" />
+				<attribute name="Class-Path" value=". lib/log4j-api-2.8.2.jar lib/log4j-core-2.8.2.jar lib/bccore-jdk15on-157.jar lib/bcmail-jdk15on-157.jar lib/bcpg-jdk15on-157.jar lib/bcpkix-jdk15on-157.jar lib/bcprov-jdk15on-157.jar lib/bctls-jdk15on-157.jar" />
+			</manifest>
+			<fileset dir="${dir.jarfile}" />
+		</jar>
+	</target>
+	<path id="classpath">
+		<fileset dir="${dir.buildfile}/lib" includes="**/*.jar"/>
+		<fileset dir="${dir.buildfile}/src/gov/gsa/pivsigner/app/" includes="**/*.class"/>
+	</path>
+	<target name="classes">
+		<javac includeantruntime="false" 
+			debug="on" srcdir="${dir.buildfile}/src/gov/gsa/pivsigner/app/" 
+			destdir="${dir.buildfile}/bin"
+			target="1.8">
+			<classpath refid="classpath"/>
+			<compilerarg value="-Xlint" />
+		</javac>
+	</target>
+	<target name="distclean">
+		<delete>
+			<fileset dir="${dir.buildfile}/bin/" includes="**/*" />
+		</delete>
+		<delete includeemptydirs="true">
+			<fileset dir="${dir.buildfile}/cards/ICAM Card Objects/" defaultexcludes="false">
+				<include name="**/.backup/" />
+			</fileset>
+		</delete>
+		<delete dir="${dir.distro}/" />
+	</target>
+	<target name="zipfile" depends="distclean,staging,javadocs">
+		<zip destfile="${dir.jarfile}/GSA-PIV-Signer.zip" basedir="${dir.distro}" />
+		<copy todir="${dir.distro}/">
+			<fileset dir="${dir.jarfile}/">
+				<include name="**/GSA-PIV-Signer.zip" />
+			</fileset>
+		</copy>
+	</target>
+	<target name="javadocs">
+		<javadoc access="private" author="true" classpath="" destdir="${dir.distro}/doc/"
+			doctitle="GSA PIV Signing Tool" nodeprecated="false"
+			nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false"
+			packagenames="gov.gsa.pivsigner.app"
+			source="1.8" sourcepath="src" splitindex="true" use="true" version="true">
+			<link href="http://download.oracle.com/javase/8/docs/api/" />
+			<link href="http://docs.oracle.com/javase/8/docs/jre/api/security/smartcardio/spec/" />
+			<link href="https://www.bouncycastle.org/docs/docs1.5on/" />
+		</javadoc>
+	</target>
+	<target name="source" depends="javadocs">
+		<zip destfile="${dir.jarfile}/GSA-PIV-Signer-devel.zip" >
+			<zipfileset dir="${dir.buildfile}/src/" prefix="src/" />
+			<zipfileset dir="${dir.buildfile}/cards/" prefix="cards/" />
+			<zipfileset dir="${dir.buildfile}/certutils/" prefix="certutils/" />
+			<zipfileset dir="${dir.buildfile}/config/" prefix="config/" />
+			<zipfileset dir="${dir.buildfile}/doc/" prefix="doc/" />
+			<zipfileset dir="${dir.buildfile}/lib/" prefix="lib/" />
+			<zipfileset dir="${dir.buildfile}/logs/" prefix="log/" />
+			<zipfileset dir="${dir.buildfile}/" prefix="./" >
+				<include name="build.xml" />
+				<include name="LICENSE.md" />
+				<include name="README.md" />
+				<include name=".classpath" />
+				<include name=".gitignore" />
+				<include name=".settings" />
+				<include name=".externalToolBuilders" />
+			</zipfileset>
+		</zip>
+		<copy todir="${dir.distro}/" >
+			<fileset dir="${dir.jarfile}/" >
+				<include name="**/GSA-PIV-Signer-devel.zip" />
+			</fileset>
+		</copy>
+	</target>
+</project>

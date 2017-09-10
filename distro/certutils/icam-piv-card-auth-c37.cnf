@@ -1,0 +1,62 @@
+[ ca ]
+default_ca = ca_default
+
+[ ca_default ]
+dir = .
+database = database/index.txt 
+unique_subject = no
+new_certs_dir = .
+private_key = pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.private.pem 
+certificate = pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.public.pem 
+name_opt = ca_default
+x509_extensions = ee_ext
+default_days = 2190 
+default_md = sha256
+serial = database/serial
+policy = policy_match
+email_in_dn = no
+
+[ policy_match ]
+C = match
+O = optional
+OU = optional
+CN = optional
+emailAddress = optional
+serialNumber = optional
+
+[ req ]
+prompt = yes
+distinguished_name = req_distinguished_name
+attributes = req_attributes
+req_extensions = v3_req
+
+[ req_distinguished_name ]
+C = Country Name
+C_default = US
+O = Organization
+O_default = U.S. Government 
+OU = Organizational Unit
+OU_default = ICAM Test Cards
+serialNumber = 200-bit FASC-N (if Card Auth)
+serialNumber_default = D13810D828AF2C108424E5A1685828AF0210849C84E739C3EB
+
+[ req_attributes ]
+
+[ v3_req ]
+basicConstraints = CA:FALSE
+subjectKeyIdentifier = hash
+
+[ ee_ext ]
+authorityKeyIdentifier = keyid:issuer
+subjectKeyIdentifier = hash
+keyUsage = critical, digitalSignature
+extendedKeyUsage = critical,2.16.840.1.101.3.6.8
+authorityInfoAccess = caIssuers;URI:http://http.apl-test.cite.fpki-lab.gov/aia/certsIssuedToICAMTestCardSigningCA.p7c, OCSP;URI:http://ocsp.apl-test.cite.fpki-lab.gov
+crlDistributionPoints = URI:http://http.apl-test.cite.fpki-lab.gov/crls/ICAMTestCardSigningCA.crl
+2.16.840.1.101.3.6.9.1 = DER:01:01:00
+certificatePolicies = ia5org,2.16.840.1.101.3.2.1.48.13
+subjectAltName = @subjectAltName_sect
+
+[ subjectAltName_sect ]
+otherName = 2.16.840.1.101.3.6.6;FORMAT:HEX,OCT:D1:38:10:D8:28:AF:2C:10:84:39:E5:A1:68:58:28:AF:02:10:87:3C:84:E7:39:C3:EB
+URI = urn:uuid:c9d20c56-8a84-4878-b4c4-ced1f6c375a3
