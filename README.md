@@ -16,7 +16,8 @@ signing tool.  The  original work was unable to:
   1. the original CBEFFs on ICAM test cards are expired and need to be updated.  Facial image CBEFF headers indicated the wrong Image Data Type (1 versus 0).
   2. Since we need to place these new objects on a card, there was no way to populate a card.
 
-Currently, this project includes tools to handle all of the above. 
+Currently, this project includes tools to handle all of the above *except the
+card data populator*. 
 
 ## Getting Started
 
@@ -216,7 +217,7 @@ reference implementation.
 
   This will be the digest algorithm used to compute hashes and for signing.
 
-* `signatureAlgorithm=SHA56withRS`
+* `signatureAlgorithm=SHA56withRSA`
 
   This will be the signature algorithm included in the signed attributes and is
   what is used to sign the Security Object.
