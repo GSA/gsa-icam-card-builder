@@ -30,7 +30,8 @@ issue.  The risk is that the bytecode isn't being verified.
 To use the tools, unzip the ZIP file `GSA-PIV-Signer-vX.x.zip` containing
 the scripts, signing application, libraries, configuration files and artifacts.
 
-To create a reference implementation, we created eight new ICAM test cards:
+In conjunction with the signing tool,  we created the objects for eight new ICAM
+test cards, which are refered to as *Gen 3*:
 
 |Card Number|Description|
 |:--:|:------------------------|
@@ -44,13 +45,12 @@ To create a reference implementation, we created eight new ICAM test cards:
 | 52 | FIPS 201-2 Fingerprint CBEFF Expires before CHUID |
 | 53 | FIPS 201-2 Large Card Auth Cert (2160 bytes) |
 
-
-The artifacts used to create these cards are included beneath
-the `cards` directory.  The objects in each card's subdirectory can be encoded
-directly on to a PIV card.  It may be necessary to precede the object files with
-a container-specific TLV as described in SP 800-73-4's data model.  This system
-does not current supply a method for doing this if your card data populator doesn't
-handle if for you.
+The artifacts used to create these cards are included beneath the `cards` 
+directory.  The objects in each card's subdirectory can be encoded directly on 
+to a PIV card.  It may be necessary to precede the object files with a container-
+specific TLV as described in SP 800-73-4's data model.  This system does not
+current supply a method for doing this if your card data populator doesn't handle
+ if for you.
 
 This project consists of two main processes:
 
@@ -61,9 +61,11 @@ This project consists of two main processes:
 The `certutils` directory contains a bash script, `mkcert.sh` that uses command
 line options to select an OpenSSL `.cnf` file that can request and sign private keys
 for any of the four certificates on a PIV or PIV-I card.  A batch-mode utility, 
-`makeall.sh` creates the first four sets of certificates for Cards 37, 39, 46, 
-and 47.  The certificates for Card 46 can be re-used for cards 48-52 since the
-purpose of those cards is to verify biometric expiration dates.
+
+But it's easier to use the `makeall.sh` script which invokes `mkcert.sh` 
+to create the certificates for all of the Gen 3 ICAM Test cards in one shot.  
+Each certificate for each Gen 3 ICAM Test card is defined by its own OpenSSL
+`.cnf` file.
 
 ### Certificate Policies
 
@@ -120,9 +122,26 @@ maintain.
 Next, it's time to create the CHUID and CBEFF objects, which also updates the
 Security Object as described below.
 
+### Usage
+Change directory to the directory created by the GSA-PIV-Signer-vX.x ZIP file and 
+run the following command:
+
+`java -classpath lib -jar GSA-ICAM-Card-Builder.jar gov.gsa.icamcardbuilder.app.Gui`
+
+The scripts `start-signer.bat` and `start-signer.sh` will do this for you.
+
+### Where the Files are Created
+Generally, you should stage your CBEFF containers and Security Object files
+in a working directory. The application will write new files into the directory 
+of the CBEFF and/or Security Object files respectively.  It's most convenient if
+ your `contentFile` and `securityObjectFile` are in the same working directory.
+ The reference implementation does *not* use a working directory, writing 
+ directly to directories that can be used to create the cards.  The reference
+ implementation's content signer properties files contain paths to objects
+ based on being run from the top level directory of the project.
 
 ### Content Signer Property Files
-To make it easy to test and run, the File menu includes a "Open Config"
+To make it easy to test and run, the "File" menu includes a "Open Config"
 menu item that enables you to easily load a properties file that contains the 
 following setup on a per-container basis.  Below are some examples from the
 reference implementation.
@@ -217,36 +236,6 @@ Other properties files can be created and used to sign fingerprint or iris
 CBEFFs.  The intent is to create property files for each biometric object
 on each ICAM card.
 
-### Usage
-Change directory to the directory created by the GSA-PIV-Signer-vX.x ZIP file and 
-run the following command:
-
-`java -classpath lib -jar GSA-ICAM-Card-Builder.jar gov.gsa.icamcardbuilder.app.Gui`
-
-The scripts `start-signer.bat` and `start-signer.sh` will do this for you.
-
-### Where the Files are Created
-Generally, you should stage your CBEFF containers and Security Object files
-in a working directory. The application will write new files into the directory 
-of the CBEFF and/or Security Object files respectively.  It's most convenient if
- your `contentFile` and `securityObjectFile` are in the same working directory.
- The reference implementation does *not* use a working directory, writing 
- directly to directories that can be used to create the cards.  This for "experts"
- only.
-
-## Sequence of Operations
-
-### Create your certificates
-Use the `mkcert.sh` script to create and sign the various `.p12` private/public key
-pairs by the signing CA.  After you've created the `.p12` file for a card, copy
-it to the directory containing the other objects you plan to encode.  If using
-Windows, Cygwin is recommended.  Ensure that your Perl implementation includes
-the Date::Calc package.
-
-Use the `mkall.sh` script to create all of the Gen 3 certificates in one
-batch.  This script also copies the certificates to the appropriate card
-directories so they are ready to write to the card.
-
 ### Re-sign your signed objects
 Next, use the `start-signer.sh` or `start-signer.bat` script to start up the GSA
 PIV Signer tool.  Use the *File -> Open* menu option to choose a properties file from
@@ -265,24 +254,17 @@ containers as well as the new security object at the same time.  Otherwise, the
 containers on the card will get out of sync, and you'll encounter errors that the
 hashes on the security object don't match the container hashes.
 
-### Copy your files to the card object directory
-The reference implementation has a simple, self-contained hierarchy of directories.
-This was done so that we could easily convey, in one ZIP file, a complete card
-creation ecosystem.  In real life, your folders could exist in other parts of your
-computer or even your network.  No matter where your work gets done, it's important
-to study the `.properties` and `.cnf` files to understand where the artifacts are
-written after you've used one of the tools in this kit.
-
-## Things Remaining to be Done
+## Future Additions and Enhancements
 Work remaining to be done if we want this to be really close to perfect:
 
-  1. Add a Verify button and the functionality behind it.
-  2. Write a user guide.
-  3. Create an installer.
-  4. Test out some stronger algorithms.
-  5. Add .config files for legacy (Gen 1 and 2) ICAM cards.
-  
- See the [list of issues](https://github.com/bob-fontana/gsa-icam-card-builder/issues) for
+  1. Add a data populator function
+  2. Add a Verify button and the functionality behind it.
+  3. Write a user guide.
+  4. Create an installer.
+  5. Test out some stronger algorithms.
+  6. Add .config files for legacy (Gen 1 and 2) ICAM cards.
+
+ See the [list of issues](https://github.com/GSA/gsa-icam-card-builder/issues) for
  more information.
 
 ## Source code
