@@ -11,9 +11,10 @@ signing tool.  The  original work was unable to:
   6. Include pivFASC-N or entryUUID in the Signed Attributes section
   7. Include support for signing with a .p12 key file versus a PIV card
 
-  In addition, the original CBEFFs on ICAM test cards are expired and need to 
-  be updated.  Facial image CBEFF headers indicated the wrong Image Data Type
-  (1 versus 0).
+  In addition:
+  
+  1. the original CBEFFs on ICAM test cards are expired and need to be updated.  Facial image CBEFF headers indicated the wrong Image Data Type (1 versus 0).
+  2. Since we need to place these new objects on a card, there was no way to populate a card.
 
 Currently, this project includes tools to handle all of the above. 
 
