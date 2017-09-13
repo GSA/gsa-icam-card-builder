@@ -148,12 +148,17 @@ public class Utils {
 	 * @param s
 	 *            the string to be converted
 	 * @return a byte array containing bytes as represented by argument s
+	 * @throws InvalidDataFormatException
 	 */
-	public static byte[] hexStringToByteArray(String s) {
+	public static byte[] hexStringToByteArray(String s) throws InvalidDataFormatException {
 		int len = s.length();
 		byte[] data = new byte[len / 2];
-		for (int i = 0; i < len; i += 2) {
-			data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i + 1), 16));
+		try {
+			for (int i = 0; i < len; i += 2) {
+				data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i + 1), 16));
+			}
+		} catch (Exception e) { 
+			throw new InvalidDataFormatException("Data format of hex string is invalid " + s, Utils.class.getName());
 		}
 		return data;
 	}
@@ -165,12 +170,16 @@ public class Utils {
 	 *            the byte to be converted
 	 * @return string of length two bytes representing the byte singleByte
 	 */
-	public static String byteToHex(byte singleByte) {
+	public static String byteToHex(byte singleByte) throws InvalidDataFormatException {
 		char[] hexChars = new char[2];
 		final char[] hexArray = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 		int v = singleByte & 0xFF;
-		hexChars[0] = hexArray[v >>> 4];
-		hexChars[1] = hexArray[v & 0x0F];
+		try {
+			hexChars[0] = hexArray[v >>> 4];
+			hexChars[1] = hexArray[v & 0x0F];
+		} catch (Exception e) {
+			throw new InvalidDataFormatException("Data format of hex byte is invalid " + Character.digit(singleByte, v), Utils.class.getName());
+		}
 		return new String(hexChars);
 	}
 
@@ -183,8 +192,13 @@ public class Utils {
 	 */
 	public static String bytesToHex(byte[] bytes) {
 		StringBuffer sb = new StringBuffer();
+		String temp = null;
 		for (int j = 0; j < bytes.length; j++) {
-			String temp = byteToHex(bytes[j]);
+			try {
+				temp = byteToHex(bytes[j]);
+			} catch (InvalidDataFormatException e) {
+				return null;
+			}
 			sb.append(temp);
 		}
 		return sb.toString();
