@@ -157,3 +157,13 @@ cp data/ICAM_PIV_*SP_800-73-4_Large_Cert.p12 "$DEST"
 cp data/der/ICAM_PIV_*SP_800-73-4_Large_Cert.key.der "$DEST"
 cp data/der/ICAM_PIV_*SP_800-73-4_Large_Cert.cer "$DEST"
 renameIn "$DEST"
+#
+sh mkcert.sh -w -b -s ICAM_NFI_PIV-I_Auth_SP_800-73-4 -i ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3 -n 54 -t pivi-auth
+sh mkcert.sh -w -b -s ICAM_NFI_PIV-I_Dig_Sig_SP_800-73-4 -i ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3 -n 54 -t pivi-dig-sig
+sh mkcert.sh -w -b -s ICAM_NFI_PIV-I_Key_Mgmt_SP_800-73-4 -i ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3 -n 54 -t pivi-key-mgmt
+sh mkcert.sh -w -b -s ICAM_NFI_PIV-I_Card_Auth_SP_800-73-4 -i ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3 -n 54 -t pivi-card-auth
+DEST="../cards/ICAM Card Objects/54 - Golden FIPS 201-2 NFI PIV-I"
+cp data/ICAM_NFI_PIV-I*SP_800-73-4.p12 "$DEST"
+cp data/der/ICAM_NFI_PIV-I*SP_800-73-4.key.der "$DEST"
+cp data/der/ICAM_NFI_PIV-I*SP_800-73-4.cer "$DEST"
+renameIn "$DEST"
