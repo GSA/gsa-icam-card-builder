@@ -88,7 +88,7 @@ PIV-I cards, the certificate policies on the certificates must correctly map
 to an initial policy on the validation system.  The Root CA cert contains a 
 policy map as illustrated below.
 
-|Certificate Name|EE Certificate Policy OID|Target Relying Party OID|
+|Certificate Name|Issuer Subject Domain OID|Issuer Policy Domain OID|
 |----------------|-------------------------|------------------------|
 |PIV Authentication|2.16.840.1.101.3.2.1.48.248|2.16.840.1.101.3.2.1.48.78|
 |Card Authentication|2.16.840.1.101.3.2.1.48.249|2.16.840.1.101.3.2.1.48.79|
