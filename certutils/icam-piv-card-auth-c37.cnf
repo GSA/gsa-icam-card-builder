@@ -38,7 +38,7 @@ O_default = U.S. Government
 OU = Organizational Unit
 OU_default = ICAM Test Cards
 serialNumber = 200-bit FASC-N (if Card Auth)
-serialNumber_default = D13810D828AF2C108424E5A1685828AF0210849C84E739C3EB
+serialNumber_default = D13810D828AF2C108439E5A1685828AF0210873C84E739C3EB
 
 [ req_attributes ]
 
