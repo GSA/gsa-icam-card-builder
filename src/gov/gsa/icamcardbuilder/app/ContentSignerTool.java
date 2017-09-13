@@ -174,7 +174,11 @@ public class ContentSignerTool {
 
 		Security.addProvider(new BouncyCastleProvider());
 		Security.addProvider(new SunRsaSign());
-		getProperties(properties);
+		try {
+			getProperties(properties);
+		} catch (NoSuchPropertyException e1) {
+			return;
+		}
 
 		if ((contentFileBytes = Utils.getFileContentBytes(contentFile)) == null)
 			return;
@@ -238,17 +242,23 @@ public class ContentSignerTool {
 		case chuidGuidTag:
 		case chuidExpirationDateTag:
 		case cardholderUuidTag:
-			LinkedHashMap<Byte, byte[]> chuidValues = getChuidContents(contentFileBytes);
+			LinkedHashMap<Byte, byte[]> chuidValues;
+			if ((chuidValues = getChuidContents(contentFileBytes)) == null) {
+				return;
+			}	
+			try {
+				if (chuidValues.containsKey(chuidFascnTag))
+					chuidValues.replace(chuidFascnTag, Utils.hexStringToByteArray(fascn));
+				else
+					chuidValues.put(chuidFascnTag, Utils.hexStringToByteArray(fascn));
 
-			if (chuidValues.containsKey(chuidFascnTag))
-				chuidValues.replace(chuidFascnTag, Utils.hexStringToByteArray(fascn));
-			else
-				chuidValues.put(chuidFascnTag, Utils.hexStringToByteArray(fascn));
-
-			if (chuidValues.containsKey(chuidGuidTag))
-				chuidValues.replace(chuidGuidTag, Utils.hexStringToByteArray(uuid));
-			else
-				chuidValues.put(chuidGuidTag, Utils.hexStringToByteArray(uuid));
+				if (chuidValues.containsKey(chuidGuidTag))
+					chuidValues.replace(chuidGuidTag, Utils.hexStringToByteArray(uuid));
+				else
+					chuidValues.put(chuidGuidTag, Utils.hexStringToByteArray(uuid));
+			} catch (InvalidDataFormatException e) {
+				return;
+			}
 
 			if (chuidValues.containsKey(chuidExpirationDateTag)) {
 				DateFormat formatter = new SimpleDateFormat("yyyyMMddhhmmss");
@@ -274,6 +284,7 @@ public class ContentSignerTool {
 			} else
 				chuidValues.put(chuidExpirationDateTag, expirationDate.substring(0, 8).getBytes());
 
+			try {
 			if (chuidValues.containsKey(cardholderUuidTag))
 				chuidValues.replace(cardholderUuidTag, Utils.hexStringToByteArray(cardholderUuid));
 			else
@@ -281,6 +292,9 @@ public class ContentSignerTool {
 
 			if (chuidValues.containsKey(issuerAsymmetricSignatureTag))
 				chuidValues.remove(issuerAsymmetricSignatureTag);
+			} catch (InvalidDataFormatException e) {
+				return;
+			}
 
 			contentBytes = Utils.valuesToBytes(chuidValues, "CHUID", errorDetectionCodeTag);
 			desiredContainerId = chuidContainerId;
@@ -651,8 +665,9 @@ public class ContentSignerTool {
 	 * 
 	 * @param properties
 	 *            Hashtable of application properties from Gui
+	 * @throw NoSuchPropertyException
 	 */
-	private void getProperties(Hashtable<String, String> properties) {
+	private void getProperties(Hashtable<String, String> properties) throws NoSuchPropertyException {
 		try {
 			updateSecurityObject = (Utils.getProperty("updateSecurityObject", properties).equals("Y")) ? true : false;
 			passcode = Utils.getProperty("passcode", properties).toCharArray();
@@ -671,7 +686,7 @@ public class ContentSignerTool {
 			piAgencyCardSerialNumber = Utils.getProperty("agencyCardSerialNumber", properties);
 			piExpirationDate = Utils.toPrintedDate(expirationDate.substring(0, 8));
 		} catch (Exception e) {
-			System.out.println("NoSuchPropertyException caught and handled\n");
+			throw new NoSuchPropertyException(e.getMessage(), ContentSignerTool.class.getName());
 		}
 	}
 
@@ -703,8 +718,11 @@ public class ContentSignerTool {
 
 		for (Byte k : list) {
 			value = tagsValues.get(k);
-			logger.debug(
-					"Tag = " + Utils.byteToHex(k) + ", Len = " + value.length + ", Value = " + Utils.bytesToHex(value));
+			try {
+				logger.debug("Tag = " + Utils.byteToHex(k) + ", Len = " + value.length + ", Value = " + Utils.bytesToHex(value));
+			} catch (InvalidDataFormatException e) {
+				return null;
+			}
 		}
 		return tagsValues;
 	}
@@ -736,8 +754,11 @@ public class ContentSignerTool {
 
 		for (Byte k : list) {
 			value = tagsValues.get(k);
-			logger.debug(
-					"Tag = " + Utils.byteToHex(k) + ", Len = " + value.length + ", Value = " + Utils.bytesToHex(value));
+			try {
+				logger.debug("Tag = " + Utils.byteToHex(k) + ", Len = " + value.length + ", Value = " + Utils.bytesToHex(value));
+			} catch (Exception e) {
+				return null;
+			}
 		}
 		return tagsValues;
 	}
