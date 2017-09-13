@@ -158,6 +158,7 @@ public class Gui extends JPanel {
 	protected static String agencyCardSerialNumber = "1234567890";
 
 	protected int signingCount = 0;
+	private boolean located = false;
 
 	public Gui(JFrame frame) {
 
@@ -766,6 +767,11 @@ public class Gui extends JPanel {
 	}
 
 	private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {
+		File dir = new File(currentDirectory + File.pathSeparator + "config");
+		if (dir.exists()) {
+			currentDirectory += File.pathSeparator + "config";
+		}
+			
 		contentFileChooser.setCurrentDirectory(new File(currentDirectory));
 		int returnVal = contentFileChooser.showOpenDialog(frame);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -798,13 +804,19 @@ public class Gui extends JPanel {
 	}
 
 	private void openPropertiesFileActionPerformed(java.awt.event.ActionEvent evt) {
-
-		propertiesFileChooser
-				.setFileFilter(new FileNameExtensionFilter("Properties Files", new String[] { "properties" }));
+		
+		if (!located) {
+			File dir = new File(currentDirectory + File.separator + "config");
+			if (dir.exists()) {
+				currentDirectory += "config\\";
+				located = true;
+			}
+		}
+			
+		propertiesFileChooser.setFileFilter(new FileNameExtensionFilter("Properties Files", new String[] { "properties" }));
 		propertiesFileChooser.setCurrentDirectory(new File(currentDirectory));
 		int returnVal = propertiesFileChooser.showOpenDialog(frame);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
-
 			propertiesFile = propertiesFileChooser.getSelectedFile();
 			FileInputStream input = null;
 			Properties prop = new Properties();
