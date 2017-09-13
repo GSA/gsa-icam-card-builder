@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 	<properties>
-		<property name="name">piv-signer</property>
+		<property name="name">icam-card-builder</property>
 		<property name="pattern">%d{yyyy-MM-dd HH:mm:ss.SSS} - %-8.8p - %C:%L - %msg%n</property>
 	</properties>
 	<appenders>
