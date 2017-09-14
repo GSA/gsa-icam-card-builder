@@ -355,6 +355,12 @@ public class Utils {
 	 */
 	protected static HashMap<Byte, String> initializeContainerDescs() {
 		HashMap<Byte, String> map = new HashMap<Byte, String>();
+		map.put(ContentSignerTool.cccCardIdentifier, "CCC Card Identifier");
+		map.put(ContentSignerTool.cccCapabilityContainerVersionNumberTag, "Capability Container Version Number");
+		map.put(ContentSignerTool.cccCapabilityGrammarVersionNumber, "Capability Grammar Version Number");
+		map.put(ContentSignerTool.cccApplicationsCardUrl, "Applications Card URL");
+		map.put(ContentSignerTool.cccPkcs15, "PKCS#15");
+		map.put(ContentSignerTool.cccRegisteredDataModelNumber, "Registered Data Model Number");
 		map.put(ContentSignerTool.issuerAsymmetricSignatureTag, "CHUID Signature");
 		map.put(ContentSignerTool.bufferLengthTag, "CHUID Buffer Length (deprecated)");
 		map.put(ContentSignerTool.chuidFascnTag, "CHUID FASC-N");

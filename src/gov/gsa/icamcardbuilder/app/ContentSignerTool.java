@@ -100,11 +100,18 @@ public class ContentSignerTool {
 	private short desiredContainerId = (short) 0xffff;
 	private PrivateKey privateKey = null;
 	private X509Certificate contentSigningCert = null;
+	protected static final short cccContainerId = (short) 0xdb00;
 	protected static final short chuidContainerId = 0x3000;
 	protected static final short printedInformationContainerId = 0x3001;
 	protected static final short fingerprintContainerId = 0x6010;
 	protected static final short facialImageContainerId = 0x6030;
 	protected static final short irisContainerId = 0x1015;
+	protected static final byte cccCardIdentifier = (byte) 0xf0;
+	protected static final byte cccCapabilityContainerVersionNumberTag = (byte) 0xf1;
+	protected static final byte cccCapabilityGrammarVersionNumber = (byte) 0xf2;
+	protected static final byte cccApplicationsCardUrl = (byte) 0xf3;
+	protected static final byte cccPkcs15 = (byte) 0xf4;
+	protected static final byte cccRegisteredDataModelNumber = (byte) 0xf5;
 	protected static final byte authenticationKeyMapTag = 0x3d;
 	protected static final byte issuerAsymmetricSignatureTag = (byte) 0x3e;
 	protected static final byte bufferLengthTag = (byte) 0xee;
@@ -237,6 +244,14 @@ public class ContentSignerTool {
 		logger.info(String.format("Read %s from first byte of file.", containerDesc.get(tag)));
 
 		switch (tag) {
+		case cccCardIdentifier:
+			@SuppressWarnings("unused") LinkedHashMap<Byte, byte[]> cccValues;
+			if ((cccValues = getCccContents(contentFileBytes)) == null) {
+				return;
+			}
+			containerBufferBytes = contentFileBytes;
+			desiredContainerId = cccContainerId;
+			break;
 		case chuidFascnTag:
 		case bufferLengthTag:
 		case chuidGuidTag:
@@ -689,6 +704,43 @@ public class ContentSignerTool {
 			throw new NoSuchPropertyException(e.getMessage(), ContentSignerTool.class.getName());
 		}
 	}
+	
+	/**
+	 * Creates a Hashtable of CCC data
+	 * 
+	 * @param contentFileBytes
+	 *            bytes from content file
+	 * @return a Hashtable of CCC tags (keys) and values
+	 */
+	private LinkedHashMap<Byte, byte[]> getCccContents(byte[] contentFileBytes2) {
+		LinkedHashMap<Byte, byte[]> tagsValues = new LinkedHashMap<Byte, byte[]>();
+		int tagPosArray[] = new int[1];
+		tagPosArray[0] = 0;
+		byte key;
+		byte value[] = new byte[1];
+		do {
+			key = contentFileBytes[tagPosArray[0]];
+			try {
+				if ((value = Utils.tlvparse(contentFileBytes, tagPosArray)) != null)
+					tagsValues.put(key, value);
+				// TODO: Add code to include zero-length tags
+			} catch (Exception e) {
+				System.out.println("TlvParserException handled\n");
+			}
+		} while (tagPosArray[0] > 0 && key != errorDetectionCodeTag);
+
+		List<Byte> list = new ArrayList<Byte>(tagsValues.keySet());
+
+		for (Byte k : list) {
+			value = tagsValues.get(k);
+			try {
+				logger.debug("Tag = " + Utils.byteToHex(k) + ", Len = " + value.length + ", Value = " + Utils.bytesToHex(value));
+			} catch (InvalidDataFormatException e) {
+				return null;
+			}
+		}
+		return tagsValues;
+	}
 
 	/**
 	 * Creates a Hashtable of CHUID data
@@ -958,6 +1010,41 @@ public class ContentSignerTool {
 		}
 
 		return aev;
+	}
+
+	/**
+	 * Writes the CCC container to a buffer
+	 * 
+	 * @param contentFile
+	 *            content File object
+	 * @param contentBytes
+	 *            CCC bytes to write the the container
+	 * @return the bytes in the CCC container file needed by the Security
+	 *         Object
+	 */
+	
+	@SuppressWarnings("unused")
+	private byte[] writeCccContainer(File contentFile, byte[] contentBytes) {
+
+		byte[] cccContainerBytes = new byte[contentBytes.length + 4];
+		ByteBuffer containerBuffer = null;
+		String message = null;
+		containerBuffer = ByteBuffer.wrap(cccContainerBytes);
+
+		// Content, but don't write out the relic yet
+		containerBuffer.put(contentBytes, 0, contentBytes.length - 2);
+
+		// Error Detection Code
+		containerBuffer.put(contentBytes, contentBytes.length - 2, 2);
+
+		// Write out the complete CCC container
+		contentFile = Utils.backupAndRecreate(contentFile);
+		message = Utils.writeBytes(containerBuffer.array(), contentFile.toString(), "CCC");
+
+		if (message != null) {
+			logger.debug(message);
+		}
+		return containerBuffer.array();
 	}
 
 	/**
