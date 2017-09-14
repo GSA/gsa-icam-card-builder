@@ -227,7 +227,7 @@ reference implementation.
   the cardholder name.
 
 * `employeeAffiliation=4700`
-	This parameter is only used for Printed Information containers.  It specifies
+  This parameter is only used for Printed Information containers.  It specifies
   the cardholder's employee affiliation, usually an agency code.
   
 * `agencyCardSerialNumber=123456789`
