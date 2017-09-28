@@ -1,3 +1,8 @@
+Bag Attributes
+    localKeyID: 69 21 41 42 B1 78 87 3A FD BA 0C 9B D9 42 E4 58 7E 6B 28 9E 
+    friendlyName: ICAM Test Card PIV Content Signer - gold gen1-2
+subject=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM PIV Content Signer
+issuer=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Signing CA
 -----BEGIN CERTIFICATE-----
 MIIFUTCCA7mgAwIBAgIKWFPM4lIYAUEgAzANBgkqhkiG9w0BAQsFADBlMQswCQYD
 VQQGEwJVUzEYMBYGA1UEChMPVS5TLiBHb3Zlcm5tZW50MRgwFgYDVQQLEw9JQ0FN
