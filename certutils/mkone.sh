@@ -12,6 +12,11 @@ PIV_AUTH_P12_NAME="3 - ICAM_PIV_Auth_SP_800-73-4.p12"
 DIG_SIG_P12_NAME="4 - ICAM_PIV_Dig_Sig_SP_800-73-4.p12"
 KEY_MGMT_P12_NAME="5 - ICAM_PIV_Key_Mgmt_SP_800-73-4.p12"
 CARD_AUTH_P12_NAME="6 - ICAM_PIV_Card_Auth_SP_800-73-4.p12"
+KEY_HIST1_P12_NAME="13 - ICAM_PIV_Key_Hist1_SP_800-73-4.p12"
+KEY_HIST2_P12_NAME="14 - ICAM_PIV_Key_Hist2_SP_800-73-4.p12"
+KEY_HIST3_P12_NAME="15 - ICAM_PIV_Key_Hist3_SP_800-73-4.p12"
+KEY_HIST4_P12_NAME="16 - ICAM_PIV_Key_Hist4_SP_800-73-4.p12"
+KEY_HIST5_P12_NAME="17 - ICAM_PIV_Key_Hist5_SP_800-73-4.p12"
 
 PIV_AUTH_KEY_NAME="3 - ICAM_PIV_Auth_SP_800-73-4.key.der"
 DIG_SIG_KEY_NAME="4 - ICAM_PIV_Dig_Sig_SP_800-73-4.key.der"
@@ -37,6 +42,22 @@ renameIn() {
 		F=$(ls ICAM*PIV*_Auth*.p12)
 		mv $F "3 - $F"
 		cp -p "3 - $F" "$PIV_AUTH_P12_NAME"
+
+		F=$(ls ICAM*PIV*_Hist1*.p12)
+		mv $F "13 - $F"
+		cp -p "13 - $F" "$KEY_HIST1_P12_NAME"
+		F=$(ls ICAM*PIV*_Hist2*.p12)
+		mv $F "14 - $F"
+		cp -p "14 - $F" "$KEY_HIST2_P12_NAME"
+		F=$(ls ICAM*PIV*_Hist3*.p12)
+		mv $F "15 - $F"
+		cp -p "15 - $F" "$KEY_HIST3_P12_NAME"
+		F=$(ls ICAM*PIV*_Hist4*.p12)
+		mv $F "16 - $F"
+		cp -p "16 - $F" "$KEY_HIST4_P12_NAME"
+		F=$(ls ICAM*PIV*_Hist5*.p12)
+		mv $F "17 - $F"
+		cp -p "17 - $F" "$KEY_HIST5_P12_NAME"
 		
 		F=$(ls ICAM*Dig_Sig*.key.der)
 		mv $F "4 - $F"
@@ -68,12 +89,17 @@ renameIn() {
 
 set -x
 #
-sh mkcert.sh -w -b -s ICAM_NFI_PIV-I_Auth_SP_800-73-4 -i ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3 -n 54 -t pivi-auth
-sh mkcert.sh -w -b -s ICAM_NFI_PIV-I_Dig_Sig_SP_800-73-4 -i ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3 -n 54 -t pivi-dig-sig
-sh mkcert.sh -w -b -s ICAM_NFI_PIV-I_Key_Mgmt_SP_800-73-4 -i ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3 -n 54 -t pivi-key-mgmt
-sh mkcert.sh -w -b -s ICAM_NFI_PIV-I_Card_Auth_SP_800-73-4 -i ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3 -n 54 -t pivi-card-auth
-DEST="../cards/ICAM Card Objects/54 - Golden FIPS 201-2 NFI PIV-I"
-cp data/ICAM_NFI_PIV-I*SP_800-73-4.p12 "$DEST"
-cp data/der/ICAM_NFI_PIV-I*SP_800-73-4.key.der "$DEST"
-cp data/der/ICAM_NFI_PIV-I*SP_800-73-4.cer "$DEST"
+#sh mkcert.sh -w -b -s ICAM_PIV_Auth_SP_800-73-4_PPS -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 37 -t piv-auth
+#sh mkcert.sh -w -b -s ICAM_PIV_Dig_Sig_SP_800-73-4_PPS -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 37 -t piv-dig-sig
+#sh mkcert.sh -w -b -s ICAM_PIV_Key_Mgmt_SP_800-73-4_PPS -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 37 -t piv-key-mgmt
+#sh mkcert.sh -w -b -s ICAM_PIV_Card_Auth_SP_800-73-4_PPS -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 37 -t piv-card-auth
+#sh mkcert.sh -w -b -s ICAM_PIV_Key_Hist1_SP_800-73-4_PPS -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 37 -t piv-key-hist1
+#sh mkcert.sh -w -b -s ICAM_PIV_Key_Hist2_SP_800-73-4_PPS -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 37 -t piv-key-hist2
+#sh mkcert.sh -w -b -s ICAM_PIV_Key_Hist3_SP_800-73-4_PPS -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 37 -t piv-key-hist3
+#sh mkcert.sh -w -b -s ICAM_PIV_Key_Hist4_SP_800-73-4_PPS -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 37 -t piv-key-hist4
+#sh mkcert.sh -w -b -s ICAM_PIV_Key_Hist5_SP_800-73-4_PPS -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 37 -t piv-key-hist5
+DEST="../cards/ICAM Card Objects/37 - Golden FIPS 201-2 PIV PPS F=512 D=64"
+cp data/ICAM_PIV_*SP_800-73-4_PPS.p12 "$DEST"
+cp data/der/ICAM_PIV_*SP_800-73-4_PPS.key.der "$DEST"
+cp data/pem/ICAM_PIV_*SP_800-73-4_PPS.crt "$DEST"
 renameIn "$DEST"

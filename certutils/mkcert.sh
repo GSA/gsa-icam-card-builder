@@ -1,40 +1,44 @@
 #!/usr/bin/bash
 #
 # Usage: mkcert.sh [-b] [-w] -s <subjectDN> -i <issuerDN> -n <cardnumber> 
-#   -t <'piv-auth'|'piv-card-auth'|'pivi-auth'|'pivi-card-auth'|'piv-dig-sig'|'pivi-dig-sig'|'piv-key-mgmt'|'pivi-key-mgmt'>
+#   -t <'piv-auth'|'piv-card-auth'|'pivi-auth'|'pivi-card-auth'|
+#       'piv-dig-sig'|'pivi-dig-sig'|'piv-key-mgmt'|'pivi-key-mgmt'|'piv-key-hist1..20'|'pivi-key-hist1..20'>
 #
-# Where:
-#
-#   -b puts this script and the various OpenSSL commands into batch mode, requiring
-#   no input from the user.
-#
-#   -w generates certificates with slightly weaker keys due to a deficiency in Win32.
-#   This is only necessary when using Win32-based software to inject keys on to the
-#   smartcard.
-#
-#   -s <subjectDN> represents the Common Name in the certificate you 
-#   wish to  create. The resulting .p12 will consist of underscores
-#   substituted for spaces.
-#
-#   -i <issuerDN> represents the Common Name of the issuer.  The name you provide
-#   is cleaned up, substituting spaces and ampersands.  The resulting .p12
-#   file must exist.  Only the public and private  keys are needed.
-#
-#   -t ARG denotes the type of cert and type of card.  Card Auth certs are
-#   always generated using ECDSA keys.
-#
-#   -n <cardnumber> is the card number which is used to locate the appropriate
-#   OpenSSL configuration file which should always end in "c<cardnumber>.cnf".
-#   If you plan to create your own configuration files, follow this naming
-#   convention: "icam" + "-" + <type> + "-c" + <cardnumber> + ".cnf".
-#   
-#   All of the artifacts end up in the "data" directory.  Beneath "data" are
-#   "csr" and "pem", respectively.
-#
+WHERE="
+  Where:
+
+   -b puts this script and the various OpenSSL commands into batch mode, requiring
+   no input from the user.
+
+   -w generates certificates with slightly weaker keys due to a deficiency in Win32.
+   This is only necessary when using Win32-based software to inject keys on to the
+   smartcard.
+
+   -s <subjectDN> represents the Common Name in the certificate you wish to  create.
+   The resulting .p12 will consist of underscores substituted for spaces.
+
+   -i <issuerDN> represents the Common Name of the issuer.  The name you provide
+   is cleaned up, substituting spaces and ampersands.  The resulting .p12 file must
+   exist.  Only the public and private  keys are needed.
+
+   -t <type> denotes the type of cert and type of card.  Card Auth certs are
+   always generated using ECDSA keys.
+
+   -n <cardnumber> is the card number which is used to locate the appropriate OpenSSL
+   configuration file which should always end in \"c<cardnumber>.cnf\".  If you plan 
+   to create your own configuration files, follow this naming convention:
+     \"icam\" + \"-\" + <type> + \"-c\" + <cardnumber> + \".cnf\".
+
+   All of the artifacts end up in the \"data\" directory.  Beneath \"data\" are
+   \"der\", \"csr\", and \"pem\".
+"
 
 function usage() {
 	echo "Usage: $0 [-b][-w] -s <SubjectCN> -i <IssuerCN> -n cardnumber"
-	echo "  -t <'piv-auth'|'piv-card-auth'|'pivi-auth'|'pivi-card-auth'|'piv-dig-sig'|'pivi-dig-sig'|'piv-key-mgmt'|'pivi-key-mgmt'>"
+	echo "  -t <'piv-auth'|'piv-card-auth'|'pivi-auth'|'pivi-card-auth'|'piv-dig-sig'|'pivi-dig-sig'|"
+	echo "      'piv-key-mgmt'|'pivi-key-mgmt'|'piv-key-hist1..20'|'pivi-key-hist1..20'>"
+	echo "$WHERE"
+	echo $1
 	exit 1
 }
 
@@ -90,8 +94,8 @@ while true ; do
             esac ;;
         -t|--type)
             case "$2" in
-                "piv-auth"|"piv-card-auth"|"pivi-auth"|"pivi-card-auth"|"piv-dig-sig"|"piv-key-mgmt"|"pivi-dig-sig"|"pivi-key-mgmt") TYPE=$2 ; shift 2 ;;
-                *) usage ;;
+                piv-auth|piv-card-auth|pivi-auth|pivi-card-auth|piv-dig-sig|piv-key-mgmt|pivi-dig-sig|pivi-key-mgmt|piv-key-hist*|pivi-key-hist*) TYPE=$2 ; shift 2 ;;
+                *) usage 1 ;;
             esac ;;
         --) shift ; break ;;
         *) echo "Internal error!" ; exit 1 ;;
@@ -99,7 +103,7 @@ while true ; do
 done
 
 if [ z"$CN" = "z" -o z"$ISSUER" == "z" -o z"$NUMBER" == "z" -o z"TYPE" == "z" ]; then
-	usage
+	usage 2
 fi
 
 # FCN is the file name with spaces and other wierd characters converted to "_"
@@ -143,8 +147,12 @@ elif [ z$TYPE == "zpiv-key-mgmt" -o z$TYPE == "zpivi-key-mgmt" ]; then
 	CN=$(grep CN_default "$CNF" | sed 's/^.*=\s*//g')
 	SUBJ="/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=$CN"
 	KEY=RSA
+elif [[ z$TYPE == "zpiv-key-hist"* ]] || [[ z$TYPE* == "zpivi-key-hist"* ]]; then
+	CN=$(grep CN_default "$CNF" | sed 's/^.*=\s*//g')
+	SUBJ="/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=$CN"
+	KEY=RSA
 else
-	usage
+	usage 3
 fi
 # Remove this comment and the next line once the data populator tool is built
 KEY=RSA
@@ -237,8 +245,13 @@ openssl req \
 if [ $? -ne 0 ]; then
 	exit
 fi
+
+# Set the end-entity certs to expire on 12/01/2032.  Key History should be sooner.
+
+if [ 
+$year = 2032
 export today=$(perl -e '($a, $b, $c, $d, $e, $f, $g, $h, $i) = localtime(time); $m = $e + 1; $y = $f + 1900; print "$y, $m, $d\n";')
-duration=$(perl -e 'use Date::Calc qw/Delta_Days/; my @first = (2032, 12, 01); my @second = ('"$today"'); my $dd = Delta_Days (@second, @first ); print $dd . "\n";')
+duration=$(perl -e 'use Date::Calc qw/Delta_Days/; my @first = ($year, 12, 01); my @second = ('"$today"'); my $dd = Delta_Days (@second, @first ); print $dd . "\n";')
 
 openssl ca \
 	-config "$CNF" \
