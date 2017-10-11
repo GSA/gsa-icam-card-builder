@@ -479,7 +479,7 @@ public class Gui extends JPanel {
 		updateSecurityObjectCheckBoxMenuItem.setAccelerator(
 				KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.CTRL_MASK));
 		updateSecurityObjectCheckBoxMenuItem.setToolTipText("Click to toggle security object re-signing");
-		updateSecurityObjectCheckBoxMenuItem.setState(true);
+		updateSecurityObjectCheckBoxMenuItem.setSelected(true);
 		optionsMenu.add(updateSecurityObjectCheckBoxMenuItem);
 
 		revocationCheckBoxMenuItem.setAccelerator(
@@ -646,7 +646,6 @@ public class Gui extends JPanel {
 	protected void updateSecurityObjectCheckBoxPerformed(ActionEvent e) {
 		AbstractButton aButton = (AbstractButton) e.getSource();
 		boolean selected = aButton.getModel().isSelected();
-		updateSecurityObject = (selected) ? false : true;
 		securityObjectFileBrowseButton.setEnabled(selected);
 		securityObjectFileTextField.setEditable(selected);
 		requiredFieldActionPerformed(new ChangeEvent(e), securityObjectFileTextField);
@@ -752,7 +751,7 @@ public class Gui extends JPanel {
 			signButton.setEnabled(!reqFieldsTable.contains(false));
 		}
 
-		if (signButton.isEnabled())
+		if (signButton.isEnabled() && (updateSecurityObjectCheckBoxMenuItem.isSelected() == true))
 			if (!securityObjectFileTextField.getText().isEmpty())
 				securityObjectFile = new File(securityObjectFileTextField.getText());
 	}
@@ -849,6 +848,7 @@ public class Gui extends JPanel {
 				if (prop.containsKey("updateSecurityObject"))
 					updateSecurityObject = prop.getProperty("updateSecurityObject").toUpperCase().equals("Y") ? true
 							: false;
+				updateSecurityObjectCheckBoxMenuItem.setSelected(updateSecurityObject);
 				if (prop.containsKey("digestAlgorithm"))
 					digestAlgorithm = prop.getProperty("digestAlgorithm");
 				if (prop.containsKey("signatureAlgorithm"))
