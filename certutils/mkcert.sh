@@ -186,6 +186,8 @@ fi
 EE_P12=$FCN.p12
 SCA_P12=$ISSUER.p12
 
+# Get the signer private and public keys
+
 openssl pkcs12 \
 	-in $SCA_P12 \
 	-nocerts \
@@ -199,32 +201,38 @@ openssl pkcs12 \
 	-clcerts \
 	-passin pass: \
 	-nokeys \
-	-out pem/$(basename pem/$SCA_P12 .p12).public.pem 
+	-out pem/$(basename $SCA_P12 .p12).crt
 
-cat pem/$(basename $SCA_P12 .p12).private.pem pem/$(basename $SCA_P12 .p12).public.pem >pem/$(basename $SCA_P12 .p12).pem
+# Create nice little PEM file for no reason
+
+cat pem/$(basename $SCA_P12 .p12).private.pem \
+	pem/$(basename $SCA_P12 .p12).crt \
+	>pem/$(basename $SCA_P12 .p12).pem
+
+# Clean up from previous runs
 
 rm -f $(basename csr/$EE_P12 .p12).csr
 rm -f $(basename pem/$EE_P12 .p12).private.pem
-rm -f $(basename pem/$EE_P12 .p12).public.pem
+rm -f $(basename pem/$EE_P12 .p12).crt
 rm -f $(basename pem/$EE_P12 .p12).pem
 rm -f $EE_P12
 
 if [ z$KEY == "zECC" ]; then
 	openssl ecparam \
-		-out $(basename $EE_P12 .p12).private.pem \
+		-out pem/$(basename $EE_P12 .p12).private.pem \
 		-name prime256v1 \
 		-genkey
 else
 	openssl genrsa \
-		-out $(basename $EE_P12 .p12).private.pem \
+		-out pem/$(basename $EE_P12 .p12).private.pem \
 		2048
 fi
 
-chmod 600 $(basename $EE_P12 .p12).private.pem
+#cat pem/$(basename $EE_P12 .p12).private.pem | \
+#	perl -n -e 'if (!(/^Bag/ | /^ / | /Key/ | /-----BEGIN/ | /-----END/)) { print $_; }' | \
+#	openssl base64 -d -out der/$(basename $EE_P12 .p12).key.der
 
-cat $(basename $EE_P12 .p12).private.pem | \
-	perl -n -e 'if (!(/^Bag/ | /^ / | /Key/ | /-----BEGIN/ | /-----END/)) { print $_; }' | \
-  openssl base64 -d -out der/$(basename $EE_P12 .p12).key.der
+chmod 600 pem/$(basename $EE_P12 .p12).private.pem
 
 BATCHPARAM=""
 
@@ -237,21 +245,19 @@ openssl req \
 	$BATCHPARAM \
 	-new \
 	-sha256 \
-	-key $(basename $EE_P12 .p12).private.pem \
+	-key pem/$(basename $EE_P12 .p12).private.pem \
 	-nodes \
 	-passin pass: \
-	-out $(basename $EE_P12 .p12).csr
+	-out csr/$(basename $EE_P12 .p12).csr
 
 if [ $? -ne 0 ]; then
 	exit
 fi
 
-# Set the end-entity certs to expire on 12/01/2032.  Key History should be sooner.
+# TODO: Set the end-entity certs to expire on 12/01/2032.  Key History should be sooner.
 
-if [ 
-$year = 2032
 export today=$(perl -e '($a, $b, $c, $d, $e, $f, $g, $h, $i) = localtime(time); $m = $e + 1; $y = $f + 1900; print "$y, $m, $d\n";')
-duration=$(perl -e 'use Date::Calc qw/Delta_Days/; my @first = ($year, 12, 01); my @second = ('"$today"'); my $dd = Delta_Days (@second, @first ); print $dd . "\n";')
+duration=$(perl -e 'use Date::Calc qw/Delta_Days/; my @first = (2032, 12, 01); my @second = ('"$today"'); my $dd = Delta_Days (@second, @first ); print $dd . "\n";')
 
 openssl ca \
 	-config "$CNF" \
@@ -260,33 +266,29 @@ openssl ca \
 	-notext \
 	-days $duration \
 	-md sha256 \
-	-in  $(basename $EE_P12 .p12).csr \
-	-out $(basename $EE_P12 .p12).public.pem
+	-in csr/$(basename $EE_P12 .p12).csr \
+	-out pem/$(basename $EE_P12 .p12).crt
 
 if [ $? -ne 0 ]; then
 	echo "Can't sign $(basename $EE_P12 .p12).csr"
 	exit 5
 fi
 
-openssl x509 \
-	-in $(basename $EE_P12 .p12).public.pem \
-	-out der/$(basename $EE_P12 .p12).cer
-
 cat \
-	$(basename $EE_P12 .p12).private.pem \
-	$(basename $EE_P12 .p12).public.pem \
-	>$(basename $EE_P12 .p12).pem
+	pem/$(basename $EE_P12 .p12).private.pem \
+	pem/$(basename $EE_P12 .p12).crt \
+	>pem/$(basename $EE_P12 .p12).pem
 
-chmod 600 $(basename $EE_P12 .p12).pem
+chmod 644 pem/$(basename $EE_P12 .p12).pem
 
-NAME=$(basename $EE_P12 .p12 | sed 's/[&_]/ /g')
+NAME=pem/$(basename $EE_P12 .p12 | sed 's/[&_]/ /g')
 
 if [ $WIN32 = 1 ]; then
 	openssl pkcs12 \
 		-export \
 		-name "$NAME" \
 		-passout pass: \
-		-in $(basename $EE_P12 .p12).pem \
+		-in pem/$(basename $EE_P12 .p12).pem \
 		-keypbe PBE-SHA1-3DES \
 		-certpbe PBE-SHA1-3DES \
 		-out $EE_P12
@@ -295,15 +297,9 @@ else
 		-export \
 		-name "$NAME" \
 		-passout pass: \
-		-in $(basename $EE_P12 .p12).pem \
+		-in pem/$(basename $EE_P12 .p12).pem \
 		-macalg sha256 \
 		-out $EE_P12
 fi
-
-if [ ! -d pem ]; then mkdir pem; fi
-if [ ! -d csr ]; then mkdir csr; fi
-
-mv *.pem pem
-mv *.csr csr
 
 popd

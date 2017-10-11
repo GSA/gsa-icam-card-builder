@@ -38,19 +38,6 @@ renameIn() {
 		mv $F "3 - $F"
 		cp -p "3 - $F" "$PIV_AUTH_P12_NAME"
 		
-		F=$(ls ICAM*Dig_Sig*.key.der)
-		mv $F "4 - $F"
-		cp -p "4 - $F" "$DIG_SIG_KEY_NAME"
-		F=$(ls ICAM*Key_Mgmt*.key.der)
-		mv $F "5 - $F"
-		cp -p "5 - $F" "$KEY_MGMT_KEY_NAME"
-		F=$(ls ICAM*Card_Auth*.key.der)
-		mv $F "6 - $F"
-		cp -p "6 - $F" "$CARD_AUTH_KEY_NAME"
-		F=$(ls ICAM*PIV*_Auth*.key.der)
-		mv $F "3 - $F"
-		cp -p "3 - $F" "$PIV_AUTH_KEY_NAME"
-		
 		F=$(ls ICAM*Dig_Sig*.crt)
 		mv $F "4 - $F"
 		cp -p "4 - $F" "$DIG_SIG_CERT_NAME"
@@ -90,7 +77,7 @@ sh mkcert.sh -w -b -s ICAM_Fed_PIV-I_Key_Mgmt_SP_800-73-4 -i ICAM_Test_Card_PIV-
 sh mkcert.sh -w -b -s ICAM_Fed_PIV-I_Card_Auth_SP_800-73-4 -i ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3 -n 39 -t pivi-card-auth
 DEST="../cards/ICAM Card Objects/39 - Golden FIPS 201-2 Fed PIV-I"
 cp data/ICAM_Fed_PIV-I*SP_800-73-4.p12 "$DEST"
-cp data/der/ICAM_Fed_PIV-I*SP_800-73-4.key.der "$DEST"
+#cp data/der/ICAM_Fed_PIV-I*SP_800-73-4.key.der "$DEST"
 cp data/pem/ICAM_Fed_PIV-I*SP_800-73-4.crt "$DEST"
 renameIn "$DEST"
 # Card 46
@@ -100,7 +87,7 @@ sh mkcert.sh -w -b -s ICAM_PIV_Key_Mgmt_SP_800-73-4 -i ICAM_Test_Card_PIV_Signin
 sh mkcert.sh -w -b -s ICAM_PIV_Card_Auth_SP_800-73-4 -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 46 -t piv-card-auth
 DEST="../cards/ICAM Card Objects/46 - Golden FIPS 201-2 PIV"
 cp data/ICAM_PIV_*SP_800-73-4.p12 "$DEST"
-cp data/der/ICAM_PIV_*SP_800-73-4.key.der "$DEST"
+#cp data/der/ICAM_PIV_*SP_800-73-4.key.der "$DEST"
 cp data/pem/ICAM_PIV_*SP_800-73-4.crt "$DEST"
 renameIn "$DEST"
 # Card 47
@@ -110,7 +97,7 @@ sh mkcert.sh -w -b -s ICAM_PIV_Key_Mgmt_SP_800-73-4_SAN_Order -i ICAM_Test_Card_
 sh mkcert.sh -w -b -s ICAM_PIV_Card_Auth_SP_800-73-4_SAN_Order -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 47 -t piv-card-auth
 DEST="../cards/ICAM Card Objects/47 - Golden FIPS 201-2 PIV SAN Order"
 cp data/ICAM_PIV_*SP_800-73-4_SAN_Order.p12 "$DEST"
-cp data/der/ICAM_PIV_*SP_800-73-4_SAN_Order.key.der "$DEST"
+#cp data/der/ICAM_PIV_*SP_800-73-4_SAN_Order.key.der "$DEST"
 cp data/pem/ICAM_PIV_*SP_800-73-4_SAN_Order.crt "$DEST"
 renameIn "$DEST"
 # Card 49
@@ -120,7 +107,7 @@ sh mkcert.sh -w -b -s ICAM_PIV_Key_Mgmt_SP_800-73-4_FI_Expired -i ICAM_Test_Card
 sh mkcert.sh -w -b -s ICAM_PIV_Card_Auth_SP_800-73-4_FI_Expired -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 49 -t piv-card-auth
 DEST="../cards/ICAM Card Objects/49 - FIPS 201-2 Facial Image CBEFF Expired"
 cp data/ICAM_PIV_*SP_800-73-4_FI_Expired.p12 "$DEST"
-cp data/der/ICAM_PIV_*SP_800-73-4_FI_Expired.key.der "$DEST"
+#cp data/der/ICAM_PIV_*SP_800-73-4_FI_Expired.key.der "$DEST"
 cp data/pem/ICAM_PIV_*SP_800-73-4_FI_Expired.crt "$DEST"
 renameIn "$DEST"
 # Card 50
@@ -130,7 +117,7 @@ sh mkcert.sh -w -b -s ICAM_PIV_Key_Mgmt_SP_800-73-4_FI_will_Expire -i ICAM_Test_
 sh mkcert.sh -w -b -s ICAM_PIV_Card_Auth_SP_800-73-4_FI_will_Expire -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 50 -t piv-card-auth
 DEST="../cards/ICAM Card Objects/50 - FIPS 201-2 Facial Image CBEFF Expires before CHUID"
 cp data/ICAM_PIV_*SP_800-73-4_FI_will_Expire.p12 "$DEST"
-cp data/der/ICAM_PIV_*SP_800-73-4_FI_will_Expire.key.der "$DEST"
+#cp data/der/ICAM_PIV_*SP_800-73-4_FI_will_Expire.key.der "$DEST"
 cp data/pem/ICAM_PIV_*SP_800-73-4_FI_will_Expire.crt "$DEST"
 renameIn "$DEST"
 # Card 51
@@ -140,7 +127,7 @@ sh mkcert.sh -w -b -s ICAM_PIV_Key_Mgmt_SP_800-73-4_FP_Expired -i ICAM_Test_Card
 sh mkcert.sh -w -b -s ICAM_PIV_Card_Auth_SP_800-73-4_FP_Expired -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 51 -t piv-card-auth
 DEST="../cards/ICAM Card Objects/51 - FIPS 201-2 Fingerprint CBEFF Expired"
 cp data/ICAM_PIV_*SP_800-73-4_FP_Expired.p12 "$DEST"
-cp data/der/ICAM_PIV_*SP_800-73-4_FP_Expired.key.der "$DEST"
+#cp data/der/ICAM_PIV_*SP_800-73-4_FP_Expired.key.der "$DEST"
 cp data/pem/ICAM_PIV_*SP_800-73-4_FP_Expired.crt "$DEST"
 renameIn "$DEST"
 # Card 52
@@ -150,7 +137,7 @@ sh mkcert.sh -w -b -s ICAM_PIV_Key_Mgmt_SP_800-73-4_FP_will_Expire -i ICAM_Test_
 sh mkcert.sh -w -b -s ICAM_PIV_Card_Auth_SP_800-73-4_FP_will_Expire -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 52 -t piv-card-auth
 DEST="../cards/ICAM Card Objects/52 - FIPS 201-2 Fingerprint CBEFF Expires before CHUID"
 cp data/ICAM_PIV_*SP_800-73-4_FP_will_Expire.p12 "$DEST"
-cp data/der/ICAM_PIV_*SP_800-73-4_FP_will_Expire.key.der "$DEST"
+#cp data/der/ICAM_PIV_*SP_800-73-4_FP_will_Expire.key.der "$DEST"
 cp data/pem/ICAM_PIV_*SP_800-73-4_FP_will_Expire.crt "$DEST"
 renameIn "$DEST"
 # Card 53
@@ -160,7 +147,7 @@ sh mkcert.sh -w -b -s ICAM_PIV_Key_Mgmt_SP_800-73-4_Large_Cert -i ICAM_Test_Card
 sh mkcert.sh -w -b -s ICAM_PIV_Card_Auth_SP_800-73-4_Large_Cert -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 53 -t piv-card-auth
 DEST="../cards/ICAM Card Objects/53 - FIPS 201-2 Large Card Auth Cert"
 cp data/ICAM_PIV_*SP_800-73-4_Large_Cert.p12 "$DEST"
-cp data/der/ICAM_PIV_*SP_800-73-4_Large_Cert.key.der "$DEST"
+#cp data/der/ICAM_PIV_*SP_800-73-4_Large_Cert.key.der "$DEST"
 cp data/pem/ICAM_PIV_*SP_800-73-4_Large_Cert.crt "$DEST"
 renameIn "$DEST"
 # Card 54
@@ -170,6 +157,6 @@ sh mkcert.sh -w -b -s ICAM_NFI_PIV-I_Key_Mgmt_SP_800-73-4 -i ICAM_Test_Card_PIV-
 sh mkcert.sh -w -b -s ICAM_NFI_PIV-I_Card_Auth_SP_800-73-4 -i ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3 -n 54 -t pivi-card-auth
 DEST="../cards/ICAM Card Objects/54 - Golden FIPS 201-2 NFI PIV-I"
 cp data/ICAM_NFI_PIV-I*SP_800-73-4.p12 "$DEST"
-cp data/der/ICAM_NFI_PIV-I*SP_800-73-4.key.der "$DEST"
+#cp data/der/ICAM_NFI_PIV-I*SP_800-73-4.key.der "$DEST"
 cp data/pem/ICAM_NFI_PIV-I*SP_800-73-4.crt "$DEST"
 renameIn "$DEST"
