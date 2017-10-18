@@ -3,6 +3,9 @@
 # Usage: mkcert.sh [-b] [-w] -s <subjectDN> -i <issuerDN> -n <cardnumber> 
 #   -t <'piv-auth'|'piv-card-auth'|'pivi-auth'|'pivi-card-auth'|
 #       'piv-dig-sig'|'pivi-dig-sig'|'piv-key-mgmt'|'pivi-key-mgmt'|'piv-key-hist1..20'|'pivi-key-hist1..20'>
+#   -e <'prime256v1'|'secp384r1'>
+#   -r <'1024|2048|3072|4096'>
+#   -p <prefix>
 #
 WHERE="
   Where:
@@ -27,19 +30,27 @@ WHERE="
    -n <cardnumber> is the card number which is used to locate the appropriate OpenSSL
    configuration file which should always end in \"c<cardnumber>.cnf\".  If you plan 
    to create your own configuration files, follow this naming convention:
-     \"icam\" + \"-\" + <type> + \"-c\" + <cardnumber> + \".cnf\".
+     <prefix> + \"-\" + <type> + \"-c\" + <cardnumber> + \".cnf\".
 
-   All of the artifacts end up in the \"data\" directory.  Beneath \"data\" are
-   \"der\", \"csr\", and \"pem\".
+   -e <ECC algorithm> specifies the name of the ECC algorithm. Does not apply to 
+   RSA-based certs.
+   
+   -r <RSA bitlength> specifies the length of the RSA key in bits. Does not apply to 
+   ECC-based certs.
+
+   -p <prefix> the prefix to the coniguration file name.  Default is \"icam\".
 "
 
 function usage() {
 	echo "Usage: $0 [-b][-w] -s <SubjectCN> -i <IssuerCN> -n cardnumber"
 	echo "  -t <'piv-auth'|'piv-card-auth'|'pivi-auth'|'pivi-card-auth'|'piv-dig-sig'|'pivi-dig-sig'|"
 	echo "      'piv-key-mgmt'|'pivi-key-mgmt'|'piv-key-hist1..20'|'pivi-key-hist1..20'>"
+	echo "  [-e <'prime256v1'|'secp384r1']>"
+	echo "  [-r <'1024'|'2048'|'3072'|'4096']>"
+	echo "  [-p <prefix>"
 	echo "$WHERE"
-	echo $1
-	exit 1
+	echo "Exiting with exit code $1"
+	exit $1
 }
 
 function cleanup() {
@@ -66,9 +77,12 @@ function tolower() {
 
 BATCH=0
 WIN32=0
-TEMP=`getopt -o bws:i:n:t: --long subject-cn:,issuer-cn:,number:,type: -n 'mkcert.sh' -- "$@"`
+ECCALG=prime256v1
+RSAALG=2048
+PREFIX=icam
+TEMP=`getopt -o bws:i:n:t:e:r:p: -l subject-cn:,issuer-cn:,number:,type:,ecc:,rsa:,prefix: -n 'mkcert.sh' -- "$@"`
 eval set -- "$TEMP"
-
+set -x
 # extract options and their arguments into variables.
 while true ; do
     case "$1" in
@@ -91,6 +105,18 @@ while true ; do
         -n|--number) 
             case "$2" in
                 *) NUMBER=$2 ; shift 2 ;;
+            esac ;;
+		-e|--ecc) 
+            case "$2" in
+                *) ECCALG=$2 ; KEY=ECC; shift 2 ;;
+            esac ;;
+        -r|--rsa) 
+            case "$2" in
+                *) RSAALG=$2 ; KEY=RSA; shift 2 ;;
+            esac ;;
+        -p|--prefix) 
+            case "$2" in
+                *) PREFIX=$2; shift 2 ;;
             esac ;;
         -t|--type)
             case "$2" in
@@ -120,7 +146,7 @@ fi
 OWD=$(pwd)
 
 pushd data
-CNF="$OWD/icam-$TYPE-c$NUMBER.cnf"
+CNF="$OWD/$PREFIX-$TYPE-c$NUMBER.cnf"
 mkdir -p pem || error mkdir $?
 mkdir -p database || error mkdir $?
 mkdir -p csr || error mkdir $?
@@ -134,28 +160,26 @@ fi
 if [ z$TYPE == "zpiv-auth" -o z$TYPE == "zpivi-auth" ]; then
 	CN=$(grep CN_default "$CNF" | sed 's/^.*=\s*//g')
 	SUBJ="/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=$CN"
-	KEY=RSA
+	if [ z"$ECCALG" == "z" ]; then KEY=RSA; fi
 elif [ z$TYPE == "zpiv-card-auth" -o z$TYPE == "zpivi-card-auth" ]; then
 	SN=$(grep serialNumber_default "$CNF" | sed 's/^.*=\s*//g')
 	SUBJ="/C=US/O=U.S. Government/OU=ICAM Test Cards/serialNumber=$SN"
-	KEY=ECC
+	if [ z"$ECCALG" == "z" ]; then KEY=RSA; fi
 elif [ z$TYPE == "zpiv-dig-sig" -o z$TYPE == "zpivi-dig-sig" ]; then
 	CN=$(grep CN_default "$CNF" | sed 's/^.*=\s*//g')
 	SUBJ="/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=$CN"
-	KEY=RSA
+	if [ z"$ECCALG" == "z" ]; then KEY=RSA; fi
 elif [ z$TYPE == "zpiv-key-mgmt" -o z$TYPE == "zpivi-key-mgmt" ]; then
 	CN=$(grep CN_default "$CNF" | sed 's/^.*=\s*//g')
 	SUBJ="/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=$CN"
-	KEY=RSA
+	if [ z"$ECCALG" == "z" ]; then KEY=RSA; fi
 elif [[ z$TYPE == "zpiv-key-hist"* ]] || [[ z$TYPE* == "zpivi-key-hist"* ]]; then
 	CN=$(grep CN_default "$CNF" | sed 's/^.*=\s*//g')
 	SUBJ="/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=$CN"
-	KEY=RSA
+	if [ z"$ECCALG" == "z" ]; then KEY=RSA; fi
 else
 	usage 3
 fi
-# Remove this comment and the next line once the data populator tool is built
-KEY=RSA
 
 if [ ! -f $2 ]; then
 	echo "$2 was not found.  Exiting."
@@ -220,17 +244,13 @@ rm -f $EE_P12
 if [ z$KEY == "zECC" ]; then
 	openssl ecparam \
 		-out pem/$(basename $EE_P12 .p12).private.pem \
-		-name prime256v1 \
+		-name $ECCALG \
 		-genkey
 else
 	openssl genrsa \
 		-out pem/$(basename $EE_P12 .p12).private.pem \
-		2048
+		$RSAALG
 fi
-
-#cat pem/$(basename $EE_P12 .p12).private.pem | \
-#	perl -n -e 'if (!(/^Bag/ | /^ / | /Key/ | /-----BEGIN/ | /-----END/)) { print $_; }' | \
-#	openssl base64 -d -out der/$(basename $EE_P12 .p12).key.der
 
 chmod 600 pem/$(basename $EE_P12 .p12).private.pem
 
