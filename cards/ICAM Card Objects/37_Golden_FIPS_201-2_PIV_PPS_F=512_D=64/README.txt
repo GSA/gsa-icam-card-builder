@@ -1,0 +1,1 @@
+Don't re-generate these certs until we have a data populator.  These are all ECC keys and certs and a 3rd party injected them into the official ICAM cards.  The mkall.sh script explicitly comments this card out.
