@@ -12,7 +12,7 @@
 		<mkdir dir="${dir.distro}/doc/" />
 		<mkdir dir="${dir.distro}/logs/" />
 		<mkdir dir="${dir.distro}/certutils/" />
-		<mkdir dir="${dir.distro}/cards/ICAM Card Objects/" />
+		<mkdir dir="${dir.distro}/cards/ICAM_Card_Objects/" />
 
 		<copy todir="${dir.distro}/">
 			<fileset dir="${dir.jarfile}/">
@@ -49,8 +49,8 @@
 				<include name="**/*" />
 			</fileset>
 		</copy>
-		<copy todir="${dir.distro}/cards/ICAM Card Objects/">
-			<fileset dir="${dir.buildfile}/cards/ICAM Card Objects/">
+		<copy todir="${dir.distro}/cards/ICAM_Card_Objects/">
+			<fileset dir="${dir.buildfile}/cards/ICAM_Card_Objects/">
 				<include name="**/*" />
 			</fileset>
 		</copy>
@@ -93,7 +93,7 @@
 			<fileset dir="${dir.buildfile}/bin/" includes="**/*" />
 		</delete>
 		<delete includeemptydirs="true">
-			<fileset dir="${dir.buildfile}/cards/ICAM Card Objects/" defaultexcludes="false">
+			<fileset dir="${dir.buildfile}/cards/ICAM_Card_Objects/" defaultexcludes="false">
 				<include name="**/.backup/" />
 			</fileset>
 		</delete>
