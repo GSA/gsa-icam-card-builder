@@ -148,11 +148,11 @@ menu item that enables you to easily load a properties file that contains the
 following setup on a per-container basis.  Below are some examples from the
 reference implementation.
 
-* `contentFile=cards/cards/ICAM Card Objects/46 - Golden FIPS 201-2 PIV/8 - Face Object`
+* `contentFile=cards/cards/ICAM_Card_Objects/46_Golden_FIPS_201-2_PIV/8 - Face Object`
 
   This is the file that contains the full container of the CBEFF to be signed
 
-* `securityObjectFile=cards/ICAM Card Objects/46 - Golden FIPS 201-2 PIV/2 - Security Object`
+* `securityObjectFile=cards/ICAM_Card_Objects/46_Golden_FIPS_201-2_PIV/2 - Security Object`
 
   This is the file that contains the full container of the Security Object
 
@@ -200,7 +200,7 @@ reference implementation.
   This is the expiration date of the CHUID or `notAfter` date of a biometric.  In
   the case of the CHUID, only the first 8 digits are used. 
 
-* `signingKeyFile=cards/ICAM Card Objects/ICAM_CA_and_Signer/gold_-_PIV_Content_Signer.p12`
+* `signingKeyFile=cards/ICAM_Card_Objects/ICAM_CA_and_Signer/gold_-_PIV_Content_Signer.p12`
 
   This is the content signing key .p12 file used to sign the CBEFF and Security
   Object.
