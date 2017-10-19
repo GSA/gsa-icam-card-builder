@@ -82,7 +82,7 @@ RSAALG=2048
 PREFIX=icam
 TEMP=`getopt -o bws:i:n:t:e:r:p: -l subject-cn:,issuer-cn:,number:,type:,ecc:,rsa:,prefix: -n 'mkcert.sh' -- "$@"`
 eval set -- "$TEMP"
-set -x
+
 # extract options and their arguments into variables.
 while true ; do
     case "$1" in

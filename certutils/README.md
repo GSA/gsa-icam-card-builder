@@ -32,7 +32,7 @@ should *never* be used to create production cards.
 ### Batch Mode Generation
 A batch-mode utility, `makeall.sh` creates the four certificates for all ICAM
 test cards that use the SP 800-73-4 (FIPS 201-2) data model.  It creates the
-PKCS12 `.p12` files and copies them into the appropriate "cards/ICAM Card Objects"
+PKCS12 `.p12` files and copies them into the appropriate "cards/ICAM_Card_Objects"
 directory.  It also creates a standardized file name for software that may be
 hard-coded to look for specific `.p12` file names.
 
