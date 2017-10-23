@@ -85,7 +85,7 @@ sh mkcert.sh -w -b -s ICAM_PIV_Card_Auth_SP_800-73-4 -i ICAM_Test_Card_PIV_Signi
 DEST="../cards/ICAM_Card_Objects/46_Golden_FIPS_201-2_PIV"
 cp data/ICAM_PIV_*SP_800-73-4.p12 "$DEST"
 cp data/pem/ICAM_PIV_*SP_800-73-4.crt "$DEST"
-#renameIn "$DEST" #### echo "Not needed since this is the golden PIV and has no caveats
+renameIn "$DEST"  # Note that it will complain that the PIV Auth cert is the same file.  Let it go.
 # Card 47
 sh mkcert.sh -w -b -s ICAM_PIV_Auth_SP_800-73-4_SAN_Order -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 47 -t piv-auth
 sh mkcert.sh -w -b -s ICAM_PIV_Dig_Sig_SP_800-73-4_SAN_Order -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 47 -t piv-dig-sig

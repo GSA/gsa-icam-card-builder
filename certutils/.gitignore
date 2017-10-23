@@ -1,12 +1,3 @@
 /SDK Card 1/
 /SDK Card 2/
 /SDK Card 3/
-/data/csr/
-/data/csr/*
-/data/pem/
-/data/pem/*
-/data/der/
-/data/der/*
-/data/*pem
-/data/*.p12
-/database/*.old
