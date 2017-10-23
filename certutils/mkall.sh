@@ -34,7 +34,7 @@ renameIn() {
 		F=$(ls ICAM*Card_Auth*.p12)
 		mv $F "6 - $F"
 		cp -p "6 - $F" "$CARD_AUTH_P12_NAME"
-		F=$(ls ICAM*PIV*_Auth*.p12)
+		F=$(ls ICAM*PIV*_Auth*.p12|egrep "PIV_Auth|PIV-I_Auth")
 		mv $F "3 - $F"
 		cp -p "3 - $F" "$PIV_AUTH_P12_NAME"
 		
@@ -47,7 +47,7 @@ renameIn() {
 		F=$(ls ICAM*Card_Auth*.crt)
 		mv $F "6 - $F"
 		cp -p "6 - $F" "$CARD_AUTH_CERT_NAME"
-		F=$(ls ICAM*PIV*_Auth*.crt)
+		F=$(ls ICAM*PIV*_Auth*.crt|egrep "PIV_Auth|PIV-I_Auth")
 		mv $F "3 - $F"
 		cp -p "3 - $F" "$PIV_AUTH_CERT_NAME"
 	popd
