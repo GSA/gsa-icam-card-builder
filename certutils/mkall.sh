@@ -90,6 +90,42 @@ DEST="../cards/ICAM_Card_Objects/41_Re-keyed_Card"
 cp data/ICAM_PIV_*SP_800-73-4_Re-key.p12 "$DEST"
 cp data/pem/ICAM_PIV_*SP_800-73-4_Re-key.crt "$DEST"
 renameIn "$DEST"
+## Card 42
+sh mkcert.sh -w -b -s ICAM_PIV_Auth_SP_800-73-4_OCSP_Expired -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 42 -t piv-auth
+sh mkcert.sh -w -b -s ICAM_PIV_Dig_Sig_SP_800-73-4_OCSP_Expired -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 42 -t piv-dig-sig
+sh mkcert.sh -w -b -s ICAM_PIV_Key_Mgmt_SP_800-73-4_OCSP_Expired -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 42 -t piv-key-mgmt
+sh mkcert.sh -w -b -s ICAM_PIV_Card_Auth_SP_800-73-4_OCSP_Expired -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 42 -t piv-card-auth
+DEST="../cards/ICAM_Card_Objects/42_OCSP_Expired"
+cp data/ICAM_PIV_*SP_800-73-4_OCSP_Expired.p12 "$DEST"
+cp data/pem/ICAM_PIV_*SP_800-73-4_OCSP_Expired.crt "$DEST"
+renameIn "$DEST"
+## Card 43
+sh mkcert.sh -w -b -s ICAM_PIV_Auth_SP_800-73-4_OCSP_Revoked_NOCHECK -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 43 -t piv-auth
+sh mkcert.sh -w -b -s ICAM_PIV_Dig_Sig_SP_800-73-4_OCSP_Revoked_NOCHECK -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 43 -t piv-dig-sig
+sh mkcert.sh -w -b -s ICAM_PIV_Key_Mgmt_SP_800-73-4_OCSP_Revoked_NOCHECK -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 43 -t piv-key-mgmt
+sh mkcert.sh -w -b -s ICAM_PIV_Card_Auth_SP_800-73-4_OCSP_Revoked_NOCHECK -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 43 -t piv-card-auth
+DEST="../cards/ICAM_Card_Objects/43_OCSP_revoked_w_nocheck"
+cp data/ICAM_PIV_*SP_800-73-4_OCSP_Revoked_NOCHECK.p12 "$DEST"
+cp data/pem/ICAM_PIV_*SP_800-73-4_OCSP_Revoked_NOCHECK.crt "$DEST"
+renameIn "$DEST"
+## Card 44
+sh mkcert.sh -w -b -s ICAM_PIV_Auth_SP_800-73-4_OCSP_Revoked_WO_NOCHECK -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 44 -t piv-auth
+sh mkcert.sh -w -b -s ICAM_PIV_Dig_Sig_SP_800-73-4_OCSP_Revoked_WO_NOCHECK -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 44 -t piv-dig-sig
+sh mkcert.sh -w -b -s ICAM_PIV_Key_Mgmt_SP_800-73-4_OCSP_Revoked_WO_NOCHECK -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 44 -t piv-key-mgmt
+sh mkcert.sh -w -b -s ICAM_PIV_Card_Auth_SP_800-73-4_OCSP_Revoked_WO_NOCHECK -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 44 -t piv-card-auth
+DEST="../cards/ICAM_Card_Objects/44_OCSP_revoked_wo_nocheck"
+cp data/ICAM_PIV_*SP_800-73-4_OCSP_Revoked_WO_NOCHECK.p12 "$DEST"
+cp data/pem/ICAM_PIV_*SP_800-73-4_OCSP_Revoked_WO_NOCHECK.crt "$DEST"
+renameIn "$DEST"
+## Card 45
+sh mkcert.sh -w -b -s ICAM_PIV_Auth_SP_800-73-4_OCSP_Invalid_Signature -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 45 -t piv-auth
+sh mkcert.sh -w -b -s ICAM_PIV_Dig_Sig_SP_800-73-4_OCSP_Invalid_Signature -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 45 -t piv-dig-sig
+sh mkcert.sh -w -b -s ICAM_PIV_Key_Mgmt_SP_800-73-4_OCSP_Invalid_Signature -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 45 -t piv-key-mgmt
+sh mkcert.sh -w -b -s ICAM_PIV_Card_Auth_SP_800-73-4_OCSP_Invalid_Signature -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 45 -t piv-card-auth
+DEST="../cards/ICAM_Card_Objects/45_OCSP_Invalid_Signature"
+cp data/ICAM_PIV_*SP_800-73-4_OCSP_Invalid_Signature.p12 "$DEST"
+cp data/pem/ICAM_PIV_*SP_800-73-4_OCSP_Invalid_Signature.crt "$DEST"
+renameIn "$DEST"
 ## Card 46
 sh mkcert.sh -w -b -s ICAM_PIV_Auth_SP_800-73-4 -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 46 -t piv-auth
 sh mkcert.sh -w -b -s ICAM_PIV_Dig_Sig_SP_800-73-4 -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 46 -t piv-dig-sig
