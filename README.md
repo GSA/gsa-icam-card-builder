@@ -33,7 +33,7 @@ To use the tools, unzip the ZIP file `GSA-PIV-Signer-vX.x.xzip` containing
 the scripts, signing application, libraries, configuration files and artifacts.
 
 In conjunction with the signing tool,  we created the objects for eight new ICAM
-test cards, which are refered to as *Gen 3*:
+test cards, which are referred to as *Gen 3*:
 
 |Card Number|Description|
 |:--:|:------------------------|
@@ -41,7 +41,7 @@ test cards, which are refered to as *Gen 3*:
 | 38 | Security Object Hash Mismatch |
 | 39 | Golden FIPS 201-2 Fed PIV-I |
 | 40 | Deprecated |
-| 41 | Re-keyed Card (same FASC-N different certs |
+| 41 | Re-keyed Card (same FASC-N different certs) |
 | 42 | Expired OCSP Response Signer Certificate |
 | 43 | Revoked OCSP Response Signer Certificate, `pkix-ocsp-nocheck` present  |
 | 44 | Revoked OCSP Response Signer Certificate, no `id-pkix-ocsp-nocheck` present |
