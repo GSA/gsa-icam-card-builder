@@ -110,8 +110,8 @@ initial policy set.
 |Digital Signature|2.16.840.1.101.3.2.1.48.251|2.16.840.1.101.3.2.1.48.4|
 |Content Signing|2.16.840.1.101.3.2.1.48.252|2.16.840.1.101.3.2.1.48.80|
 
-The normative reference for these policies can be found at [FPKI CITE](www.idmanagement.gov/wp-content/uploads/sites/1171/uploads/FPKI_CITE_v1_0_4.pdf).
+The normative reference for these policies can be found at [FPKI CITE](https://www.idmanagement.gov/wp-content/uploads/sites/1171/uploads/FPKI_CITE_v1_0_4.pdf).
 
- See the [list of issues](https://github.com/bob-fontana/gsa-piv-signer/issues) for
- more information.
+See the [list of issues](https://github.com/GSA/gsa-icam-card-builder/issues) for
+more information.
  
