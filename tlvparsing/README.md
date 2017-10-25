@@ -10,13 +10,16 @@ If you want to these utilities run on Windows, use Cygwin with Perl installed.
 I have not tested these with ActiveState Perl.  They should also run fine on
 Linux or OS-X.
 ```bash
-  /usr/local/bin binchuid.pl
-  facial.pl
-  finger.pl
+  /usr/local/bin/binchuid.pl
+  /usr/local/bin/facial.pl
+  /usr/local/bin/finger.pl
   /usr/local/bin/text2bin.pl
-  tofascn.pl
-  toraw.pl
+  /usr/local/bin/tofascn.pl
+  /usr/local/bin/toraw.pl
   /usr/local/bin/txtchuid.pl
+```
+The Perl module these utilities use is
+```
   /usr/local/lib/perl/lib/LogParser.pm
 ```
 Perl prerequisite packages that you'll need to pull from CPAN are:
