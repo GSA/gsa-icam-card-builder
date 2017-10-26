@@ -38,7 +38,7 @@ O_default = U.S. Government
 OU = Organizational Unit
 OU_default = ICAM Test Cards
 serialNumber = 200-bit FASC-N (if Card Auth)
-serialNumber_default = D13810D828AB6C10C339E5A1685A08C92ADE0A6184E739C3E7
+serialNumber_default = D13810D828AF2C1084246DA1685828AF0210848D84E739C3EB
 
 [ req_attributes ]
 
@@ -58,5 +58,5 @@ certificatePolicies = ia5org,2.16.840.1.101.3.2.1.48.13
 subjectAltName = @subjectAltName_sect
 
 [ subjectAltName_sect ]
-otherName = 2.16.840.1.101.3.6.6;FORMAT:HEX,OCT:D1:38:10:D8:28:AB:6C:10:C3:39:E5:A1:68:5A:08:C9:2A:DE:0A:61:84:E7:39:C3:E7
-URI = urn:uuid:119f38f9-ca88-49c6-a1f2-5f13b0efcb6d
+otherName = 2.16.840.1.101.3.6.6;FORMAT:HEX,OCT:D1:38:10:D8:28:AF:2C:10:84:24:6D:A1:68:58:28:AF:02:10:84:8D:84:E7:39:C3:EB
+URI = urn:uuid:94e28c68-84db-44db-8a0e-f502d6689b14
