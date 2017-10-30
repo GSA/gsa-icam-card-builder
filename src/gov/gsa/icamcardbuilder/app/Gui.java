@@ -69,7 +69,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 public class Gui extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	protected final static String version = "1.8.12";
+	protected final static String version = "1.8.13";
 	protected static boolean debug = true;
 	protected static Logger logger;
 	protected static String decodedPath;
