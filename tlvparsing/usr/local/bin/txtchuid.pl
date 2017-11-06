@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-## txtchuid.pl v1.5
+## txtchuid.pl v1.6
 # vim: set ts=2 nowrap
 # 
 # Usage: ./txtchuid.pl <File containing CHUID in ASCII Hex> 

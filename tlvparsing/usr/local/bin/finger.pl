@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ##
-# finger.pl v1.5
+# finger.pl v1.6
 # vim: ts=2 nohlsearch nowrapscan
 #
 # Usage: ./finger.pl <File containing CBEFF in binary format> 

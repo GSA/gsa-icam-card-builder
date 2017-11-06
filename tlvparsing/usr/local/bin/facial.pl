@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# facial.pl v1.5
+# facial.pl v1.6
 # vim: ts=2 nohlsearch nowrap
 #
 # Usage: ./facial.pl <File containing facial image CBEFF in binary format> 
