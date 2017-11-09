@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# facial.pl v1.6
+# facial.pl v1.7
 # vim: ts=2 nohlsearch nowrap
 #
 # Usage: ./facial.pl <File containing facial image CBEFF in binary format> 
@@ -33,7 +33,7 @@ sub image_matches($$$) {
 		$headerref = $headers[$i];	
 		@header = @$headerref;
 		$headerlen = scalar @header;
-		for ($j = 0, $k = $index; $j < $headerlen; $j++, $k++) {
+		for ($count = 0, $j = 0, $k = $index; $j < $headerlen; $j++, $k++) {
 			$count++ if ($chars[$k] == $header[$j]);
 		}
 		if ($count == $headerlen) {
@@ -109,7 +109,7 @@ if ($chars[$i] == 0x53) {
 $charslen = scalar @chars;
 if ($chars[$i] == 0xBC) {
 	$container_flag = 1; 
-  	$i++;
+	$i++;
 	$i++;  # Skip (82)
 	print "CBEFF size: " . (($chars[$i++] << 8) | $chars[$i++]) . "\n";
 }
@@ -216,26 +216,35 @@ print "Quality.............................." . (($chars[$i++] << 8) | $chars[$i
 
 print "---- Image Data ----\n";
 
-my %types = (-1 => "Unknown", 0 => "JPEG", 1 => "JPEG 2000");
+my %types = (-1 => "Unknown", 0 => "JPEG", 1 => "JPEG 2000", 2 => "JPEG 2000");
+
+# Here we map actual image data type found in the image to the Image Information->Image Data Type
+my %idt_hash = (0 => 0, 1 => 1, 2 => 1);
 
 # Create arrays of all magic bytes we will be looking for
 
+# JPEG
 my @jpheader = (0xFF, 0xD8);
+
+# JPEG2000 still
 my @jp2header = (0x00, 0x00, 0x00, 0x0c, 0x6a, 0x50, 0x20, 0x20, 0x0d, 0x0a, 0x87, 0x0a);
+
+# JPEG2000 codestream
+my @jp2000header = (0xff, 0x4f, 0xff, 0x51);
 
 # Stick them all in an array
 
-my @headers = (\@jpheader, \@jp2header);
+my @headers = (\@jpheader, \@jp2header, \@jp2000header);
 
 # See what type they match
 
 my $actualtype = image_matches(\@headers, \@chars, $i);
 
-if ($actualtype != $imagedtype) {
+if ($imagedtype != $idt_hash{$actualtype}) {
 	print ">>> Error: Image Data Type ($types{$actualtype}) doesn't match Image Data Type ($types{$imagedtype}) <<<\n";
 }
 
-my $imageext = ($actualtype == 0) ? ".jpg" : ($actualtype == 1) ? ".jp2" : ".dat";
+my $imageext = ($actualtype == 0) ? ".jpg" : ($actualtype == 1) ? ".jp2" : ($actualtype == 2) ? ".jpeg2000" : ".dat";
 
 my $imagelength = 0;
 
@@ -292,7 +301,9 @@ binmode $outfile;
 my $sblen_counted = 0;
 
 # Account for Error Detection tag, since we saw the 0xBC earlier
-my $nbytes = ($container_flag == 1) ? $charslen - 2 : $charslen + 2;
+# If the 0xBC exists, then expect to find the Error Detection Code 0xFE00
+
+my $nbytes = ($container_flag == 1) ? $charslen - 2 : $charslen + 0;
 
 for ( ; $i < $nbytes; $i++, $sblen_counted++) {
 	$unencoded .= sprintf "%02X", $chars[$i];
@@ -302,8 +313,10 @@ if ($sblen_counted != $sblen) {
 	print ">>> Error: Actual SB length ($sblen_counted) doesn't match header ($sblen) <<<\n";
 }
 
-if ($chars[$i++] != 0xFE) {
-	print ">>> Warning: No Error Detection Code <<<\n";
+if ($container_flag == 1 && $i < scalar @chars) {
+	if ($chars[$i++] != 0xFE) {
+		print ">>> Warning: No Error Detection Code <<<\n";
+	}
 }
 
 close $outfile;

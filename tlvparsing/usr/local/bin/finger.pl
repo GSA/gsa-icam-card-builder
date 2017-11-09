@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ##
-# finger.pl v1.6
+# finger.pl v1.7
 # vim: ts=2 nohlsearch nowrapscan
 #
 # Usage: ./finger.pl <File containing CBEFF in binary format> 
@@ -244,16 +244,22 @@ binmode $outfile;
 my $sblen_counted = 0;
 
 # Account for Error Detection tag, since we saw the 0xBC earlier
-my $nbytes = ($container_flag == 1) ? $charslen - 2 : $charslen + 2;
+# If the 0xBC exists, then expect to find the Error Detection Code 0xFE00
+
+my $nbytes = ($container_flag == 1) ? $charslen - 2 : $charslen + 0;
 
 for ( ; $i < $nbytes; $i++, $sblen_counted++) {
 	$unencoded .= sprintf "%02X", $chars[$i];
 	print $outfile chr($chars[$i]);
 }
-close $outfile;
-
 if ($sblen_counted != $sblen) {
 	print ">>> Error: Actual SB length ($sblen_counted) doesn't match header ($sblen) <<<\n";
+}
+
+if ($container_flag == 1 && $i < scalar @chars) {
+	if ($chars[$i++] != 0xFE) {
+		print ">>> Warning: No Error Detection Code <<<\n";
+	}
 }
 
 $octets = pack ("H*", $unencoded);
