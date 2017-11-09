@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# facial.pl v1.7
+# facial.pl v1.7.1
 # vim: ts=2 nohlsearch nowrap
 #
 # Usage: ./facial.pl <File containing facial image CBEFF in binary format> 
@@ -244,7 +244,7 @@ if ($imagedtype != $idt_hash{$actualtype}) {
 	print ">>> Error: Image Data Type ($types{$actualtype}) doesn't match Image Data Type ($types{$imagedtype}) <<<\n";
 }
 
-my $imageext = ($actualtype == 0) ? ".jpg" : ($actualtype == 1) ? ".jp2" : ($actualtype == 2) ? ".jpeg2000" : ".dat";
+my $imageext = ($actualtype == 0) ? ".jpg" : ($actualtype == 1) ? ".jp2" : ($actualtype == 2) ? ".jp2k" : ".dat";
 
 my $imagelength = 0;
 
@@ -275,7 +275,7 @@ print MIME::Base64::encode($octets);
 
 # Create a renderable image file
 
-print "***** Image Data *****\n";
+print "***** " . $types{$actualtype} ." Image Data *****\n";
 
 $unencoded = "";
 $outname = basename("$ARGV[0]", ".bin") . "$imageext";
