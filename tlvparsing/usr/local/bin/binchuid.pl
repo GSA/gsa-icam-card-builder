@@ -18,7 +18,6 @@ my $octets;
 my $validtag;
 my $encoded;
 my @chars = ();
-my $charslen = 0;
 my $hashable = "";
 
 # Check args
@@ -59,7 +58,6 @@ $/ = $oldfs;
 # Convert the string to an array of 1-byte strings
 
 @chars = unpack('C*', $octets);
-$charslen = scalar @chars;
 
 # Parse the CHUID
 
@@ -67,22 +65,23 @@ my $i = 0;
 my $j = 0;
 my $tag = 0;
 my $len = 0;
-my $container_flag = 0;
+
 #
 # Deal with TLV header, if present
 #
 if ($chars[$i] == 0x53) {
 	my ($tag, $length, @value) = tlvparse (\@chars);
 	@chars = @value;
-	# Now, @chars should start with 0xBC
+	# Now, @chars should start with a FASC-N tag
 }
+
+my $charslen = scalar @chars;	
 
 do {
 	$tag = $chars[$i];
 	if ($tag == 0xEE) { #EE02F905
-		$hashable .= chr($chars[$i++]) . chr($chars[$i]);
-		$len = $chars[$i++]; print "EE - Buffer Length (Deprecated) (2 + $len)\n"; 
-		output_value ($i, $len, "$bname.Buffer_Length", \@chars, $octets, \$hashable, 0);
+		$i++; $len = $chars[$i++]; print "EE - Buffer Length (Deprecated and not counted in signature) ($len)\n"; 
+		output_value ($i, $len, "$bname.Buffer_Length", \@chars, $octets, undef, 0);
 		print ">>> Error: Deprecated tag 0xEE <<<\n";
 	} elsif ($tag == 0x30) {
 		$hashable .= chr($chars[$i++]) . chr($chars[$i]);
@@ -90,11 +89,11 @@ do {
 		output_value ($i, $len, "$bname.FASC-N", \@chars, $octets, \$hashable, 0);
 	} elsif ($tag == 0x32) {
 		$hashable .= chr($chars[$i++]) . chr($chars[$i]);
-		$len = $chars[$i++]; print "32 - Organizational Identifier (2 + $len)\n";
+		$len = $chars[$i++]; print "32 - Organizational Identifier (Deprecated) (2 + $len)\n";
 		output_value ($i, $len, "$bname.Organizational_Identifier", \@chars, $octets, \$hashable, 0);
 	} elsif ($tag == 0x33) {
 		$hashable .= chr($chars[$i++]) . chr($chars[$i]);
-		$len = $chars[$i++]; print "33 - DUNS (Optional) (2 + $len)\n";
+		$len = $chars[$i++]; print "33 - DUNS (Deprecated) (2 + $len)\n";
 		output_value ($i, $len, "$bname.DUNS", \@chars, $octets, \$hashable, 0);
 	} elsif ($tag == 0x34) {
 		$hashable .= chr($chars[$i++]) . chr($chars[$i]);
@@ -109,7 +108,7 @@ do {
 		$len = $chars[$i++]; print "36 - Cardholder UUID (Optional) (2 + $len)\n";
 		output_value ($i, $len, "$bname.Cardholder_UUID", \@chars, $octets, \$hashable, 0);
 	} elsif ($tag == 0x3D) {
-		$i++; $len = $chars[$i++]; print "3D - Deprecated (2 + $len)\n"; 
+		$i++; $len = $chars[$i++]; print "3D - Authentication Key Map (Deprecated) (2 + $len)\n"; 
 		output_value ($i, $len, undef, \@chars, $octets, undef, 0);
 		print ">>> Error: Deprecated tag 0x3D <<<\n";
 	} elsif ($tag == 0x3E) {
@@ -121,7 +120,9 @@ do {
 		$len = $chars[$i++]; print "FE - Error Detection code (2 + $len)\n"; 
 		output_value ($i, $len, "$bname.Error_Detection_Code", \@chars, $octets, \$hashable, 0);
 	} else {
-		die "Unknown tag ($tag)\n";
+		$i++; $len = $chars[$i++]; printf "%02X - Unknown tag (2 + $len)\n", $tag; 
+		output_value ($i, $len, "$bname.Unknown_Tag" . (sprintf "%2X", $tag), \@chars, $octets, \$hashable, 0);
+		printf ">>> Error: Unknown tag 0x%02X <<<\n", $tag;
 	}
 	$i += $len;
 } while ($i < $charslen);
