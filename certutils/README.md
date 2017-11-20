@@ -3,22 +3,7 @@ There are two utilities in this directory.  The purpose, usage instructions and
 other information is provided in the following sections. 
 
 These utilities are to be run in a Linux, MAC OS X, or Cygwin environment only.
-There is currently no DOS Command Window or Windows Power Shell equivalent.  If
-you use Cygwin, ensure that your Cygwin installation includes all available 
-Perl packages, and that your Perl installation has the `Date::Calc` module. 
-Normally, `Date::Calc` is part of the standard Perl installation.
-
-To test whether your installation includes `Date::Calc`, type the folllowing
-command:
-
-`perl -e 'use Date::Calc;'`
-
-If no error occurs, an empty line will be output.  If an error occurs, you'll
-see a message beginning with `Can't locate Data/Calc.pm in @INC...`  The `mkcert.sh`
-utility uses this package to compute how many days the certificates should be
-valid if the certificate is to expire on December 2, 2032.  Of course, you can
-change this by editing the script and locating the line that begins with
-`duration=`.
+There is currently no DOS Command Window or Windows Power Shell equivalent.
 
 ### Purpose
 In order to customize the certificates to create certain test case scenarios,
@@ -53,6 +38,11 @@ issuer RDN component. The issuer CN should correspond to an existing signing CA 
 which already exists in the `data` directory.  Omit the `.p12` extension on the
 `sh mkcert.sh` command line.
 
+`mkcert.sh` can also create content signer certs by specifying specifying any
+`-t` parameter that begins with `piv-content-signer` or `pivi-content-signer`. 
+It will attempt to match your `-t` parameter with the configuration file, so you can
+support multiple content signer certs as in `piv-content-signer-gen1` or 
+`pivi-content-signer-gen3`.
 
 By studying the command structure, you can tailor additional certificates by creating
 your own  OpenSSL configuration files and executing your customized `mkcert.sh` 

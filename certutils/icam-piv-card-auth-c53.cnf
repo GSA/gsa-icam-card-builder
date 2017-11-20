@@ -65,10 +65,10 @@ caIssuers;URI.3 = ldap://some.wierd.ldap4.server.gov/ou=ICAM Test Cards, o=U.S. 
 OCSP;URI.0 = http://ocsp.apl-test.cite.fpki-lab.gov/
 
 [ crldp_sect ]
-URI.0 = http://http.apl-test.cite.fpki-lab.gov/crls/ICAMTestCardSigningCA.crl
-URI.1 = http://http.apl1-test.cite.fpki-lab.gov/crls/ICAMTestCardSigningCA.crl
-URI.2 = http://http.apl3-test.cite.fpki-lab.gov/crls/ICAMTestCardSigningCA.crl
-URI.3 = http://http.apl4-test.cite.fpki-lab.gov/crls/ICAMTestCardSigningCA.crl
+URI.0 = http://http.apl-test.cite.fpki-lab.gov/crls/ICAMTestCardGen3SigningCA.crl
+URI.1 = http://http.apl1-test.cite.fpki-lab.gov/crls/ICAMTestCardGen3SigningCA.crl
+URI.2 = http://http.apl3-test.cite.fpki-lab.gov/crls/ICAMTestCardGen3SigningCA.crl
+URI.3 = http://http.apl4-test.cite.fpki-lab.gov/crls/ICAMTestCardGen3SigningCA.crl
 
 
 [ subjectAltName_sect ]
