@@ -680,7 +680,7 @@ public class ContentSignerTool {
 	 * 
 	 * @param properties
 	 *            Hashtable of application properties from Gui
-	 * @throw NoSuchPropertyException
+	 * @throws NoSuchPropertyException if a property doesn't exist or is misspelled
 	 */
 	private void getProperties(Hashtable<String, String> properties) throws NoSuchPropertyException {
 		try {
@@ -712,7 +712,7 @@ public class ContentSignerTool {
 	 *            bytes from content file
 	 * @return a Hashtable of CCC tags (keys) and values
 	 */
-	private LinkedHashMap<Byte, byte[]> getCccContents(byte[] contentFileBytes2) {
+	private LinkedHashMap<Byte, byte[]> getCccContents(byte[] contentFileBytes) {
 		LinkedHashMap<Byte, byte[]> tagsValues = new LinkedHashMap<Byte, byte[]>();
 		int tagPosArray[] = new int[1];
 		tagPosArray[0] = 0;
@@ -860,7 +860,7 @@ public class ContentSignerTool {
 	/**
 	 * Loads the a private key from a .p12 file and populates a class field.
 	 * 
-	 * @param keyFile
+	 * @param keyFilePath
 	 *            the .p12 file
 	 * @param passcode
 	 *            the passcode to the .p12 file
@@ -868,22 +868,30 @@ public class ContentSignerTool {
 	 * @throws
 	 *            KeystoreException if a problem occurs while trying to access the keystore
 	 */
-	private X509Certificate loadPrivateKeyAndCert(String keyFile, char[] passcode) throws KeystoreException {
+	private X509Certificate loadPrivateKeyAndCert(String keyFilePath, char[] passcode) throws KeystoreException {
 		KeyStore ks = null;
-		Exception e = null;
 		X509Certificate signingCert = null;
-		try {
-			ks = KeyStore.getInstance("PKCS12");
-			ks.load(new FileInputStream(signingKeyFile), passcode);
-			signingCert = (X509Certificate) ks.getCertificate(keyAlias);
-			this.privateKey = (PrivateKey) ks.getKey(keyAlias, passcode);
-			if (signingCert == null || privateKey == null) {
-				e = new KeystoreException ("Error accessing keystore '" + keyFile + "'", ContentSignerTool.class.getName());
+		File file = new File(keyFilePath);
+
+		if(file.exists() && !file.isDirectory()) { 
+			try {
+				ks = KeyStore.getInstance("PKCS12", bc);
+				FileInputStream fis = new FileInputStream(keyFilePath);
+				ks.load(fis, passcode);
+				if ((signingCert = (X509Certificate) ks.getCertificate(keyAlias)) != null) {	
+					if ((this.privateKey = (PrivateKey) ks.getKey(keyAlias, passcode)) == null) {
+						throw new KeystoreException ("Cannot load private key from '" + keyFilePath + "'", ContentSignerTool.class.getName());
+					}
+				} else {
+					throw new KeystoreException ("Cannot load certificate from '" + keyFilePath + "'", ContentSignerTool.class.getName());
+				}
+			} catch (Exception x) {
+				if (!(x instanceof KeystoreException))
+					throw new KeystoreException (x.getMessage(), ContentSignerTool.class.getName());
 			}
-		} catch (Exception x) {
-			if (e != null)
-				throw new KeystoreException (x.getMessage(), ContentSignerTool.class.getName());
-			return null;
+		}
+		else {
+			throw new KeystoreException ("Cannot open '" + keyFilePath + "'", ContentSignerTool.class.getName());
 		}
 		return signingCert;
 	}

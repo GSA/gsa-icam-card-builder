@@ -69,7 +69,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 public class Gui extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	protected final static String version = "1.8.15";
+	protected final static String version = "1.8.16";
 	protected static boolean debug = true;
 	protected static Logger logger;
 	protected static String decodedPath;
@@ -274,6 +274,8 @@ public class Gui extends JPanel {
 				progress.setValue(0);
 				if (signingCount > 0)
 					status.append("***************************************************************************\n");
+				status.append(dateFormat.format(new Date()) + " - ");
+				status.append("Config: " + propertiesFile.getName() + "\n");
 				status.append(dateFormat.format(new Date()) + " - Applying signature (" + ++signingCount + ").\n");
 				checkRevocation = revocationCheckBoxMenuItem.isSelected();
 				progress.setValue(8);
@@ -766,9 +768,9 @@ public class Gui extends JPanel {
 	}
 
 	private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {
-		File dir = new File(currentDirectory + File.pathSeparator + "config");
+		File dir = new File(currentDirectory + "cards" + File.separator + "ICAM_Card_Objects");
 		if (dir.exists()) {
-			currentDirectory += File.pathSeparator + "config";
+			currentDirectory += "cards" + File.separator + "ICAM_Card_Objects";
 		}
 			
 		contentFileChooser.setCurrentDirectory(new File(currentDirectory));
@@ -805,13 +807,13 @@ public class Gui extends JPanel {
 	private void openPropertiesFileActionPerformed(java.awt.event.ActionEvent evt) {
 		
 		if (!located) {
-			File dir = new File(currentDirectory + File.separator + "config");
+			File dir = new File(currentDirectory + "cards" + File.separator + "ICAM_Card_Objects");
 			if (dir.exists()) {
-				currentDirectory += "config\\";
+				currentDirectory +=  "cards" + File.separator + "ICAM_Card_Objects";
 				located = true;
 			}
 		}
-			
+		propertiesFileChooser.setPreferredSize(new Dimension(840, 500));
 		propertiesFileChooser.setFileFilter(new FileNameExtensionFilter("Properties Files", new String[] { "properties" }));
 		propertiesFileChooser.setCurrentDirectory(new File(currentDirectory));
 		int returnVal = propertiesFileChooser.showOpenDialog(frame);

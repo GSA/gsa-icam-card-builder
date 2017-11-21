@@ -148,7 +148,7 @@ public class Utils {
 	 * @param s
 	 *            the string to be converted
 	 * @return a byte array containing bytes as represented by argument s
-	 * @throws InvalidDataFormatException
+	 * @throws InvalidDataFormatException if an bad date format is encountered
 	 */
 	public static byte[] hexStringToByteArray(String s) throws InvalidDataFormatException {
 		int len = s.length();
@@ -169,6 +169,7 @@ public class Utils {
 	 * @param singleByte
 	 *            the byte to be converted
 	 * @return string of length two bytes representing the byte singleByte
+	 * @throws InvalidDataFormatException if a byte can't be converted 
 	 */
 	public static String byteToHex(byte singleByte) throws InvalidDataFormatException {
 		char[] hexChars = new char[2];

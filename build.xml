@@ -8,7 +8,6 @@
 		<mkdir dir="${dir.distro}" />
 		<mkdir dir="${dir.distro}/lib/" />
 		<mkdir dir="${dir.distro}/cards/" />
-		<mkdir dir="${dir.distro}/config/" />
 		<mkdir dir="${dir.distro}/doc/" />
 		<mkdir dir="${dir.distro}/logs/" />
 		<mkdir dir="${dir.distro}/certutils/" />
@@ -34,11 +33,6 @@
 		<copy todir="${dir.distro}/lib">
 			<fileset dir="${dir.buildfile}/lib">
 				<include name="**/*.jar" />
-			</fileset>
-		</copy>
-		<copy todir="${dir.distro}/config">
-			<fileset dir="${dir.buildfile}/config">
-				<include name="**/*.properties" />
 			</fileset>
 		</copy>
 		<copy todir="${dir.distro}/lib">
@@ -123,7 +117,6 @@
 			<zipfileset dir="${dir.buildfile}/src/" prefix="src/" />
 			<zipfileset dir="${dir.buildfile}/cards/" prefix="cards/" />
 			<zipfileset dir="${dir.buildfile}/certutils/" prefix="certutils/" />
-			<zipfileset dir="${dir.buildfile}/config/" prefix="config/" />
 			<zipfileset dir="${dir.buildfile}/doc/" prefix="doc/" />
 			<zipfileset dir="${dir.buildfile}/lib/" prefix="lib/" />
 			<zipfileset dir="${dir.buildfile}/logs/" prefix="log/" />

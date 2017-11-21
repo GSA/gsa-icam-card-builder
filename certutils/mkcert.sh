@@ -321,7 +321,7 @@ cat \
 
 chmod 644 pem/$(basename $EE_P12 .p12).pem
 
-NAME=pem/$(basename $EE_P12 .p12 | sed 's/[&_]/ /g')
+NAME=$(basename $EE_P12 .p12 | sed 's/[&_]/ /g')
 
 if [ $WIN32 = 1 ]; then
 	openssl pkcs12 \

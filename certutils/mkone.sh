@@ -108,3 +108,21 @@
 #cp data/ICAM_NFI_PIV-I*SP_800-73-4.p12 "$DEST"
 #cp data/pem/ICAM_NFI_PIV-I*SP_800-73-4.crt "$DEST"
 #renameIn "$DEST"
+
+## Content signer
+sh mkcert.sh -b -s ICAM_Test_Card_PIV_Content_Signer_-_gold_gen3 -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -t piv-content-signer-gen3 || exit $?
+DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
+cp -p data/ICAM_Test_Card_PIV_Content_Signer_-_gold_gen3.p12 "$DEST"
+cp -p data/pem/ICAM_Test_Card_PIV_Content_Signer_-_gold_gen3.crt "$DEST"
+
+## CVC Certificate signer
+sh mkcert.sh -b -s ICAM_Test_Card_PIV_Intermediate_CVC_Signer_-_gold_gen3 -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -t piv-content-signer-gen3 || exit $?
+DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
+cp -p data/ICAM_Test_Card_PIV_Intermediate_CVC_Signer_-_gold_gen3.p12 "$DEST"
+cp -p data/pem/ICAM_Test_Card_PIV_Intermediate_CVC_Signer_-_gold_gen3.crt "$DEST"
+
+## RSA-signed P-256 SMCS
+sh mkcert.sh -b -s ICAM_Test_Card_PIV_RSA_issued_P-256_Secure_Messaging_Certificate_Signer_1 -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -t piv-content-signer-gen3 || exit $?
+DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
+cp -p data/ICAM_Test_Card_PIV_RSA_issued_P-256_Secure_Messaging_Certificate_Signer_1.p12 "$DEST"
+cp -p data/pem/ICAM_Test_Card_PIV_RSA_issued_P-256_Secure_Messaging_Certificate_Signer_1.crt "$DEST"
