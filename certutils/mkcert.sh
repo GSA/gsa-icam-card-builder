@@ -234,6 +234,11 @@ fi
 EE_P12=$FCN.p12
 SCA_P12=$ISSUER.p12
 
+NAME=$(basename $EE_P12 .p12 | sed 's/[&_]/ /g')
+echo
+echo "**************************** $NAME ******************************"
+echo
+
 # Get the signer private and public keys
 
 openssl pkcs12 \
@@ -320,8 +325,6 @@ cat \
 	>pem/$(basename $EE_P12 .p12).pem
 
 chmod 644 pem/$(basename $EE_P12 .p12).pem
-
-NAME=$(basename $EE_P12 .p12 | sed 's/[&_]/ /g')
 
 if [ $WIN32 = 1 ]; then
 	openssl pkcs12 \

@@ -37,7 +37,7 @@ O_default = U.S. Government
 OU = Organizational Unit
 OU_default = ICAM Test Cards
 CN = Common Name
-CN_default = ICAM Content Signer Gen3
+CN_default = ICAM Test Card Content Signer Gen3
 emailAddress = E-Mail Address
 emailAddress_default = icam.test.cards@gsa.gov
 

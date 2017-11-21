@@ -37,7 +37,7 @@ O_default = U.S. Government
 OU = Organizational Unit
 OU_default = ICAM Test Cards
 CN = Common Name
-CN_default = ICAM Key Mgmt SP 800-73-4 OCSP Revoked NOCHECK
+CN_default = ICAM Test Card Key Mgmt SP 800-73-4 OCSP Revoked NOCHECK
 emailAddress = E-Mail Address
 emailAddress_default = icam.test.cards@gsa.gov
 

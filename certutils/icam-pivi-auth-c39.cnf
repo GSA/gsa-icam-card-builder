@@ -37,7 +37,7 @@ O_default = U.S. Government
 OU = Organizational Unit
 OU_default = ICAM Test Cards
 CN = Common Name (if Authentication)
-CN_default = ICAM Fed PIV-I Auth SP 800-73-4
+CN_default = ICAM Test Card PIV-I Auth Fed SP 800-73-4
 
 [ req_attributes ]
 

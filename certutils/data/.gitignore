@@ -1,8 +1,7 @@
 /csr/
-/csr/*
+/csr/*.csr
 /der/
 /der/*
-/pem/*
 *.pem
 *.p12
 *.crt
