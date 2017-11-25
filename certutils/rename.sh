@@ -46,7 +46,7 @@ renameIn () {
 		fi
 		COPY=1
 		if [ z"$3" != "z" ]; then
-			# This handles .P12s that don't need to be named per the IMEDIA tool
+			# This handles .P12s that don't need to be named per the old populator tool
 			if [ $3 -eq 0 ]; then
 				COPY=0
 			fi
