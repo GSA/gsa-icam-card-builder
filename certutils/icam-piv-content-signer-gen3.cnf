@@ -1,20 +1,26 @@
-[ ca ]
-default_ca = ca_default
-
-[ ca_default ]
+[ default]
 dir = .
-database = database/index.txt 
+new_certs_dir = $dir
+database = ${dir}/database/index.txt 
 unique_subject = no
-new_certs_dir = .
-private_key = pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.private.pem 
-certificate = pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt 
-name_opt = ca_default
+name_opt = utf8
 x509_extensions = ee_ext
 default_days = 2190 
 default_md = sha256
 serial = database/serial
 policy = policy_match
 email_in_dn = no
+
+[ ca ]
+default_ca = ca_rsa2048
+
+[ ca_rsa2048 ]
+private_key = ${dir}/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.private.pem 
+certificate = ${dir}/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt 
+
+[ ca_secp384r1 ]
+private_key = ${dir}/pem/ICAM_Test_Card_PIV_P-384_Signing_CA_gold_gen3.private.pem
+certificate = ${dir}/pem/ICAM_Test_Card_PIV_P-384_Signing_CA_gold_gen3.crt
 
 [ policy_match ]
 C = match
@@ -37,7 +43,7 @@ O_default = U.S. Government
 OU = Organizational Unit
 OU_default = ICAM Test Cards
 CN = Common Name
-CN_default = ICAM Test Card Content Signer Gen3
+CN_default = $ENV::CN
 emailAddress = E-Mail Address
 emailAddress_default = icam.test.cards@gsa.gov
 

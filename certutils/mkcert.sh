@@ -1,13 +1,19 @@
 #!/usr/bin/bash
 #
-# Usage: mkcert.sh [-b] [-w] -s subjectDN -i issuerDN [-n cardnumber]
-#   -t <piv-auth|piv-card-auth|pivi-auth|pivi-card-auth|
+# Usage: mkcert.sh 
+#   -s|--subject subjectDN 
+#   -i|--issuer issuerDN 
+#   -t|--type <piv-auth|piv-card-auth|pivi-auth|pivi-card-auth|
 #       piv-dig-sig|pivi-dig-sig|piv-key-mgmt|pivi-key-mgmt|
 #       piv-key-hist1..20|pivi-key-hist1..20|
-#       piv-content-signer|pivi-content-signer>
-#   -e [prime256v1|secp384r1]
-#   -r [1024|2048|3072|4096]
-#   -p [prefix]
+#       piv-content-signer*|pivi-content-signer*>
+#   [-b|--batch] 
+#   [-w|--win32] 
+#   [-n|--number cardnumber]
+#   [-e|--ecc prime256v1|secp384r1]
+#   [-r|--rsa 1024|2048|3072|4096]
+#   [-p|--prefix prefix]
+#   [-c|--cakey rsa2048|secp384r1]
 #
 WHERE="
   Where:
@@ -45,6 +51,8 @@ WHERE="
    ECC-based certs.
 
    -p prefix the prefix to the coniguration file name.  Default is \"icam\".
+
+   -c cakey the CA key length/type used to sign the request.  Default is \"rsa2048\".
 "
 
 function usage() {
@@ -54,6 +62,7 @@ function usage() {
 	echo "  [-e prime256v1|secp384r1]"
 	echo "  [-r 1024|2048|3072|4096]"
 	echo "  [-p prefix]"
+	echo "  [-c rsa2048|secp384r1]"
 	echo "$WHERE"
 	echo "Exiting with exit code $1"
 	exit $1
@@ -65,9 +74,9 @@ function cleanup() {
 }
 
 function error() {
-	cmd = ${1}
-	error = ${2}
-	echo "$cmd: $error.  Exiting."
+	CMD = ${1}
+	ERROR = ${2}
+	echo "$CMD: $ERROR.  Exiting."
 	exit 2
 }
 
@@ -86,96 +95,102 @@ WIN32=0
 ECCALG=prime256v1
 RSAALG=2048
 PREFIX=icam
-TEMP=`getopt -o bws:i:n:t:e:r:p: -l subject-cn:,issuer-cn:,number:,type:,ecc:,rsa:,prefix: -n 'mkcert.sh' -- "$@"`
+CAKEY=default
+TEMP=`getopt -o bws:i:n:t:e:r:p:c: -l subject-cn:,issuer-cn:,number:,type:,ecc:,rsa:,prefix:,cakey: -n 'mkcert.sh' -- "$@"`
 eval set -- "$TEMP"
 
 # extract options and their arguments into variables.
 while true ; do
-    case "$1" in
-        -b|--batch)
-            case "$2" in
-                *) BATCH=1 ; shift 1 ;;
-            esac ;;
-        -w|--win32)
-            case "$2" in
-                *) WIN32=1 ; shift 1 ;;
-            esac ;;
-        -s|--subject-cn)
-            case "$2" in
-                *) CN=$2 ; shift 2 ;;
-            esac ;;
-        -i|--issuer-p12) 
-            case "$2" in
-                *) ISSUER=$2 ; shift 2 ;;
-            esac ;;
-        -n|--number) 
-            case "$2" in
-                *) NUMBER=$2 ; shift 2 ;;
-            esac ;;
+	case "$1" in
+		-b|--batch)
+			case "$2" in
+				*) BATCH=1 ; shift 1 ;;
+			esac ;;
+		-w|--win32)
+			case "$2" in
+				*) WIN32=1 ; shift 1 ;;
+			esac ;;
+		-s|--subject-cn)
+			case "$2" in
+				*) SUBJCN=$2 ; shift 2 ;;
+			esac ;;
+		-i|--issuer-p12) 
+			case "$2" in
+				*) ISSUER=$2 ; shift 2 ;;
+			esac ;;
+		-n|--number) 
+			case "$2" in
+				*) NUMBER=$2 ; shift 2 ;;
+			esac ;;
 		-e|--ecc) 
-            case "$2" in
-                *) ECCALG=$2 ; KEY=ECC; shift 2 ;;
-            esac ;;
-        -r|--rsa) 
-            case "$2" in
-                *) RSAALG=$2 ; KEY=RSA; shift 2 ;;
-            esac ;;
-        -p|--prefix) 
-            case "$2" in
-                *) PREFIX=$2 ; shift 2 ;;
-            esac ;;
-        -t|--type)
-            case "$2" in
-                piv-auth|piv-card-auth|pivi-auth|pivi-card-auth| \
+			case "$2" in
+				prime256v1|secp384r1) ECCALG=$2 ; KEY=ECC; shift 2 ;;
+				*) usage 1 ;;
+			esac ;;
+		-r|--rsa) 
+			case "$2" in
+				1024|2048|3072|4096) RSAALG=$2; KEY=RSA; shift 2 ;;
+				*) usage 1 ;;
+			esac ;;
+		-t|--type)
+			case "$2" in
+				piv-auth|piv-card-auth|pivi-auth|pivi-card-auth| \
 				piv-dig-sig|piv-key-mgmt|pivi-dig-sig|pivi-key-mgmt| \
 				piv-key-hist*|pivi-key-hist*|piv-*-signer*|pivi-*-signer*) TYPE=$2 ; shift 2 ;;
-                *) usage 1 ;;
-            esac ;;
-        --) shift ; break ;;
-        *) echo "Internal error!" ; exit 1 ;;
-    esac
+				*) usage 1 ;;
+			esac ;;
+		-p|--prefix) 
+			case "$2" in
+				*) PREFIX=$2 ; shift 2 ;;
+			esac ;;
+		-c|--cakey) 
+			case "$2" in
+				rsa2048|secp384r1) CAKEY=$2 ; shift 2 ;;
+				*) usage 1 ;;
+			esac ;;
+		--) shift ; break ;;
+		*) echo "Internal error!" ; exit 1 ;;
+	esac
 done
 
 # Mandatory values must be supplied on the command line
 
-if [ z"$CN" = "z" -o z"$ISSUER" == "z" -o z"$TYPE" == "z" ]; then
+if [ z"$SUBJCN" = "z" -o z"$ISSUER" == "z" -o z"$TYPE" == "z" ]; then
 	usage 2
 fi
 
 # FCN is the file name with spaces and other wierd characters converted to "_"
 
-FCN=$(cleanup "$CN")
+FCN=$(cleanup "$SUBJCN")
 ISSUER=$(cleanup "$ISSUER")
 TYPE=$(echo $TYPE | tr "[:upper:]" "[:lower:]")
+
+# End dates of certificates need to be nested
+
+if [ $(expr $TYPE : ".*-signer") -ge 7 ]; then
+	CNF="$(pwd)/$PREFIX-$TYPE.cnf"
+	STARTDATE=171202000000Z
+	ENDDATE=321230235959Z
+else
+	CNF="$(pwd)/$PREFIX-$TYPE-c$NUMBER.cnf"
+	STARTDATE=171202000000Z
+	ENDDATE=321201235959Z
+fi
+
+if [ ! -f "$CNF" ]; then
+	echo "$CNF was not found.  Exiting."
+	exit 4
+fi
 
 if [ ! -d data ]; then
 	echo "Data directory 'data' does not exist.  Creating."
 	mkdir -p data || error mkdir $?
+	mkdir -p data/pem || error mkdir $?
+	mkdir -p data/database || error mkdir $?
+	mkdir -p data/csr || error mkdir $?
 fi
-
-OWD=$(pwd)
 
 pushd data
-
-if [ $(expr $TYPE : ".*-signer") -ge 7 ]; then
-	CNF="$OWD/$PREFIX-$TYPE.cnf"
-	STARTDATE=20171118000000Z
-	ENDDATE=20321230235959Z
-else
-	CNF="$OWD/$PREFIX-$TYPE-c$NUMBER.cnf"
-	STARTDATE=20171118000000Z
-	ENDDATE=20321201235959Z
-fi
-
-mkdir -p pem || error mkdir $?
-mkdir -p database || error mkdir $?
-mkdir -p csr || error mkdir $?
-mkdir -p der || error mkdir $?
-
-if [ ! -f "$CNF" ]; then
-	echo "$CNF was not found.  Exiting."
-	exit 3
-fi
 
 if [ z$TYPE == "zpiv-auth" -o z$TYPE == "zpivi-auth" ]; then
 	CN=$(grep CN_default "$CNF" | sed 's/^.*=\s*//g')
@@ -198,16 +213,11 @@ elif [[ z$TYPE == "zpiv-key-hist"* ]] || [[ z$TYPE* == "zpivi-key-hist"* ]]; the
 	SUBJ="/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=$CN"
 	if [ z"$ECCALG" == "z" ]; then KEY=RSA; fi
 elif [[ z$TYPE == "zpiv-content"* ]] || [[ z$TYPE* == "zpivi-content"* ]]; then
-	CN=$(grep CN_default "$CNF" | sed 's/^.*=\s*//g')
+	CN=$(echo $SUBJCN | sed 's/_/ /g')
 	SUBJ="/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=$CN"
 	if [ z"$ECCALG" == "z" ]; then KEY=RSA; fi
 else
 	usage 3
-fi
-
-if [ ! -f $2 ]; then
-	echo "$2 was not found.  Exiting."
-	exit 4
 fi
 
 if [ $BATCH -eq 0 ]; then
@@ -231,6 +241,8 @@ else
 	echo "Issuing $TYPE cert to $SUBJ."
 fi
 
+export CN="$CN"
+export SN="$SN"
 EE_P12=$FCN.p12
 SCA_P12=$ISSUER.p12
 
@@ -281,8 +293,6 @@ else
 		$RSAALG
 fi
 
-chmod 600 pem/$(basename $EE_P12 .p12).private.pem
-
 BATCHPARAM=""
 
 if [ $BATCH -eq 1 ]; then
@@ -303,11 +313,14 @@ if [ $? -ne 0 ]; then
 	exit 6
 fi
 
+SERIAL=$(cat database/serial)
+
 openssl ca \
 	-config "$CNF" \
+	-name "ca_$CAKEY" \
 	-batch \
-	-preserveDN \
 	-notext \
+	-preserveDN \
 	-startdate $STARTDATE \
 	-enddate $ENDDATE \
 	-md sha256 \
@@ -349,5 +362,12 @@ if [ $? -ne 0 ]; then
 	echo "Can't create $EE_P12"
 	exit 7
 fi
+
+rm -f pem/$(basename $SCA_P12 .p12).pem
+rm -f pem/$(basename $SCA_P12 .p12).private.pem
+rm -f pem/$(basename $EE_P12 .p12).pem
+rm -f pem/$(basename $EE_P12 .p12).private.pem
+rm -f csr/$(basename $EE_P12 .p12).csr
+rm -f $SERIAL.pem
 
 popd
