@@ -183,12 +183,13 @@ if [ ! -f "$CNF" ]; then
 fi
 
 if [ ! -d data ]; then
-	echo "Data directory 'data' does not exist.  Creating."
-	mkdir -p data || error mkdir $?
-	mkdir -p data/pem || error mkdir $?
-	mkdir -p data/database || error mkdir $?
-	mkdir -p data/csr || error mkdir $?
+	echo "Data directory 'data' does not exist.  Exiting."
+	exit 5
 fi
+
+mkdir -p data/pem || error mkdir $?
+mkdir -p data/database || error mkdir $?
+mkdir -p data/csr || error mkdir $?
 
 pushd data
 
@@ -232,7 +233,7 @@ if [ $BATCH -eq 0 ]; then
 		read ans
 		if [ "a$ans" == "an" -o "a$ans" == "aN" ]; then
 		    echo "Canceling."
-			exit 5
+			exit 6
 		elif [ "a$ans" == "ay" -o "a$ans" == "aY" ]; then
 			ISSUE=1
 		fi
@@ -310,7 +311,7 @@ openssl req \
 	-out csr/$(basename $EE_P12 .p12).csr
 
 if [ $? -ne 0 ]; then
-	exit 6
+	exit 7
 fi
 
 SERIAL=$(cat database/serial)
@@ -329,7 +330,7 @@ openssl ca \
 
 if [ $? -ne 0 ]; then
 	echo "Can't sign $(basename $EE_P12 .p12).csr"
-	exit 7
+	exit 8
 fi
 
 cat \
@@ -360,14 +361,14 @@ fi
 
 if [ $? -ne 0 ]; then
 	echo "Can't create $EE_P12"
-	exit 7
+	exit 9
 fi
 
 rm -f pem/$(basename $SCA_P12 .p12).pem
 rm -f pem/$(basename $SCA_P12 .p12).private.pem
 rm -f pem/$(basename $EE_P12 .p12).pem
 rm -f pem/$(basename $EE_P12 .p12).private.pem
-rm -f csr/$(basename $EE_P12 .p12).csr
 rm -f $SERIAL.pem
+rm -rf csr
 
 popd
