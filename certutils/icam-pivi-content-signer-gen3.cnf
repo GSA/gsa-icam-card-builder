@@ -1,0 +1,63 @@
+[ default]
+dir = .
+new_certs_dir = $dir
+database = ${dir}/database/index.txt 
+unique_subject = no
+name_opt = utf8
+x509_extensions = ee_ext
+default_days = 2190 
+default_md = sha256
+serial = database/serial
+policy = policy_match
+email_in_dn = no
+
+[ ca ]
+default_ca = ca_rsa2048
+
+[ ca_rsa2048 ]
+private_key = ${dir}/pem/ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.private.pem 
+certificate = ${dir}/pem/ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.crt 
+
+[ ca_secp384r1 ]
+private_key = ${dir}/pem/ICAM_Test_Card_PIV-I_P-384_Signing_CA_gold_gen3.private.pem
+certificate = ${dir}/pem/ICAM_Test_Card_PIV-I_P-384_Signing_CA_gold_gen3.crt
+
+[ policy_match ]
+C = match
+O = optional
+OU = optional
+CN = optional
+emailAddress = optional
+
+[ req ]
+prompt = yes
+distinguished_name = req_distinguished_name
+attributes = req_attributes
+req_extensions = v3_req
+
+[ req_distinguished_name ]
+C = Country Name
+C_default = US
+O = Organization
+O_default = U.S. Government 
+OU = Organizational Unit
+OU_default = ICAM Test Cards
+CN = Common Name
+CN_default = $ENV::CN
+emailAddress = E-Mail Address
+emailAddress_default = icam.test.cards@gsa.gov
+
+[ req_attributes ]
+
+[ v3_req ]
+basicConstraints = CA:FALSE
+subjectKeyIdentifier = hash
+
+[ ee_ext ]
+authorityKeyIdentifier = keyid:issuer
+subjectKeyIdentifier = hash
+extendedKeyUsage = critical,2.16.840.1.101.3.8.7
+keyUsage = critical,digitalSignature
+authorityInfoAccess = caIssuers;URI:http://http.apl-test.cite.fpki-lab.gov/aia/certsIssuedToPIV-ISigningCA.p7c,OCSP;URI:http://ocsp.apl-test.cite.fpki-lab.gov
+crlDistributionPoints = URI:http://http.apl-test.cite.fpki-lab.gov/crls/ICAMTestCardPIV-ISigningCA.crl
+certificatePolicies = ia5org,2.16.840.1.101.3.2.1.48.252
