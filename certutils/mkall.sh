@@ -141,7 +141,7 @@ sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Card_Auth_SP_800-73-4 -i ICAM_Test_Card
 DEST="../cards/ICAM_Card_Objects/46_Golden_FIPS_201-2_PIV"
 cp -p data/ICAM_Test_Card_PIV_*SP_800-73-4.p12 "$DEST"
 cp -p data/pem/ICAM_Test_Card_PIV_*SP_800-73-4.crt "$DEST"
-renameIn "$DEST" 1 0
+renameIn "$DEST" 1 1
 
 ## Card 47
 sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Auth_SP_800-73-4_SAN_Order -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 47 -t piv-auth
@@ -212,3 +212,13 @@ DEST="../cards/ICAM_Card_Objects/54_Golden_FIPS_201-2_NFI_PIV-I"
 cp -p data/ICAM_Test_Card_PIV-I_*NFI_SP_800-73-4.p12 "$DEST"
 cp -p data/pem/ICAM_Test_Card_PIV-I*NFI_SP_800-73-4.crt "$DEST"
 renameIn "$DEST" 1 1
+
+## Card 55
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Auth_SP_800-73-4_Missing_SO -i ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3 -n 55 -t piv-auth
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Dig_Sig_SP_800-73-4_Missing_SO-i ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3 -n 55 -t piv-dig-sig
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Key_Mgmt_SP_800-73-4_Missing_SO -i ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3 -n 55 -t piv-key-mgmt
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Card_Auth_SP_800-73-4_Missing_SO -i ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3 -n 55 -t piv-card-auth
+DEST="../cards/ICAM_Card_Objects/55_FIPS_201-2_Missing_Security_Object"
+cp -p data/ICAM_Test_Card_PIV*SP_800-73-4_Missing_SO.p12 "$DEST"
+cp -p data/pem/ICAM_Test_Card_PIV*SP_800-73-4_Missing_SO.crt "$DEST"
+
