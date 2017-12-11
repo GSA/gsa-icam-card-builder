@@ -1,6 +1,9 @@
 package gov.gsa.icamcardbuilder.app;
+import static gov.gsa.icamcardbuilder.app.Gui.logger;
+
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.Set;
 
 public class DgMap {
 	private LinkedHashMap<Short, Byte> dgMap = null;
@@ -9,27 +12,28 @@ public class DgMap {
 	 * Constructor for initializing a DgMap object
 	 * @param mapping
 	 */
-	public DgMap () {
-		create (null);
+	protected DgMap () {
+		init (null);
 	}
 	
 	/**
 	 * Constructor for creating a DgMap object
-	 * @param mapping
+	 * @param fileBytes the bytes in the Security Object container
 	 */
-	public DgMap (byte[] mapping) {
-		create (mapping);
+	protected DgMap (byte[] fileBytes) {
+		byte[] mapping = getSoMapping(fileBytes);
+		init (mapping);
 	}
 	
 	/**
-	 * Creates a HashMap representing container IDs and their data group
+	 * Instantiates a HashMap representing container IDs and their data group
 	 * numbers.
 	 * 
 	 * @param mapping
 	 *            byte array containing the value of the DG Map tag.
 	 * @return a HashMap of container IDs and group numbers.
 	 */
-	private void create(byte[] mapping) {
+	private void init(byte[] mapping) {
 		dgMap = new LinkedHashMap<Short, Byte>(16);
 		if (mapping != null) {
 			for (int i = 0; i < mapping.length; i += 3) {
@@ -50,7 +54,7 @@ public class DgMap {
 	 *         Security Object container
 	 */
 
-	public byte[] toBytes() {
+	public byte[] getBytes() {
 		byte[] mapping = new byte[3 * dgMap.size()];
 		int i = 0;
 		for (Short k : dgMap.keySet()) {
@@ -68,6 +72,7 @@ public class DgMap {
 	public DgMap getInstance() {
 		return this;
 	}
+
 	/**
 	 * Returns the first available slot in the security object
 	 * 
@@ -91,7 +96,12 @@ public class DgMap {
 		throw new NoSpaceForDataGroupException("No space for another data group in Security Object.",
 				DgMap.class.getName());
 	}
-	
+
+	/**
+	 * Add a data group (DG) mapping given a container ID
+	 * @param containerId the container ID being added
+	 * @return the data group number assigned
+	 */
 	public Byte addMapping (Short containerId) {
 		Byte dgNumber = 0;
 		// If the container is already there
@@ -110,33 +120,39 @@ public class DgMap {
 	}
 	
 	/**
-	 * Deletes the mapping entry for a container	
-	 * @param containerId the container ID to be deleted
-	 * @return a flag, if true the container was found and deleted, if falee the container didn't exist
+	 * Gets a data group (DG) number given a container ID
+	 * @param containerId the container ID being queried
+	 * @return a data group (DG) number or zero if not found
 	 */
-	public boolean deleteMapping(Short containerId) {
-		boolean deleted = false;
+	Byte getDgNumber(Short containerId) {
 		Byte dgNumber = 0;
 		if (dgMap.containsKey(containerId)) {
 			dgNumber = dgMap.get(containerId);
-			deleted = dgMap.remove(containerId, dgNumber);
 		}
-		return deleted;
+		return dgNumber;
 	}
-
+	
+	/**
+	 * Deletes the mapping entry for a container	
+	 * @param containerId the container ID to be deleted
+	 * @return data group (DB) number if found or null if not found
+	 */
+	public Byte removeMapping(Short containerId) {
+		return dgMap.remove(containerId);
+	}
+	
 	/**
 	 * Deletes the mapping entry for a DG number	
 	 * @param DG number of the mapping entry be deleted
 	 * @return a flag, if true the container was found and deleted, if falee the container didn't exist
 	 */
-	
-	public boolean deleteMapping(Byte dgNumber) {
+	public boolean removeMapping(Byte dgNumber) {
 		boolean deleted = false;
 		Short containerId = 0;
 		
-		if (dgMap.containsValue(dgNumber)) {
-			for (Short k : dgMap.keySet()) {
-				if (dgMap.get(k) == dgNumber) {
+		if (this.dgMap.containsValue(dgNumber)) {
+			for (Short k : this.dgMap.keySet()) {
+				if (this.dgMap.get(k) == dgNumber) {
 					containerId = k;
 					break;
 				}
@@ -144,8 +160,65 @@ public class DgMap {
 		}
 		
 		if (containerId != 0) {
-			deleted = dgMap.remove(containerId, dgNumber);
+			deleted = this.dgMap.remove(containerId, dgNumber);
 		}
 		return deleted;
+	}
+	
+	/**
+	 * Indicates whether the DG mapping object contains a mapping for a specified container ID
+	 * @param containerId the container ID being queried
+	 * @return true if the container ID is present, false if not present
+	 */
+	public boolean containsContainerId(Short containerId) {
+		return this.dgMap.containsKey((Short) containerId);
+	}
+	
+	/**
+	 * Indicates whether the DG mapping object contains a mapping for a specified data group (DG) number
+	 * @param dgNumber the DG number being queried
+	 * @return true if the DG number is present, false if not present
+	 */
+	
+	public boolean containsDgNumber(int dgNumber) {
+		Byte value = (byte) dgNumber;
+		return this.dgMap.containsValue(value);
+	}
+	
+	/**
+	 * Indicates whether DG mapping object is empty or null
+	 * returns true if the DG mapping object has no entries and false if there are entries
+	 */
+	protected boolean isEmpty() {
+		return this.dgMap.isEmpty();
+	}
+	
+	/**
+	 * Gets the container IDs in the DG mapping object
+	 * @return the container IDs in the DG mapping object
+	 */
+	
+	protected Set<Short> getContainerIds() {
+		Set<Short> keys;
+		keys = this.dgMap.keySet();
+		return keys;
+	}
+	
+	/**
+	 * Gets the contents of the DG mapping value from the Security Object container
+	 * 
+	 * @param fileBytes
+	 *            Security Object file byte array
+	 * @return byte array containing the DG Mapping value
+	 */
+	private byte[] getSoMapping(byte[] fileBytes) {
+		int len = fileBytes[1] & 0xFF;
+		byte[] mapping = new byte[len];
+		for (int j = 0, i = 2; i < len + 2;) {
+			for (int k = 0; k < 3; k++)
+				mapping[j++] = fileBytes[i++];
+		}
+		logger.debug("Security Object DG mapping length = " + mapping.length);
+		return mapping;
 	}
 }

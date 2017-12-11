@@ -4,7 +4,6 @@ import static gov.gsa.icamcardbuilder.app.Gui.logger;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 
 import org.bouncycastle.asn1.ASN1InputStream;
@@ -17,27 +16,29 @@ import org.bouncycastle.asn1.cms.SignedData;
 import org.bouncycastle.asn1.icao.DataGroupHash;
 import org.bouncycastle.asn1.icao.LDSSecurityObject;
 
-import gov.gsa.icamcardbuilder.app.SecurityObjectFacade;
-
 public class DgHashMap {
-	private LinkedHashMap<Integer, DataGroupHash> dgMap = null;
+	
+	private LinkedHashMap<Integer, DataGroupHash> dgHashMap = null;
+	private DgMap dgMap = null;
 	
 	/**
 	 * Constructor for initializing a DgMap object
 	 * @param mapping
 	 */
 	public DgHashMap () {
-		create (null);
+		init (null);
 	}
+
 	/**
 	 * Constructor for creating a DgMap object from raw bytes
-	 * @param bytes byte array containng LDSecurityObject from file or card
-	 */
-	
-	public DgHashMap (byte[] bytes) {
+	 * @param containerBytes byte array containing Security Object from file or card
+	 */	
+	public DgHashMap (byte[] containerBytes) {
 		
-		byte[] so = getSecurityObject(bytes);
-		logger.debug("Old Security Object signed object length = " + so.length);
+		byte[] so = this.getSoSecurityObject(containerBytes);
+		this.dgMap = new DgMap (containerBytes);
+
+		logger.debug("Security Object signed object length = " + so.length);
 
 		LDSSecurityObject oldsso = null;
 		LDSSecurityObject nldsso = null;
@@ -59,103 +60,129 @@ public class DgHashMap {
 			soSeq = (ASN1Sequence) asn1is.readObject();
 			asn1is.close();
 			oldsso = LDSSecurityObject.getInstance(soSeq);
-			create (oldsso.getDatagroupHash());
+			init (oldsso.getDatagroupHash());
+			in.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}		
-	}
-	/**
-	 * Constructor for creating a DgMap object
-	 * @param map
-	 */
-	public DgHashMap (DataGroupHash[] map) {
-		create (map);
+		}
+		this.sync();
 	}
 	
 	/**
-	 * Creates a HashMap representing container IDs and their data group
+	 * Creates a new Data Group Hash Map representing container IDs and their data group
 	 * numbers.
 	 * 
-	 * @param map
-	 *            byte array containing the value of the DG Map tag.
-	 * @return a HashMap of container IDs and group numbers.
+	 * @param dgHashArray
+	 *            array of Bouncy Castle DataGroupHashes
 	 */
-	private void create(DataGroupHash[] map) {
-		dgMap = new LinkedHashMap<Integer, DataGroupHash>(16);
-		if (map != null) {
-			for (int i = 0; i < map.length; i += 3) {
-				int dgNumber = map[i].getDataGroupNumber();
-				dgMap.put(dgNumber, map[i]);
+	private void init(DataGroupHash[] dgHashArray) {
+		this.dgHashMap = new LinkedHashMap<Integer, DataGroupHash>(16);
+		logger.debug("Security Object hash count = " + dgHashArray.length);
+		if (dgHashArray != null) {
+			for (int i = 0; i < dgHashArray.length; i++) {
+				int dgNumber = dgHashArray[i].getDataGroupNumber();
+				this.dgHashMap.put(dgNumber, dgHashArray[i]);
 			}
 		}
 	}
-
+	
 	/**
-	 * Getter for DgHashMap
-	 * @return a DgMap object
+	 * Adds a new DG hash to the Security Object
+	 * @param container Id associated with the hash
+	 * @param hash a new hash to add
 	 */
-	public DgHashMap getInstance() {
-		return this;
-	}
-
-	public Byte addHash (byte[] hash) {
+	public void addDgHash (Short containerId, byte[] hash) {
 		Byte dgNumber = 0;
-		// If the container is already there
-		if (dgMap.containsValue(containerId)) {
-			dgMap.remove(containerId);
+		// If the container is already there, remove it
+		if (this.dgMap.containsContainerId(containerId)) {
+			dgNumber = this.dgMap.removeMapping(containerId);
+			this.dgHashMap.remove(containerId);
 		}
-		try {
-			dgNumber = getNextDgNumber();
 
-		this.dgMap.put(containerId, dgNumber);
-
-		} catch (NoSpaceForDataGroupException e) {
-			dgNumber = 0;
-		}
-		return dgNumber;
+		// Add the mapping to the mapping object
+		dgNumber = this.dgMap.addMapping(containerId);
+		// Create and add a DataGroupHash
+		DataGroupHash dgHash = new DataGroupHash(dgNumber, (new DEROctetString(hash)));
+		this.dgHashMap.put((int) dgNumber, dgHash);
 	}
 	
 	/**
-	 * Deletes the mapping entry for a container	
+	 * Replaces the hash for a given container ID
+	 * @param containerId the container ID of the hash to be replaced
+	 * @param hash the hash that will be replacing the container's hash
+	 */
+	public void replaceDgHash (Short containerId, byte[] hash) {
+		this.removeDgHash(containerId);
+		this.addDgHash(containerId, hash);
+	}
+	
+	/**
+	 * Deletes the hash for a given container ID
 	 * @param containerId the container ID to be deleted
-	 * @return a flag, if true the container was found and deleted, if falee the container didn't exist
 	 */
-	public boolean deleteMapping(Short containerId) {
-		boolean deleted = false;
-		Byte dgNumber = 0;
-		if (dgMap.containsKey(containerId)) {
-			dgNumber = dgMap.get(containerId);
-			deleted = dgMap.remove(containerId, dgNumber);
+	public void removeDgHash(Short containerId) {
+		if (this.dgMap.containsContainerId(containerId)) {
+			this.dgMap.removeMapping(containerId);
+			this.dgHashMap.remove(containerId);
 		}
-		return deleted;
 	}
-
-	/**
-	 * Deletes the mapping entry for a DG number	
-	 * @param DG number of the mapping entry be deleted
-	 * @return a flag, if true the container was found and deleted, if falee the container didn't exist
-	 */
 	
-	public boolean deleteMapping(Byte dgNumber) {
-		boolean deleted = false;
-		Short containerId = 0;
+	/**
+	 * Indicates whether DG hash map is empty or null
+	 * returns true if the DG hash map object has no entries and false if there are entries
+	 */
+	protected boolean isEmpty() {
+		return this.dgHashMap.isEmpty();
+	}
+	
+	/**
+	 * Synchronizes the DG hashes with the DG Map.
+	 */
+	public void sync () {
 		
-		if (dgMap.containsValue(dgNumber)) {
-			for (Short k : dgMap.keySet()) {
-				if (dgMap.get(k) == dgNumber) {
-					containerId = k;
-					break;
+		// First check for orphaned hashes
+		if (!this.dgHashMap.isEmpty()) {
+			for (Integer k : this.dgHashMap.keySet()) {
+				// If a hash exists but there's no DG mapping entry then the container ID is unknown
+				// which means the hash is orphaned. It must be removed.
+				if (false == this.dgMap.containsDgNumber(k)) {
+					this.dgHashMap.remove(k);
 				}
 			}
 		}
 		
-		if (containerId != 0) {
-			deleted = dgMap.remove(containerId, dgNumber);
+		// Check for orphaned mapping entries
+		if (!this.dgMap.isEmpty()) {
+			for (Short k : this.dgMap.getContainerIds()) {
+				Byte dgNumber = this.dgMap.getDgNumber(k);
+				// If a mapping entry exists but there's no hash then then
+				// the mapping entry must be removed.
+				if (false == this.dgHashMap.containsKey((int) dgNumber)) {
+					dgMap.removeMapping(k);
+				}
+			}
 		}
-		return deleted;
+		
+		// TODO: Check for duplicate data group numbers
+		// TODO: Check for duplicate container IDs
 	}
 	
+	/**
+	 * Gets the data group hashes from the object
+	 * 
+	 */
+	DataGroupHash[] getDgHashes() {
+		return (DataGroupHash[]) this.dgHashMap.values().toArray();
+	}
+	
+	/**
+	 * Gets the data group mapping from the object
+	 * 
+	 */
+	byte[] getDgMapping() {
+		return dgMap.getBytes();
+	}
 
 	/**
 	 * Gets the contents of the Data Group hash from the Security Object
@@ -165,7 +192,7 @@ public class DgHashMap {
 	 * @return byte array containing the Data Group Hashes value (also known as
 	 *         the security object)
 	 */
-	protected static byte[] getSecurityObject(byte[] fileBytes) {
+	protected byte[] getSoSecurityObject(byte[] fileBytes) {
 		int mapLen = fileBytes[1] & 0xff;
 		byte so[] = null;
 

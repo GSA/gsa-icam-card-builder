@@ -567,7 +567,20 @@ public class ContentSignerTool {
 
 				switch (tag) {
 				case securityObjectDgMapTag: // Security Object DG Mapping
-					byte[] oldMapping = getMapping(securityObjectFileBytes); // DG Mapping
+					
+					// New stuff here
+					DgHashMap dgHashMap = new DgHashMap(securityObjectFileBytes);
+					dgHashMap.addDgHash(desiredContainerId, containerDigestBytes);	
+					if (clearDg)
+						dgHashMap.removeDgHash(desiredContainerId);
+
+					DataGroupHash ndghArray[] = dgHashMap.getDgHashes();
+					byte newMapping[] = dgHashMap.getDgMapping();
+					
+					//******
+					
+/*					byte[] oldMapping = getMapping(securityObjectFileBytes); // DG Mapping					
+					
 					boolean newDg = false;
 					Byte dgNumber = 0;
 					logger.debug("Old Security Object mapping length = " + oldMapping.length);
@@ -598,9 +611,9 @@ public class ContentSignerTool {
 					byte[] so = getSecurityObject(securityObjectFileBytes);
 					logger.debug("Old Security Object signed object length = " + so.length);
 
-					LDSSecurityObject oldsso = null;
+					LDSSecurityObject oldsso = null;*/
 					LDSSecurityObject nldsso = null;
-
+/*
 					ASN1InputStream in = new ASN1InputStream(new ByteArrayInputStream(so));
 					Gui.progress.setValue(55);
 					try {
@@ -619,8 +632,8 @@ public class ContentSignerTool {
 						oldsso = LDSSecurityObject.getInstance(soSeq);
 
 						DataGroupHash[] odghArray = oldsso.getDatagroupHash();
-						DataGroupHash[] ndghArray = null;
-						DataGroupHash ndgh = new DataGroupHash(dgNumber, (new DEROctetString(containerDigestBytes)));
+//						DataGroupHash[] ndghArray = null;
+//						DataGroupHash ndgh = new DataGroupHash(dgNumber, (new DEROctetString(containerDigestBytes)));
 						boolean dgHashFound = false;
 
 						if (clearDg) {
@@ -660,7 +673,7 @@ public class ContentSignerTool {
 							ndghArray[ndghArray.length - 1] = ndgh;
 							logger.debug("New DG Number " + ndgh.getDataGroupNumber() + " = " + Utils.bytesToHex(ndgh.getDataGroupHashValue().getOctets()));
 						} 
-						
+						*/
 						Gui.progress.setValue(50);
 
 						nldsso = new LDSSecurityObject(digestAlgorithmAid, ndghArray);
