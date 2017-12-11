@@ -171,7 +171,7 @@ public class DgMap {
 	 * @return true if the container ID is present, false if not present
 	 */
 	public boolean containsContainerId(Short containerId) {
-		return this.dgMap.containsKey((Short) containerId);
+		return this.dgMap.containsKey(containerId);
 	}
 	
 	/**

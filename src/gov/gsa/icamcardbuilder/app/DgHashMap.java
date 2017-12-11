@@ -223,7 +223,7 @@ public class DgHashMap {
 
 		int tagOffset = 2 + mapLen;
 		if ((fileBytes[tagOffset] & 0xff) == ContentSignerTool.securityObjectDgHashesTag) {
-			int soLen = ((int) (fileBytes[tagOffset + 2] & 0x0ff) << 8) | (int) (fileBytes[tagOffset + 3] & 0x0ff);
+			int soLen = ((fileBytes[tagOffset + 2] & 0x0ff) << 8) | (fileBytes[tagOffset + 3] & 0x0ff);
 			so = new byte[soLen];
 			System.arraycopy(fileBytes, tagOffset + 4, so, 0, soLen);
 		}
