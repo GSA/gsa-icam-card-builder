@@ -99,7 +99,7 @@ public class Gui extends JPanel {
 	protected JMenuItem aboutMenu;
 	protected JMenuItem closeApp;
 	protected JMenuItem openFile;
-	protected boolean updateSecurityObject = true;
+	protected static boolean updateSecurityObject = true;
 	protected static JCheckBoxMenuItem updateSecurityObjectCheckBoxMenuItem;
 	protected static boolean checkRevocation = true;
 	protected static JCheckBoxMenuItem revocationCheckBoxMenuItem;
@@ -159,6 +159,8 @@ public class Gui extends JPanel {
 
 	protected int signingCount = 0;
 	private boolean located = false;
+	protected static String pivCardApplicationAid = "";
+	protected static String pinUsagePolicy = "";
 
 	public Gui(JFrame frame) {
 
@@ -650,6 +652,7 @@ public class Gui extends JPanel {
 		boolean selected = aButton.getModel().isSelected();
 		securityObjectFileBrowseButton.setEnabled(selected);
 		securityObjectFileTextField.setEditable(selected);
+		updateSecurityObject = selected;
 		requiredFieldActionPerformed(new ChangeEvent(e), securityObjectFileTextField);
 	}
 
@@ -877,6 +880,10 @@ public class Gui extends JPanel {
 						errors = true;
 					}
 				}
+				if (prop.containsKey("pivCardApplicationAid"))
+					pivCardApplicationAid = prop.getProperty("pivCardApplicationAid");
+				if (prop.containsKey("pinUsagePolicy"))
+					pinUsagePolicy = prop.getProperty("pinUsagePolicy");
 			} catch (IOException ex) {
 				ex.printStackTrace();
 			} finally {
@@ -1061,7 +1068,6 @@ public class Gui extends JPanel {
 					errors = true;
 					progress.setValue(100);
 					publish(updateText);
-
 				} else {
 					errors = false;
 					Hashtable<String, String> properties = new Hashtable<String, String>();
@@ -1087,6 +1093,8 @@ public class Gui extends JPanel {
 				properties.put("name", (piName != null) ? piName : ""); 
 				properties.put("employeeAffiliation", (employeeAffiliation != null) ? employeeAffiliation : "");
 				properties.put("agencyCardSerialNumber", (agencyCardSerialNumber != null) ? agencyCardSerialNumber : "");
+				properties.put("pivCardApplicationAid", pivCardApplicationAid);
+				properties.put("pinUsagePolicy", pinUsagePolicy);
 			}
 
 			@Override

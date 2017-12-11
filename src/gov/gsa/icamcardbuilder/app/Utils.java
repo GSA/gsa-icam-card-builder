@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -309,29 +310,38 @@ public class Utils {
 	 *            LinkedHashMap of tags and values
 	 * @param name
 	 *            Name of the container
-	 * @param edcTag
-	 *            Error detection code tag (normally 0xFE)
+	 * @param endTag
+	 *            End tag (normally 0xFE)
 	 * @return a byte array representing the content to be written (and possibly
 	 *         signed)
 	 */
-	public static byte[] valuesToBytes(LinkedHashMap<Byte, byte[]> valueMap, String name, byte edcTag) {
+	public static byte[] valuesToBytes(LinkedHashMap<Integer, byte[]> valueMap, String name, int endTag) {
 		byte[] result = null;
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		List<Byte> list = new ArrayList<Byte>(valueMap.keySet());
-
-		for (Byte b : list) {
+		Iterator<Integer> it = valueMap.keySet().iterator();
+		while (it.hasNext()) {
+			int b = it.next();
 			byte[] value = valueMap.get(b);
-			int numberLenBytes = (value.length > 127) ? 2 : 0;
+			int numberTagBytes = (((b >> 8) & 0x1f) == 0x1f ? 2 : 1);
+			int numberLenBytes = (value == null) ? 0 : (value.length > 127) ? 2 : 1;
 			try {
-				os.write(((b) & 0xff));
-				if (numberLenBytes != 0) {
-					os.write((((byte) 0x80 + numberLenBytes) & 0xff));
-					os.write(((value.length & 0xff00) >> 8) & 0xff);
-					os.write(value.length & 0x00ff);
+				// Tag
+				if (numberTagBytes == 2) {
+					os.write((byte)(((b & 0xff00) >> 8) & 0xff));
+					os.write((byte)(b & 0x00ff));
+				} else
+					os.write((byte)((b) & 0xff));
+				// Length & value
+				if (numberLenBytes == 2) {
+					os.write((byte)((0x80 + numberLenBytes) & 0xff));
+					os.write((byte)(((value.length & 0xff00) >> 8) & 0xff));
+					os.write((byte)(value.length & 0x00ff));
 					os.write(value);
-				} else {
-					os.write(value.length & 0x00ff);
+				} else if (numberLenBytes == 1) {
+					os.write((byte) (value.length & 0xff));
 					os.write(value);
+				} else if (numberLenBytes == 0) {
+					os.write(0x00);
 				}
 			} catch (IOException e) {
 				logger.fatal(e.getMessage());
@@ -341,9 +351,11 @@ public class Utils {
 		}
 
 		// Add this deprecated relic here, since the CHUID hash includes it.
-		os.write(edcTag);
-		os.write((byte) 0x00);
-
+		
+		if (endTag != 0) {
+			os.write(endTag);
+			os.write((byte) 0x00);
+		}
 		result = os.toByteArray();
 		logger.debug("New " + name + " data = " + Utils.bytesToHex(result));
 		return result;
@@ -354,8 +366,11 @@ public class Utils {
 	 * 
 	 * @return HashMap of tags with names
 	 */
-	protected static HashMap<Byte, String> initializeContainerDescs() {
-		HashMap<Byte, String> map = new HashMap<Byte, String>();
+	protected static HashMap<Integer, String> initializeContainerDescs() {
+		HashMap<Integer, String> map = new HashMap<Integer, String>();
+		map.put(ContentSignerTool.discoveryObjectTag, "Discovery Object Container");
+		map.put(ContentSignerTool.doPcaaTag, "Discovery Object PIV Card Application AID");
+		map.put(ContentSignerTool.doPupTag, "Discovery Object Pin Usage Policy");
 		map.put(ContentSignerTool.cccCardIdentifier, "CCC Card Identifier");
 		map.put(ContentSignerTool.cccCapabilityContainerVersionNumberTag, "Capability Container Version Number");
 		map.put(ContentSignerTool.cccCapabilityGrammarVersionNumber, "Capability Grammar Version Number");
@@ -391,22 +406,31 @@ public class Utils {
 	 *            the data to be parsed
 	 * @param tagPosArray
 	 *            location of the starting tag
+	 * @param tagArragy
+	 *            array that holds the tag
 	 * @return a byte array containing just the data corresponding to the tag
 	 *         and the location of the next tag (via the tagPosArray argument.
 	 * @throws TlvParserException if unexpected end-of-data is encountered.
 	 */
-	protected static byte[] tlvparse(byte[] data, int[] tagPosArray) throws TlvParserException {
+	protected static byte[] tlvparse(byte[] data, int[] tagPosArray , int[] tagArray) throws TlvParserException {
 		byte value[] = null;
 		int len = 0;
 		int tagPos = tagPosArray[0];
 		int lenbytes = 0;
+		// 1 or 2 byte tag?
+		if ((data[tagPos] & 0x1f) == 0x1f) {
+			tagArray[0] = (((data[tagPos] << 8) & 0xff00) | ((data[tagPos + 1]) & 0xff));
+			tagPos++;
+		} else {
+			tagArray[0] = data[tagPos] & 0xff;
+		}
 		try {
 			if ((data[tagPos + 1] & (byte) 0x80) == (byte) 0x80) {
 				lenbytes = data[tagPos + 1] & 0x7F;
 				int j = 2;
 				for (len = 0; j < 2 + lenbytes; j++)
 					len = ((len << 8) | (data[tagPos + j]) & 0xff);
-			} else
+			} else				
 				len = data[tagPos + 1];
 
 			if (len > 0) {
@@ -415,7 +439,8 @@ public class Utils {
 					value[i] = data[tagPos + 2 + lenbytes + i];
 
 				tagPosArray[0] = tagPos + 2 + lenbytes + len;
-			}
+			} else
+				tagPosArray[0] = tagPos + 2 + lenbytes;
 		} catch (ArrayIndexOutOfBoundsException e) {
 			// Recover gracefully
 			value = null;
@@ -423,5 +448,30 @@ public class Utils {
 			throw new TlvParserException("Ran out of data to parse.", Utils.class.getName());
 		}
 		return value;
+	}
+	
+	/**
+	 * Gets the first tag in a byte array
+	 * @param bytes the bytes in a BER-TLV byte arraye
+	 * @return the tag
+	 */
+
+	public static int getTag(byte[] bytes, int pos) {
+		int tag = bytes[0] & 0x000000ff;
+		int i = pos;
+		/* https://en.wikipedia.org/wiki/X.690
+		 * Where the identifier is not universal, its tag number may be too large for the 5-bit tag field,
+		 * so it is encoded in further octets.  The initial octet encodes the class and primitive/constructed
+		 * as before, and bits 1–5 are 1. The tag number is encoded in the following octets, where
+		 * bit 8 of each is 1 if there are more octets, and bits 1–7 encode the tag number. The tag number
+		 * bits combined, big-endian, encode the tag number. The least number of following octets should be
+		 * encoded; that is, bits 1–7 should not all be 0 in the first following octet.
+		 */
+		if ((tag & 0x1f) == 0x1f) {
+			do {
+				tag |= (tag << 8) | (bytes[++i] & 0xff);
+			} while ((bytes[i] & 0x80) == 0x80);
+		}
+		return tag;
 	}
 }

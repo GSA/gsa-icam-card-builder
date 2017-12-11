@@ -100,39 +100,60 @@ public class ContentSignerTool {
 	private short desiredContainerId = (short) 0xffff;
 	private PrivateKey privateKey = null;
 	private X509Certificate contentSigningCert = null;
+
+	protected static final short discoveryObjectContainerId = (short) 0x6050;
 	protected static final short cccContainerId = (short) 0xdb00;
-	protected static final short chuidContainerId = 0x3000;
-	protected static final short printedInformationContainerId = 0x3001;
-	protected static final short fingerprintContainerId = 0x6010;
-	protected static final short facialImageContainerId = 0x6030;
-	protected static final short irisContainerId = 0x1015;
-	protected static final byte cccCardIdentifier = (byte) 0xf0;
-	protected static final byte cccCapabilityContainerVersionNumberTag = (byte) 0xf1;
-	protected static final byte cccCapabilityGrammarVersionNumber = (byte) 0xf2;
-	protected static final byte cccApplicationsCardUrl = (byte) 0xf3;
-	protected static final byte cccPkcs15 = (byte) 0xf4;
-	protected static final byte cccRegisteredDataModelNumber = (byte) 0xf5;
-	protected static final byte authenticationKeyMapTag = 0x3d;
-	protected static final byte issuerAsymmetricSignatureTag = (byte) 0x3e;
-	protected static final byte bufferLengthTag = (byte) 0xee;
-	protected static final byte chuidFascnTag = (byte) 0x30;
-	protected static final byte chuidGuidTag = (byte) 0x34;
-	protected static final byte chuidExpirationDateTag = (byte) 0x35;
-	protected static final byte cardholderUuidTag = (byte) 0x36;
-	protected static final byte biometricObjectTag = (byte) 0xbc;
-	protected static final byte piNameTag = (byte) 0x01;
-	protected static final byte piEmployeeAffiliationTag = (byte) 0x02;
-	protected static final byte piEmployeeAffiliation2Tag = (byte) 0x03;
-	protected static final byte piExpirationDateTag = (byte) 0x04;
-	protected static final byte piAgencyCardSerialNumberTag = (byte) 0x05;
-	protected static final byte piIssuerIdentificationTag = (byte) 0x06;
-	protected static final byte piOrgAffiliation1Tag = (byte) 0x07;
-	protected static final byte piOrgAffiliation2Tag = (byte) 0x08;
-	protected static final byte securityObjectDgMapTag = (byte) 0xba;
-	protected static final byte securityObjectDgHashesTag = (byte) 0xbb;
-	protected static final byte errorDetectionCodeTag = (byte) 0xfe;
+	protected static final short chuidContainerId = (short) 0x3000;
+	protected static final short printedInformationContainerId = (short) 0x3001;
+	protected static final short fingerprintContainerId = (short) 0x6010;
+	protected static final short facialImageContainerId = (short) 0x6030;
+	protected static final short irisContainerId = (short) 0x1015;
+	
+	protected static final int cccCardIdentifier = 0xf0;
+	protected static final int cccCapabilityContainerVersionNumberTag = 0xf1;
+	protected static final int cccCapabilityGrammarVersionNumber = 0xf2;
+	protected static final int cccApplicationsCardUrl = 0xf3;
+	protected static final int cccPkcs15 = 0xf4;
+	protected static final int cccRegisteredDataModelNumber = 0xf5;
+	protected static final int authenticationKeyMapTag = 0x3d;
+	protected static final int issuerAsymmetricSignatureTag = 0x3e;
+	protected static final int bufferLengthTag = 0xee;
+	protected static final int chuidFascnTag = 0x30;
+	protected static final int chuidGuidTag = 0x34;
+	protected static final int chuidExpirationDateTag = 0x35;
+	protected static final int cardholderUuidTag = 0x36;
+	protected static final int discoveryObjectTag = 0x7e;
+	protected static final int doPcaaTag = 0x4f;
+	protected static final int doPupTag = 0x5f2f;
+	protected static final int biometricObjectTag = 0xbc;
+	protected static final int piNameTag = 0x01;
+	protected static final int piEmployeeAffiliationTag = 0x02;
+	protected static final int piEmployeeAffiliation2Tag = 0x03;
+	protected static final int piExpirationDateTag = 0x04;
+	protected static final int piAgencyCardSerialNumberTag = 0x05;
+	protected static final int piIssuerIdentificationTag = 0x06;
+	protected static final int piOrgAffiliation1Tag = 0x07;
+	protected static final int piOrgAffiliation2Tag = 0x08;
+	protected static final int securityObjectDgMapTag = 0xba;
+	protected static final int securityObjectDgHashesTag = 0xbb;
+	protected static final int errorDetectionCodeTag = 0xfe;
+	
 	protected static final String defaultDigAlgName = "SHA-256";
 	protected static final String defaultSigAlgName = "RSA";
+
+	protected static final byte[] doGlobalPinMandatory = { 
+		0x2f, 0x40, 0x00
+	};
+			
+	protected static final byte[] doGlobalPinPreferred = { 
+		0x2f, 0x60, 0x20
+	};
+	
+	protected static final byte[] doAppPinPreferred = { 
+		0x2f, 0x60, 0x10
+	};
+	
+	private boolean clearDg = false;
 	
 	private String digestAlgorithmName = defaultDigAlgName;
 	private AlgorithmIdentifier digestAlgorithmAid = null;
@@ -162,7 +183,9 @@ public class ContentSignerTool {
 	private String uuidOid = null;
 	private String uuid = null;
 	private String expirationDate = null;
-	private HashMap<Byte, String> containerDesc = null;
+	private String pinUsagePolicy = "";
+	private String pivCardApplicationAid = "";
+	private HashMap<Integer,String> containerDesc = null;
 
 	/**
 	 * Handles CBEFF signing and Security Object updating and signing
@@ -173,6 +196,11 @@ public class ContentSignerTool {
 	 *            Security Object file
 	 * @param properties
 	 *            a Hashtable of properties
+	 */
+	/**
+	 * @param contentFile
+	 * @param securityObjectFile
+	 * @param properties
 	 */
 	protected ContentSignerTool(File contentFile, File securityObjectFile, Hashtable<String, String> properties) {
 
@@ -236,7 +264,7 @@ public class ContentSignerTool {
 		}
 
 		// What kind of file is this?
-		byte tag = contentFileBytes[0];
+		int tag = Utils.getTag(contentFileBytes, 0);
 		byte[] signedFakeBytes;
 		byte[] contentBytes = null;
 		Gui.status.append(dateFormat.format(new Date())
@@ -245,20 +273,66 @@ public class ContentSignerTool {
 
 		switch (tag) {
 		case cccCardIdentifier:
-			@SuppressWarnings("unused") LinkedHashMap<Byte, byte[]> cccValues;
+			@SuppressWarnings("unused") LinkedHashMap<Integer, byte[]> cccValues;
 			if ((cccValues = getCccContents(contentFileBytes)) == null) {
 				return;
 			}
 			containerBufferBytes = contentFileBytes;
 			desiredContainerId = cccContainerId;
 			break;
+		case discoveryObjectTag:
+			// Not a signed object
+			LinkedHashMap<Integer, byte[]> doContainer;
+			LinkedHashMap<Integer, byte[]> doChildren;
+			// Map the values to the tags that were found in the container
+			if ((doContainer = getDoContents(contentFileBytes)) == null)
+				return;
+			
+			doChildren = getDoContents(doContainer.get(discoveryObjectTag));
+			
+			if (pinUsagePolicy != null && pinUsagePolicy.length() != 0) {
+				try {
+					if (pivCardApplicationAid.length() > 0 && pinUsagePolicy.length() > 0) {
+						if (doChildren.containsKey(doPcaaTag))
+							doChildren.replace(doPcaaTag, Utils.hexStringToByteArray(pivCardApplicationAid));
+						else
+							doChildren.put(doPcaaTag, Utils.hexStringToByteArray(pivCardApplicationAid));
+
+						if (doChildren.containsKey(doPupTag))
+							doChildren.replace(doPupTag, Utils.hexStringToByteArray(pinUsagePolicy));
+						else
+							doChildren.put(doPupTag, Utils.hexStringToByteArray(pinUsagePolicy));
+					}
+				} catch (InvalidDataFormatException e) {
+					return;
+				} catch (Exception e) {
+					return;
+				}
+				contentBytes = Utils.valuesToBytes(doChildren, "Discovery Object PCA & PUP", 0);
+				doContainer.replace(discoveryObjectTag, contentBytes);
+				contentBytes = Utils.valuesToBytes(doContainer, "Discovery Object", 0);
+			} else {
+				// An empty PIN usage policy indicates to clear the Discovery Object (and remove the SO hash) 
+				clearDg = true;
+				doContainer.replace(discoveryObjectTag, new byte[0]);
+				contentBytes = Utils.valuesToBytes(doContainer, "Discovery Object", 0);
+			}
+			desiredContainerId = discoveryObjectContainerId;
+			containerBufferBytes = writeDoContainer(contentFile, contentBytes);
+			/* This is a real hack.  The Security Object hash for Discovery Object must not
+			 * include the 7e tag and length.
+			 */
+			byte temp[] = new byte[containerBufferBytes.length - 2];
+			System.arraycopy(containerBufferBytes, 2, temp, 0, containerBufferBytes.length -2);
+			containerBufferBytes = temp;
+			break;
 		case chuidFascnTag:
 		case bufferLengthTag:
 		case chuidGuidTag:
 		case chuidExpirationDateTag:
 		case cardholderUuidTag:
-			LinkedHashMap<Byte, byte[]> chuidValues;
-			if ((chuidValues = getChuidContents(contentFileBytes)) == null) {
+			LinkedHashMap<Integer, byte[]> chuidValues;
+			if ((chuidValues = getDoContents(contentFileBytes)) == null) {
 				return;
 			}	
 			try {
@@ -300,13 +374,13 @@ public class ContentSignerTool {
 				chuidValues.put(chuidExpirationDateTag, expirationDate.substring(0, 8).getBytes());
 
 			try {
-			if (chuidValues.containsKey(cardholderUuidTag))
-				chuidValues.replace(cardholderUuidTag, Utils.hexStringToByteArray(cardholderUuid));
-			else
-				chuidValues.put(cardholderUuidTag, Utils.hexStringToByteArray(cardholderUuid));
-
-			if (chuidValues.containsKey(issuerAsymmetricSignatureTag))
-				chuidValues.remove(issuerAsymmetricSignatureTag);
+				if (chuidValues.containsKey(cardholderUuidTag))
+					chuidValues.replace(cardholderUuidTag, Utils.hexStringToByteArray(cardholderUuid));
+				else
+					chuidValues.put(cardholderUuidTag, Utils.hexStringToByteArray(cardholderUuid));
+	
+				if (chuidValues.containsKey(issuerAsymmetricSignatureTag))
+					chuidValues.remove(issuerAsymmetricSignatureTag);
 			} catch (InvalidDataFormatException e) {
 				return;
 			}
@@ -330,9 +404,8 @@ public class ContentSignerTool {
 		case piOrgAffiliation1Tag:
 		case piOrgAffiliation2Tag:
 			// Not a signed object
-			System.out.println(String.format("%s (0x%02x)\n", "Printed Information tag", tag));
-			LinkedHashMap<Byte, byte[]> piValues;
-			if ((piValues = getPiContents(contentFileBytes)) == null)
+			LinkedHashMap<Integer,byte[]> piValues;
+			if ((piValues = getDoContents(contentFileBytes)) == null)
 				return;
 
 			if (piValues.containsKey(piNameTag))
@@ -477,7 +550,7 @@ public class ContentSignerTool {
 		default:
 			logger.fatal("Unrecognized tag in byte[0] of file");
 			Gui.status.append(dateFormat.format(new Date())
-					+ String.format(" - Unrecognized tag in file, tag is: 0x02X\n.", tag));
+					+ String.format(" - Unrecognized tag in file, tag is: 0x%02X\n.", tag));
 			Gui.errors = true;
 			return;
 		}
@@ -489,33 +562,41 @@ public class ContentSignerTool {
 
 				if ((securityObjectFileBytes = Utils.getFileContentBytes(securityObjectFile)) == null)
 					return;
-
-				tag = securityObjectFileBytes[0];
+				logger.debug("Security Object file size = " + securityObjectFileBytes.length);
+				tag = Utils.getTag(securityObjectFileBytes, 0);
 
 				switch (tag) {
 				case securityObjectDgMapTag: // Security Object DG Mapping
-					byte[] mapping = getMapping(securityObjectFileBytes); // DG
-																			// Mapping
+					byte[] oldMapping = getMapping(securityObjectFileBytes); // DG Mapping
 					boolean newDg = false;
 					Byte dgNumber = 0;
+					logger.debug("Old Security Object mapping length = " + oldMapping.length);
 
-					HashMap<Short, Byte> dgMap = createDgMap(mapping);
+					// Map Container ID to DG number
+					HashMap<Short, Byte> dgMap = createDgMap(oldMapping);
 
-					if (!dgMap.containsKey(desiredContainerId)) {
+					// If the desired container doesn't exist find first available number
+					if (!clearDg && !dgMap.containsKey(desiredContainerId)) {
 						try {
+							// Find the next higher DG number
 							dgNumber = (byte) (firstAvailableDgNumber(dgMap));
 						} catch (NoSpaceForDataGroupException e) {
 							System.out.println("NoSpaceForDataGroupException caught (fatal).");
 							return;
 						}
+						// This is a new one, so expand the tables
 						dgMap.put(desiredContainerId, dgNumber);
 						newDg = true;
 					} else {
 						dgNumber = dgMap.get(desiredContainerId);
+						if (clearDg) {
+							dgMap.remove(desiredContainerId);
+						}
 					}
 
 					byte[] newMapping = dgMapToBytes(dgMap);
-					byte[] so = getSecurityObject(securityObjectFileBytes); // SecurityObject;
+					byte[] so = getSecurityObject(securityObjectFileBytes);
+					logger.debug("Old Security Object signed object length = " + so.length);
 
 					LDSSecurityObject oldsso = null;
 					LDSSecurityObject nldsso = null;
@@ -540,23 +621,46 @@ public class ContentSignerTool {
 						DataGroupHash[] odghArray = oldsso.getDatagroupHash();
 						DataGroupHash[] ndghArray = null;
 						DataGroupHash ndgh = new DataGroupHash(dgNumber, (new DEROctetString(containerDigestBytes)));
+						boolean dgHashFound = false;
 
-						if (!newDg) {
+						if (clearDg) {
+							dgHashFound = true;
+							// Delete hash, but beware that it may not exist
+							if (dgNumberExists(odghArray, dgNumber))
+								ndghArray = new DataGroupHash[odghArray.length - 1];
+							else
+								ndghArray = new DataGroupHash[odghArray.length];
+
+							for (int i = 0, j = 0; i < odghArray.length; i++) {
+								if (odghArray[i].getDataGroupNumber() != dgNumber) {
+									// Copy existing hash
+									ndghArray[j++] = odghArray[i];
+									logger.debug("Clear DG Number " + odghArray[i].getDataGroupNumber() + " = " + Utils.bytesToHex(odghArray[i].getDataGroupHashValue().getOctets()));
+								}
+							}							
+						} else if (!newDg) {
+							// Replace hash
 							ndghArray = new DataGroupHash[odghArray.length];
 							System.arraycopy(odghArray, 0, ndghArray, 0, odghArray.length);
 							for (int i = 0; i < ndghArray.length; i++) {
 								if (ndghArray[i].getDataGroupNumber() == dgNumber) {
 									// Replace with updated hash
-									ndghArray[i] = ndgh;
+									ndghArray[i] = ndgh; 
+									logger.debug("Replace DG Number " + ndghArray[i].getDataGroupNumber() + " = " + Utils.bytesToHex(ndghArray[i].getDataGroupHashValue().getOctets()));
+									dgHashFound = true;
 								}
 							}
-						} else {
+						}
+
+						if (newDg || !dgHashFound) {
+							// Add hash
 							ndghArray = new DataGroupHash[odghArray.length + 1];
 							System.arraycopy(odghArray, 0, ndghArray, 0, odghArray.length);
 							// Add new hash
 							ndghArray[ndghArray.length - 1] = ndgh;
-						}
-
+							logger.debug("New DG Number " + ndgh.getDataGroupNumber() + " = " + Utils.bytesToHex(ndgh.getDataGroupHashValue().getOctets()));
+						} 
+						
 						Gui.progress.setValue(50);
 
 						nldsso = new LDSSecurityObject(digestAlgorithmAid, ndghArray);
@@ -581,8 +685,9 @@ public class ContentSignerTool {
 								// Write out the complete container object
 								int length = 2 + newMapping.length + 4 + signedSoContentBytes.length + 2;
 
-								writeSecurityObjectContainer(securityObjectFile, newMapping, signedSoContentBytes,
-										length);
+								writeSecurityObjectContainer(securityObjectFile, newMapping , signedSoContentBytes, length);
+								logger.debug("New Security Object mapping length = " + newMapping.length);
+								logger.debug("New Security Object signed object length = " + signedSoContentBytes.length);
 
 								Gui.progress.setValue(100);
 							}
@@ -595,7 +700,7 @@ public class ContentSignerTool {
 
 					break;
 				default:
-					String message = String.format("Unrecognized object file, tag is 0x02X.", tag);
+					String message = String.format("Unrecognized object file, tag is 0x%02X.", tag);
 					logger.fatal(message);
 					Gui.status.append(dateFormat.format(new Date()) + " - " + message + "\n");
 					Gui.errors = true;
@@ -610,6 +715,26 @@ public class ContentSignerTool {
 		}
 
 		Security.removeProvider(bc.getName());
+	}
+	
+	/**
+	 * Returns if the requested data group number exists in the DG hash array
+	 * @param odghArray the array to be searched
+	 * @param dgNumber the data group number to search for
+	 * @return true if the data group number exists
+	 */
+
+	private boolean dgNumberExists(DataGroupHash[] odghArray, int dgNumber) {
+		int i;
+		boolean result = false;
+		for (i = 0; i < odghArray.length; i++) {
+			if (odghArray[i].getDataGroupNumber() == dgNumber) {
+				result = true;
+				break;
+			}
+		}
+		
+		return result;
 	}
 
 	/**
@@ -674,6 +799,16 @@ public class ContentSignerTool {
 		}
 		return mapping;
 	}
+	
+	/**
+	 * Syncs the DG Map and DG Hashes
+	 * @param dgMap
+	 * @param dgHashes
+	 */
+	private void syncDgHashes (HashMap<Short, Byte> dgMap, DataGroupHash[] dgHashes) {
+		// 
+		
+	}
 
 	/**
 	 * Loads up class variables with properties.
@@ -684,6 +819,8 @@ public class ContentSignerTool {
 	 */
 	private void getProperties(Hashtable<String, String> properties) throws NoSuchPropertyException {
 		try {
+			pivCardApplicationAid = Utils.getProperty("pivCardApplicationAid", properties);
+			pinUsagePolicy = Utils.getProperty("pinUsagePolicy", properties);
 			updateSecurityObject = (Utils.getProperty("updateSecurityObject", properties).equals("Y")) ? true : false;
 			passcode = Utils.getProperty("passcode", properties).toCharArray();
 			signingKeyFile = Utils.getProperty("signingKeyFile", properties);
@@ -700,6 +837,7 @@ public class ContentSignerTool {
 			piEmployeeAffiliation = Utils.getProperty("employeeAffiliation", properties);
 			piAgencyCardSerialNumber = Utils.getProperty("agencyCardSerialNumber", properties);
 			piExpirationDate = Utils.toPrintedDate(expirationDate.substring(0, 8));
+			pinUsagePolicy = Utils.getProperty("pinUsagePolicy", properties);
 		} catch (Exception e) {
 			throw new NoSuchPropertyException(e.getMessage(), ContentSignerTool.class.getName());
 		}
@@ -712,32 +850,27 @@ public class ContentSignerTool {
 	 *            bytes from content file
 	 * @return a Hashtable of CCC tags (keys) and values
 	 */
-	private LinkedHashMap<Byte, byte[]> getCccContents(byte[] contentFileBytes) {
-		LinkedHashMap<Byte, byte[]> tagsValues = new LinkedHashMap<Byte, byte[]>();
+	private LinkedHashMap<Integer, byte[]> getCccContents(byte[] contentFileBytes) {
+		LinkedHashMap<Integer, byte[]> tagsValues = new LinkedHashMap<Integer, byte[]>();
 		int tagPosArray[] = new int[1];
-		tagPosArray[0] = 0;
-		byte key;
+		int tagArray[] = new int[1];
+		tagPosArray[0] = tagArray[0] = 0;
 		byte value[] = new byte[1];
 		do {
-			key = contentFileBytes[tagPosArray[0]];
 			try {
-				if ((value = Utils.tlvparse(contentFileBytes, tagPosArray)) != null)
-					tagsValues.put(key, value);
+				if ((value = Utils.tlvparse(contentFileBytes, tagPosArray, tagArray)) != null)
+					tagsValues.put(tagArray[0], value);
 				// TODO: Add code to include zero-length tags
 			} catch (Exception e) {
 				System.out.println("TlvParserException handled\n");
 			}
-		} while (tagPosArray[0] > 0 && key != errorDetectionCodeTag);
+		} while (tagPosArray[0] > 0 && tagArray[0] != errorDetectionCodeTag);
 
-		List<Byte> list = new ArrayList<Byte>(tagsValues.keySet());
+		List<Integer> list = new ArrayList<Integer>(tagsValues.keySet());
 
-		for (Byte k : list) {
+		for (Integer k : list) {
 			value = tagsValues.get(k);
-			try {
-				logger.debug("Tag = " + Utils.byteToHex(k) + ", Len = " + value.length + ", Value = " + Utils.bytesToHex(value));
-			} catch (InvalidDataFormatException e) {
-				return null;
-			}
+			logger.debug("Tag = " + String.format("%04X",  k) + ", Len = " + value.length + ", Value = " + Utils.bytesToHex(value));
 		}
 		return tagsValues;
 	}
@@ -749,36 +882,73 @@ public class ContentSignerTool {
 	 *            bytes from content file
 	 * @return a Hashtable of CHUID tags (keys) and values
 	 */
-	private LinkedHashMap<Byte, byte[]> getChuidContents(byte[] contentFileBytes) {
-		LinkedHashMap<Byte, byte[]> tagsValues = new LinkedHashMap<Byte, byte[]>();
+	private LinkedHashMap<Integer, byte[]> getChuidContents(byte[] contentFileBytes) {
+		LinkedHashMap<Integer, byte[]> tagsValues = new LinkedHashMap<Integer, byte[]>();
 		int tagPosArray[] = new int[1];
-		tagPosArray[0] = 0;
-		byte key;
+		int tagArray[] = new int[1];
+		tagPosArray[0] = tagArray[0] = 0;
 		byte value[] = new byte[1];
 		do {
-			key = contentFileBytes[tagPosArray[0]];
 			try {
-				if ((value = Utils.tlvparse(contentFileBytes, tagPosArray)) != null)
-					if (key != authenticationKeyMapTag && key != bufferLengthTag)
-						tagsValues.put(key, value);
+				if ((value = Utils.tlvparse(contentFileBytes, tagPosArray, tagArray)) != null)
+					if (tagArray[0] != authenticationKeyMapTag && tagArray[0] != bufferLengthTag)
+						tagsValues.put(tagArray[0], value);
 			} catch (Exception e) {
 				System.out.println("TlvParserException handled\n");
 			}
-		} while (tagPosArray[0] > 0 && key != errorDetectionCodeTag);
+		} while (tagPosArray[0] > 0 && tagArray[0] != errorDetectionCodeTag);
 
-		List<Byte> list = new ArrayList<Byte>(tagsValues.keySet());
+		List<Integer> list = new ArrayList<Integer>(tagsValues.keySet());
 
-		for (Byte k : list) {
+		for (Integer k : list) {
+			value = tagsValues.get(k);
+			logger.debug("Tag = " + String.format("%04X",  k) + ", Len = " + value.length + ", Value = " + Utils.bytesToHex(value));
+		}
+		return tagsValues;
+	}
+
+	/**
+	 * Creates a Hashtable of Discovery Object data
+	 * 
+	 * @param contentFileBytes
+	 *            bytes from content file
+	 * @return a Hashtable of Discovery Object tags (keys) and values
+	 */
+	private LinkedHashMap<Integer, byte[]> getDoContents(byte[] contentFileBytes) {
+		LinkedHashMap<Integer, byte[]> tagsValues = new LinkedHashMap<Integer, byte[]>();
+		int tagPosArray[] = new int[1];
+		int tagArray[] = new int[1];
+		tagPosArray[0] = tagArray[0] = 0;
+		byte value[] = new byte[1];
+		do {
+			try {
+				if ((value = Utils.tlvparse(contentFileBytes, tagPosArray, tagArray)) != null)
+					tagsValues.put(tagArray[0], value);
+				else
+					tagsValues.put(tagArray[0], null);
+			} catch (Exception e) {
+				logger.debug("TlvParserException handled");
+			}
+		} while (tagPosArray[0] > 0 && tagPosArray[0] < contentFileBytes.length);
+
+		Iterator<Integer> it = tagsValues.keySet().iterator();
+
+		while (it.hasNext()) {
+			Integer k = it.next();
 			value = tagsValues.get(k);
 			try {
-				logger.debug("Tag = " + Utils.byteToHex(k) + ", Len = " + value.length + ", Value = " + Utils.bytesToHex(value));
-			} catch (InvalidDataFormatException e) {
+				if (value != null)
+					logger.debug("Tag = " + String.format("%04x, Len = %d, Value = %s", k, value.length, Utils.bytesToHex(value)));
+				else
+					logger.debug("Tag = " + String.format("%04x, Len = %d, Value = %s", k, 0, "null"));
+			} catch (Exception e) {
 				return null;
 			}
 		}
 		return tagsValues;
 	}
-
+	
+	
 	/**
 	 * Creates a Hashtable of Printed Information data
 	 * 
@@ -786,28 +956,28 @@ public class ContentSignerTool {
 	 *            bytes from content file
 	 * @return a Hashtable of Printed Information tags (keys) and values
 	 */
-	private LinkedHashMap<Byte, byte[]> getPiContents(byte[] contentFileBytes) {
-		LinkedHashMap<Byte, byte[]> tagsValues = new LinkedHashMap<Byte, byte[]>();
+	private LinkedHashMap<Integer, byte[]> getPiContents(byte[] contentFileBytes) {
+		LinkedHashMap<Integer, byte[]> tagsValues = new LinkedHashMap<Integer, byte[]>();
 		int tagPosArray[] = new int[1];
-		tagPosArray[0] = 0;
-		byte key;
+		int tagArray[] = new int[1];
+		tagPosArray[0] = tagArray[0] = 0;
 		byte value[] = new byte[1];
 		do {
-			key = contentFileBytes[tagPosArray[0]];
+
 			try {
-				if ((value = Utils.tlvparse(contentFileBytes, tagPosArray)) != null)
-					tagsValues.put(key, value);
+				if ((value = Utils.tlvparse(contentFileBytes, tagPosArray, tagArray)) != null)
+					tagsValues.put(tagArray[0], value);
 			} catch (Exception e) {
 				System.out.println("TlvParserException handled\n");
 			}
-		} while (tagPosArray[0] > 0 && key != errorDetectionCodeTag);
+		} while (tagPosArray[0] > 0 && tagArray[0] != errorDetectionCodeTag);
 
-		List<Byte> list = new ArrayList<Byte>(tagsValues.keySet());
+		List<Integer> list = new ArrayList<Integer>(tagsValues.keySet());
 
-		for (Byte k : list) {
+		for (Integer k : list) {
 			value = tagsValues.get(k);
 			try {
-				logger.debug("Tag = " + Utils.byteToHex(k) + ", Len = " + value.length + ", Value = " + Utils.bytesToHex(value));
+				logger.debug("Tag = " + String.format("%04X", k) + ", Len = " + value.length + ", Value = " + Utils.bytesToHex(value));
 			} catch (Exception e) {
 				return null;
 			}
@@ -843,16 +1013,13 @@ public class ContentSignerTool {
 	 */
 	private byte[] getSecurityObject(byte[] fileBytes) {
 		int mapLen = fileBytes[1] & 0xff;
-		int tagPos = 1 + 1 + mapLen;
 		byte so[] = null;
 
 		int tagOffset = 2 + mapLen;
-		if (fileBytes[tagOffset] == securityObjectDgHashesTag) {
-			int soLen = ((byte) (fileBytes[tagPos + 2] & 0xff) << 8) | (byte) (fileBytes[tagPos + 3] & 0xff);
+		if ((fileBytes[tagOffset] & 0xff) == securityObjectDgHashesTag) {
+			int soLen = ((int) (fileBytes[tagOffset + 2] & 0x0ff) << 8) | (int) (fileBytes[tagOffset + 3] & 0x0ff);
 			so = new byte[soLen];
-			for (int i = 0; i < soLen; i++) {
-				so[i] = fileBytes[4 + tagOffset + i];
-			}
+			System.arraycopy(fileBytes, tagOffset + 4, so, 0, soLen);
 		}
 		return so;
 	}
@@ -1078,7 +1245,7 @@ public class ContentSignerTool {
 		containerBuffer.put(contentBytes, 0, contentBytes.length - 2);
 
 		// Signature
-		containerBuffer.put(issuerAsymmetricSignatureTag);
+		containerBuffer.put((byte) issuerAsymmetricSignatureTag);
 		containerBuffer.put((byte) 0x82);
 		containerBuffer.put((byte) (short) ((tag3ELen >>> 8) & 0xff));
 		containerBuffer.put((byte) (short) (tag3ELen & 0xff));
@@ -1144,7 +1311,7 @@ public class ContentSignerTool {
 		containerBuffer = ByteBuffer.wrap(cbeffContainerBytes);
 
 		// Container TLV
-		containerBuffer.put(biometricObjectTag);
+		containerBuffer.put((byte) biometricObjectTag);
 		containerBuffer.put((byte) 0x82);
 		containerBuffer.put((byte) (short) ((tagBCLen >>> 8) & 0xff));
 		containerBuffer.put((byte) (short) (tagBCLen & 0xff));
@@ -1154,12 +1321,39 @@ public class ContentSignerTool {
 		containerBuffer.put(signatureBytes);
 
 		// Error Detection Code
-		containerBuffer.put(errorDetectionCodeTag);
+		containerBuffer.put((byte) errorDetectionCodeTag);
 		containerBuffer.put((byte) 0x00);
 
 		// Write out the complete container object
 		containerFile = Utils.backupAndRecreate(containerFile);
 		message = Utils.writeBytes(containerBuffer.array(), containerFile.toString(), "CBEFF");
+		if (message != null) {
+			logger.debug(message);
+		}
+		return containerBuffer.array();
+	}
+	
+	/**
+	 * Writes the Discovery Object container to a buffer
+	 * 
+	 * @param contentFile
+	 *            content File object
+	 * @param contentBytes
+	 *            Discovery Object bytes to write the the container
+	 * @return the bytes in the Discovery Object container file needed by the
+	 *         Security Object
+	 */
+	private byte[] writeDoContainer(File contentFile, byte[] contentBytes) {
+		byte[] doContainerBytes = new byte[contentBytes.length];
+		ByteBuffer containerBuffer = null;
+		String message = null;
+		containerBuffer = ByteBuffer.wrap(doContainerBytes);
+		containerBuffer.put(contentBytes, 0, contentBytes.length);
+
+		// Write out the complete Discovery Object container
+
+		contentFile = Utils.backupAndRecreate(contentFile);
+		message = Utils.writeBytes(containerBuffer.array(), contentFile.toString(), "Discovery Object");
 		if (message != null) {
 			logger.debug(message);
 		}
@@ -1186,15 +1380,15 @@ public class ContentSignerTool {
 		byte[] soContainerBytes = new byte[length];
 		ByteBuffer containerBuffer = null;
 		containerBuffer = ByteBuffer.wrap(soContainerBytes);
-		containerBuffer.put(securityObjectDgMapTag);
+		containerBuffer.put((byte) securityObjectDgMapTag);
 		containerBuffer.put((byte) (mappingBytes.length & 0xff));
 		containerBuffer.put(mappingBytes);
-		containerBuffer.put(securityObjectDgHashesTag);
+		containerBuffer.put((byte) securityObjectDgHashesTag);
 		containerBuffer.put((byte) 0x82);
 		containerBuffer.put((byte) ((signedSecurityObjectBytes.length >>> 8) & 0xff));
 		containerBuffer.put((byte) (signedSecurityObjectBytes.length & 0xff));
 		containerBuffer.put(signedSecurityObjectBytes);
-		containerBuffer.put(errorDetectionCodeTag);
+		containerBuffer.put((byte) errorDetectionCodeTag);
 		containerBuffer.put((byte) 0x00);
 
 		securityObjectFile = Utils.backupAndRecreate(securityObjectFile);
