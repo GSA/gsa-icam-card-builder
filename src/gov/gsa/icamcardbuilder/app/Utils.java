@@ -457,14 +457,6 @@ public class Utils {
 	public static int getTag(byte[] bytes, int pos) {
 		int tag = bytes[0] & 0x000000ff;
 		int i = pos;
-		/* https://en.wikipedia.org/wiki/X.690
-		 * Where the identifier is not universal, its tag number may be too large for the 5-bit tag field,
-		 * so it is encoded in further octets.  The initial octet encodes the class and primitive/constructed
-		 * as before, and bits 1–5 are 1. The tag number is encoded in the following octets, where
-		 * bit 8 of each is 1 if there are more octets, and bits 1–7 encode the tag number. The tag number
-		 * bits combined, big-endian, encode the tag number. The least number of following octets should be
-		 * encoded; that is, bits 1–7 should not all be 0 in the first following octet.
-		 */
 		if ((tag & 0x1f) == 0x1f) {
 			do {
 				tag |= (tag << 8) | (bytes[++i] & 0xff);
