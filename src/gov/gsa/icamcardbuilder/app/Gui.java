@@ -69,7 +69,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 public class Gui extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	protected final static String version = "1.8.21";
+	protected final static String version = "1.8.22";
 	protected static boolean debug = true;
 	protected static Logger logger;
 	protected static String decodedPath;
@@ -831,43 +831,43 @@ public class Gui extends JPanel {
 
 				// get the property value and print it out
 				if (prop.containsKey("fascnOid"))
-					fascnOidTextField.setText(prop.getProperty("fascnOid"));
+					fascnOidTextField.setText(prop.getProperty("fascnOid").trim());
 				if (prop.containsKey("fascn"))
-					fascnTextField.setText(prop.getProperty("fascn"));
+					fascnTextField.setText(prop.getProperty("fascn").trim());
 				if (prop.containsKey("uuidOid"))
-					uuidOidTextField.setText(prop.getProperty("uuidOid"));
+					uuidOidTextField.setText(prop.getProperty("uuidOid").trim());
 				if (prop.containsKey("uuid"))
-					uuidTextField.setText(prop.getProperty("uuid").replace("-", ""));
+					uuidTextField.setText(prop.getProperty("uuid").trim().replace("-", ""));
 				if (prop.containsKey("cardholderUuid"))
-					cardholderUuidTextField.setText(prop.getProperty("cardholderUuid").replace("-", ""));
+					cardholderUuidTextField.setText(prop.getProperty("cardholderUuid").trim().replace("-", ""));
 				if (prop.containsKey("signingKeyFile"))
-					signingKeyFileTextField.setText(pathFixup(prop.getProperty("signingKeyFile")));
+					signingKeyFileTextField.setText(pathFixup(prop.getProperty("signingKeyFile").trim()));
 				if (prop.containsKey("securityObjectFile"))
-					securityObjectFileTextField.setText(pathFixup(prop.getProperty("securityObjectFile")));
+					securityObjectFileTextField.setText(pathFixup(prop.getProperty("securityObjectFile").trim()));
 				if (prop.containsKey("passcode")) {
 					passcodePasswordField
-							.setText((prop.getProperty("passcode") == null) ? "" : prop.getProperty("passcode"));
+							.setText((prop.getProperty("passcode").trim() == null) ? "" : prop.getProperty("passcode"));
 				}
 				if (prop.containsKey("keyAlias"))
 					keyAliasTextField.setText(prop.getProperty("keyAlias"));
 				if (prop.containsKey("updateSecurityObject"))
-					updateSecurityObject = prop.getProperty("updateSecurityObject").toUpperCase().equals("Y") ? true
+					updateSecurityObject = prop.getProperty("updateSecurityObject").trim().toUpperCase().equals("Y") ? true
 							: false;
 				updateSecurityObjectCheckBoxMenuItem.setSelected(updateSecurityObject);
 				if (prop.containsKey("digestAlgorithm"))
-					digestAlgorithm = prop.getProperty("digestAlgorithm");
+					digestAlgorithm = prop.getProperty("digestAlgorithm").trim();
 				if (prop.containsKey("signatureAlgorithm"))
-					signatureAlgorithm = prop.getProperty("signatureAlgorithm");
+					signatureAlgorithm = prop.getProperty("signatureAlgorithm").trim();
 				if (prop.containsKey("expirationDate"))
-					expirationDate = prop.getProperty("expirationDate");
+					expirationDate = prop.getProperty("expirationDate").trim();
 				if (prop.containsKey("name"))
-					piName = prop.getProperty("name");
+					piName = prop.getProperty("name").trim();
 				if (prop.containsKey("employeeAffiliation"))
-					employeeAffiliation = prop.getProperty("employeeAffiliation");
+					employeeAffiliation = prop.getProperty("employeeAffiliation").trim();
 				if (prop.containsKey("agencyCardSerialNumber"))
-					agencyCardSerialNumber = prop.getProperty("agencyCardSerialNumber");
+					agencyCardSerialNumber = prop.getProperty("agencyCardSerialNumber").trim();
 				if (prop.containsKey("contentFile")) {
-					String contentFileName = pathFixup(prop.getProperty("contentFile"));
+					String contentFileName = pathFixup(prop.getProperty("contentFile").trim());
 					if (contentFileName != null && contentFileName.length() > 0) {
 						contentFileTextField.setText(pathFixup(prop.getProperty("contentFile")));
 						signedFileDestTextField.setText(
@@ -881,9 +881,9 @@ public class Gui extends JPanel {
 					}
 				}
 				if (prop.containsKey("pivCardApplicationAid"))
-					pivCardApplicationAid = prop.getProperty("pivCardApplicationAid");
+					pivCardApplicationAid = prop.getProperty("pivCardApplicationAid").trim();
 				if (prop.containsKey("pinUsagePolicy"))
-					pinUsagePolicy = prop.getProperty("pinUsagePolicy");
+					pinUsagePolicy = prop.getProperty("pinUsagePolicy").trim();
 			} catch (IOException ex) {
 				ex.printStackTrace();
 			} finally {

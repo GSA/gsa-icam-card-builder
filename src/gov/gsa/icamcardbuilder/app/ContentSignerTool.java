@@ -573,7 +573,6 @@ public class ContentSignerTool {
 					DataGroupHash ndghArray[] = dgHashMap.getDgHashes();
 					byte newMapping[] = dgHashMap.getDgMapping();
 					ContentInfo origSoContentInfo = dgHashMap.getCountentInfo();
-					LDSSecurityObject oldsso = dgHashMap.getLdsSecurityObject();
 					LDSSecurityObject nldsso = null;
 
 					Gui.progress.setValue(50);
