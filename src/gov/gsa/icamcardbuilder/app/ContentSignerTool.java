@@ -3,7 +3,6 @@ package gov.gsa.icamcardbuilder.app;
 import static gov.gsa.icamcardbuilder.app.Gui.dateFormat;
 import static gov.gsa.icamcardbuilder.app.Gui.logger;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -41,7 +40,6 @@ import org.apache.logging.log4j.LogManager;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Encoding;
-import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -567,8 +565,6 @@ public class ContentSignerTool {
 
 				switch (tag) {
 				case securityObjectDgMapTag: // Security Object DG Mapping
-					
-					// New stuff here
 					DgHashMap dgHashMap = new DgHashMap(securityObjectFileBytes);
 					dgHashMap.addDgHash(desiredContainerId, containerDigestBytes);	
 					if (clearDg)
@@ -576,107 +572,15 @@ public class ContentSignerTool {
 
 					DataGroupHash ndghArray[] = dgHashMap.getDgHashes();
 					byte newMapping[] = dgHashMap.getDgMapping();
-					
-					//******
-					
-/*					byte[] oldMapping = getMapping(securityObjectFileBytes); // DG Mapping					
-					
-					boolean newDg = false;
-					Byte dgNumber = 0;
-					logger.debug("Old Security Object mapping length = " + oldMapping.length);
-
-					// Map Container ID to DG number
-					HashMap<Short, Byte> dgMap = createDgMap(oldMapping);
-
-					// If the desired container doesn't exist find first available number
-					if (!clearDg && !dgMap.containsKey(desiredContainerId)) {
-						try {
-							// Find the next higher DG number
-							dgNumber = (byte) (firstAvailableDgNumber(dgMap));
-						} catch (NoSpaceForDataGroupException e) {
-							System.out.println("NoSpaceForDataGroupException caught (fatal).");
-							return;
-						}
-						// This is a new one, so expand the tables
-						dgMap.put(desiredContainerId, dgNumber);
-						newDg = true;
-					} else {
-						dgNumber = dgMap.get(desiredContainerId);
-						if (clearDg) {
-							dgMap.remove(desiredContainerId);
-						}
-					}
-
-					byte[] newMapping = dgMapToBytes(dgMap);
-					byte[] so = getSecurityObject(securityObjectFileBytes);
-					logger.debug("Old Security Object signed object length = " + so.length);
-
-					LDSSecurityObject oldsso = null;*/
+					ContentInfo origSoContentInfo = dgHashMap.getCountentInfo();
+					LDSSecurityObject oldsso = dgHashMap.getLdsSecurityObject();
 					LDSSecurityObject nldsso = null;
-/*
-					ASN1InputStream in = new ASN1InputStream(new ByteArrayInputStream(so));
-					Gui.progress.setValue(55);
+
+					Gui.progress.setValue(50);
+
+					nldsso = new LDSSecurityObject(digestAlgorithmAid, ndghArray);
+					
 					try {
-						ASN1Sequence seq = (ASN1Sequence) in.readObject();
-
-						DERTaggedObject dto1 = (DERTaggedObject) seq.getObjectAt(1).toASN1Primitive();
-						DERSequence seq1 = (DERSequence) dto1.getObject();
-						SignedData soSignedData = SignedData.getInstance(seq1);
-						ContentInfo origSoContentInfo = soSignedData.getEncapContentInfo();
-
-						DEROctetString oldRawSo = (DEROctetString) origSoContentInfo.getContent();
-						ASN1InputStream asn1is = new ASN1InputStream(new ByteArrayInputStream(oldRawSo.getOctets()));
-						ASN1Sequence soSeq = (ASN1Sequence) asn1is.readObject();
-						asn1is.close();
-
-						oldsso = LDSSecurityObject.getInstance(soSeq);
-
-						DataGroupHash[] odghArray = oldsso.getDatagroupHash();
-//						DataGroupHash[] ndghArray = null;
-//						DataGroupHash ndgh = new DataGroupHash(dgNumber, (new DEROctetString(containerDigestBytes)));
-						boolean dgHashFound = false;
-
-						if (clearDg) {
-							dgHashFound = true;
-							// Delete hash, but beware that it may not exist
-							if (dgNumberExists(odghArray, dgNumber))
-								ndghArray = new DataGroupHash[odghArray.length - 1];
-							else
-								ndghArray = new DataGroupHash[odghArray.length];
-
-							for (int i = 0, j = 0; i < odghArray.length; i++) {
-								if (odghArray[i].getDataGroupNumber() != dgNumber) {
-									// Copy existing hash
-									ndghArray[j++] = odghArray[i];
-									logger.debug("Clear DG Number " + odghArray[i].getDataGroupNumber() + " = " + Utils.bytesToHex(odghArray[i].getDataGroupHashValue().getOctets()));
-								}
-							}							
-						} else if (!newDg) {
-							// Replace hash
-							ndghArray = new DataGroupHash[odghArray.length];
-							System.arraycopy(odghArray, 0, ndghArray, 0, odghArray.length);
-							for (int i = 0; i < ndghArray.length; i++) {
-								if (ndghArray[i].getDataGroupNumber() == dgNumber) {
-									// Replace with updated hash
-									ndghArray[i] = ndgh; 
-									logger.debug("Replace DG Number " + ndghArray[i].getDataGroupNumber() + " = " + Utils.bytesToHex(ndghArray[i].getDataGroupHashValue().getOctets()));
-									dgHashFound = true;
-								}
-							}
-						}
-
-						if (newDg || !dgHashFound) {
-							// Add hash
-							ndghArray = new DataGroupHash[odghArray.length + 1];
-							System.arraycopy(odghArray, 0, ndghArray, 0, odghArray.length);
-							// Add new hash
-							ndghArray[ndghArray.length - 1] = ndgh;
-							logger.debug("New DG Number " + ndgh.getDataGroupNumber() + " = " + Utils.bytesToHex(ndgh.getDataGroupHashValue().getOctets()));
-						} 
-						*/
-						Gui.progress.setValue(50);
-
-						nldsso = new LDSSecurityObject(digestAlgorithmAid, ndghArray);
 						DEROctetString newRawSo = new DEROctetString(nldsso.getEncoded("DER"));
 
 						// Build a new Content Info (content, contentType) and
@@ -730,99 +634,6 @@ public class ContentSignerTool {
 		Security.removeProvider(bc.getName());
 	}
 	
-	/**
-	 * Returns if the requested data group number exists in the DG hash array
-	 * @param odghArray the array to be searched
-	 * @param dgNumber the data group number to search for
-	 * @return true if the data group number exists
-	 */
-
-	private boolean dgNumberExists(DataGroupHash[] odghArray, int dgNumber) {
-		int i;
-		boolean result = false;
-		for (i = 0; i < odghArray.length; i++) {
-			if (odghArray[i].getDataGroupNumber() == dgNumber) {
-				result = true;
-				break;
-			}
-		}
-		
-		return result;
-	}
-
-	/**
-	 * Returns the first available slot in the security object
-	 * 
-	 * @param dgMap
-	 *            Hashmap of datagroup elements
-	 * @return the first available data group number
-	 * @throws NoSpaceForDataGroupException if a data group slot can't be found
-	 */
-	private Byte firstAvailableDgNumber(HashMap<Short, Byte> dgMap) throws NoSpaceForDataGroupException {
-
-		int[] slots = new int[16];
-		Arrays.fill(slots, 0);
-
-		for (short k : dgMap.keySet())
-			slots[dgMap.get(k) - 1] = 1;
-
-		for (int i = 0; i < 16; i++)
-			if (slots[i] == 0)
-				return (byte) (i + 1);
-
-		throw new NoSpaceForDataGroupException("No space for another data group in Security Object.",
-				ContentSignerTool.class.getName());
-	}
-
-	/**
-	 * Creates a HashMap representing container IDs and their data group
-	 * numbers.
-	 * 
-	 * @param mapping
-	 *            byte array containing the value of the DG Map tag.
-	 * @return a HashMap of container IDs and group numbers.
-	 */
-	private HashMap<Short, Byte> createDgMap(byte[] mapping) {
-		HashMap<Short, Byte> dgMap = new HashMap<Short, Byte>(16);
-		for (int i = 0; i < mapping.length; i += 3) {
-			short cid = Utils.toShortFromBytes(mapping[i + 1], mapping[i + 2]);
-			dgMap.put(cid, mapping[i]);
-		}
-		return dgMap;
-	}
-
-	/**
-	 * Does the reverse of createDgMap. Converts a HashMap of container IDs and
-	 * DG numbers to a byte array suitable for writing to the DG Map tag in the
-	 * Security Object container.
-	 * 
-	 * @param dgMap
-	 *            HashMap of container IDs and DG numbers
-	 * @return a byte array suitable for writing to the DG Map tag in the
-	 *         Security Object container
-	 */
-
-	private byte[] dgMapToBytes(HashMap<Short, Byte> dgMap) {
-		byte[] mapping = new byte[3 * dgMap.size()];
-		int i = 0;
-		for (Short k : dgMap.keySet()) {
-			mapping[i++] = dgMap.get(k);
-			mapping[i++] = (byte) ((k & 0xff00) >> 8);
-			mapping[i++] = (byte) (k & 0xff);
-		}
-		return mapping;
-	}
-	
-	/**
-	 * Syncs the DG Map and DG Hashes
-	 * @param dgMap
-	 * @param dgHashes
-	 */
-	private void syncDgHashes (HashMap<Short, Byte> dgMap, DataGroupHash[] dgHashes) {
-		// 
-		
-	}
-
 	/**
 	 * Loads up class variables with properties.
 	 * 
@@ -889,38 +700,6 @@ public class ContentSignerTool {
 	}
 
 	/**
-	 * Creates a Hashtable of CHUID data
-	 * 
-	 * @param contentFileBytes
-	 *            bytes from content file
-	 * @return a Hashtable of CHUID tags (keys) and values
-	 */
-	private LinkedHashMap<Integer, byte[]> getChuidContents(byte[] contentFileBytes) {
-		LinkedHashMap<Integer, byte[]> tagsValues = new LinkedHashMap<Integer, byte[]>();
-		int tagPosArray[] = new int[1];
-		int tagArray[] = new int[1];
-		tagPosArray[0] = tagArray[0] = 0;
-		byte value[] = new byte[1];
-		do {
-			try {
-				if ((value = Utils.tlvparse(contentFileBytes, tagPosArray, tagArray)) != null)
-					if (tagArray[0] != authenticationKeyMapTag && tagArray[0] != bufferLengthTag)
-						tagsValues.put(tagArray[0], value);
-			} catch (Exception e) {
-				System.out.println("TlvParserException handled\n");
-			}
-		} while (tagPosArray[0] > 0 && tagArray[0] != errorDetectionCodeTag);
-
-		List<Integer> list = new ArrayList<Integer>(tagsValues.keySet());
-
-		for (Integer k : list) {
-			value = tagsValues.get(k);
-			logger.debug("Tag = " + String.format("%04X",  k) + ", Len = " + value.length + ", Value = " + Utils.bytesToHex(value));
-		}
-		return tagsValues;
-	}
-
-	/**
 	 * Creates a Hashtable of Discovery Object data
 	 * 
 	 * @param contentFileBytes
@@ -961,82 +740,6 @@ public class ContentSignerTool {
 		return tagsValues;
 	}
 	
-	
-	/**
-	 * Creates a Hashtable of Printed Information data
-	 * 
-	 * @param contentFileBytes
-	 *            bytes from content file
-	 * @return a Hashtable of Printed Information tags (keys) and values
-	 */
-	private LinkedHashMap<Integer, byte[]> getPiContents(byte[] contentFileBytes) {
-		LinkedHashMap<Integer, byte[]> tagsValues = new LinkedHashMap<Integer, byte[]>();
-		int tagPosArray[] = new int[1];
-		int tagArray[] = new int[1];
-		tagPosArray[0] = tagArray[0] = 0;
-		byte value[] = new byte[1];
-		do {
-
-			try {
-				if ((value = Utils.tlvparse(contentFileBytes, tagPosArray, tagArray)) != null)
-					tagsValues.put(tagArray[0], value);
-			} catch (Exception e) {
-				System.out.println("TlvParserException handled\n");
-			}
-		} while (tagPosArray[0] > 0 && tagArray[0] != errorDetectionCodeTag);
-
-		List<Integer> list = new ArrayList<Integer>(tagsValues.keySet());
-
-		for (Integer k : list) {
-			value = tagsValues.get(k);
-			try {
-				logger.debug("Tag = " + String.format("%04X", k) + ", Len = " + value.length + ", Value = " + Utils.bytesToHex(value));
-			} catch (Exception e) {
-				return null;
-			}
-		}
-		return tagsValues;
-	}
-
-	/**
-	 * Gets the contents of the DG mapping value from the Security Object
-	 * 
-	 * @param fileBytes
-	 *            Security Object file byte array
-	 * @return byte array containing the DG Mapping value
-	 */
-	private byte[] getMapping(byte[] fileBytes) {
-		int len = fileBytes[1] & 0xFF;
-		byte[] mapping = new byte[len];
-		for (int j = 0, i = 2; i < len + 2;) {
-			for (int k = 0; k < 3; k++)
-				mapping[j++] = fileBytes[i++];
-		}
-
-		return mapping;
-	}
-
-	/**
-	 * Gets the contents of the Data Group hash from the Security Object
-	 * 
-	 * @param fileBytes
-	 *            Security Object file byte array
-	 * @return byte array containing the Data Group Hashes value (also known as
-	 *         the security object)
-	 */
-	private byte[] getSecurityObject(byte[] fileBytes) {
-		int mapLen = fileBytes[1] & 0xff;
-		byte so[] = null;
-
-		int tagOffset = 2 + mapLen;
-		if ((fileBytes[tagOffset] & 0xff) == securityObjectDgHashesTag) {
-			int soLen = ((int) (fileBytes[tagOffset + 2] & 0x0ff) << 8) | (int) (fileBytes[tagOffset + 3] & 0x0ff);
-			so = new byte[soLen];
-			System.arraycopy(fileBytes, tagOffset + 4, so, 0, soLen);
-		}
-		return so;
-	}
-
 	/**
 	 * Loads the a private key from a .p12 file and populates a class field.
 	 * 
