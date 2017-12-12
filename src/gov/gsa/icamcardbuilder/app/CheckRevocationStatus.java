@@ -29,8 +29,11 @@ public final class CheckRevocationStatus {
 
 	/**
 	 * Check revocation status entry point
-	 * @param signingCert certificate to be checked for revocation
-	 * @throws RevocationStatusException if a certificate is revoked or some other CRL error occurs
+	 * 
+	 * @param signingCert
+	 *            certificate to be checked for revocation
+	 * @throws RevocationStatusException
+	 *             if a certificate is revoked or some other CRL error occurs
 	 */
 	public static void getRevocationStatus(X509Certificate signingCert) throws RevocationStatusException {
 		try {
@@ -38,26 +41,31 @@ public final class CheckRevocationStatus {
 			for (String crlDp : crlDistPoints) {
 				X509CRL x509crl = downloadCRL(crlDp);
 				if (x509crl.isRevoked(signingCert)) {
-					throw new RevocationStatusException("The signing certificate is revoked.", CheckRevocationStatus.class.getName());
+					throw new RevocationStatusException("The signing certificate is revoked.",
+							CheckRevocationStatus.class.getName());
 				}
 			}
 		} catch (Exception e) {
 			if (e instanceof RevocationStatusException) {
 				throw (RevocationStatusException) e;
 			} else {
-				throw new RevocationStatusException("Can't verify CRL for certificate: " + e.getMessage(), CheckRevocationStatus.class.getName());
+				throw new RevocationStatusException("Can't verify CRL for certificate: " + e.getMessage(),
+						CheckRevocationStatus.class.getName());
 			}
 		}
 	}
 
 	/**
 	 * Downloads the CRL at the specified URL
-	 * @param crlUri the URL to be accessed
+	 * 
+	 * @param crlUri
+	 *            the URL to be accessed
 	 * @return an X509CRL object
-	 * @throws RevocationStatusException if the URL doesn't start with 
-	 *        "http://" or "https://" or the URL can't be generated from the stream being downloaded.
+	 * @throws RevocationStatusException
+	 *             if the URL doesn't start with "http://" or "https://" or the
+	 *             URL can't be generated from the stream being downloaded.
 	 */
-	private static X509CRL downloadCRL(String crlUri) throws  RevocationStatusException {
+	private static X509CRL downloadCRL(String crlUri) throws RevocationStatusException {
 		X509CRL x509crl = null;
 		if (crlUri.startsWith("http://") || crlUri.startsWith("https://")) {
 			URL uri;
@@ -67,19 +75,24 @@ public final class CheckRevocationStatus {
 				InputStream uriStream = uri.openStream();
 				x509crl = (X509CRL) certFactory.generateCRL(uriStream);
 			} catch (IOException | CertificateException | CRLException e) {
-				throw new RevocationStatusException("CRL exception: " + e.getMessage(), CheckRevocationStatus.class.getName());
+				throw new RevocationStatusException("CRL exception: " + e.getMessage(),
+						CheckRevocationStatus.class.getName());
 			}
 		} else {
-			throw new RevocationStatusException("CRL URI must start with http:// or https://", CheckRevocationStatus.class.getName());
+			throw new RevocationStatusException("CRL URI must start with http:// or https://",
+					CheckRevocationStatus.class.getName());
 		}
 		return x509crl;
 	}
 
 	/**
 	 * Gets the CRLDPs from the specified certificate
-	 * @param cert the certificate to be checked
+	 * 
+	 * @param cert
+	 *            the certificate to be checked
 	 * @return An ArrayList of CRL distribution point URIs
-	 * @throws RevocationStatusException if the URIs can't be extracted from the certificate
+	 * @throws RevocationStatusException
+	 *             if the URIs can't be extracted from the certificate
 	 */
 	public static ArrayList<String> getCrlDistributionPoints(X509Certificate cert) throws RevocationStatusException {
 
@@ -90,9 +103,11 @@ public final class CheckRevocationStatus {
 		if (crldpExt != null) {
 			try {
 				@SuppressWarnings("resource")
-				DEROctetString crlOs = (DEROctetString) (new ASN1InputStream(new ByteArrayInputStream(crldpExt)).readObject());
+				DEROctetString crlOs = (DEROctetString) (new ASN1InputStream(new ByteArrayInputStream(crldpExt))
+						.readObject());
 				@SuppressWarnings("resource")
-				ASN1Primitive crlDpDer = (new ASN1InputStream(new ByteArrayInputStream(crlOs.getOctets()))).readObject();
+				ASN1Primitive crlDpDer = (new ASN1InputStream(new ByteArrayInputStream(crlOs.getOctets())))
+						.readObject();
 				CRLDistPoint crlDp = CRLDistPoint.getInstance(crlDpDer);
 				for (DistributionPoint distPoint : crlDp.getDistributionPoints()) {
 					DistributionPointName distPointName = distPoint.getDistributionPoint();
@@ -112,8 +127,9 @@ public final class CheckRevocationStatus {
 			} catch (IOException e) {
 				throw new RevocationStatusException(e.getMessage(), CheckRevocationStatus.class.getName());
 			}
-		} else { 
-			throw new RevocationStatusException("No CRL Distribution Point OID was found.", CheckRevocationStatus.class.getName());
+		} else {
+			throw new RevocationStatusException("No CRL Distribution Point OID was found.",
+					CheckRevocationStatus.class.getName());
 		}
 		return crlDps;
 	}

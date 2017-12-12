@@ -170,7 +170,7 @@ public class Gui extends JPanel {
 				(frameDimension.height / 2 - frame.getSize().height / 2) - 400);
 
 		logger.debug(String.format("Screen height: %d, width %d", frameDimension.height, frameDimension.width));
-		
+
 		JTabbedPane tabbedPane = new JTabbedPane();
 
 		Dimension dimension = new Dimension();
@@ -301,10 +301,10 @@ public class Gui extends JPanel {
 				if (status != null) {
 					status.setText("");
 				}
-				
+
 			}
 		});
-		
+
 		statusLabel = new JLabel();
 		statusLabel.setText("Status:");
 		statusLabel.setHorizontalAlignment(SwingConstants.TRAILING);
@@ -410,7 +410,7 @@ public class Gui extends JPanel {
 		progress.setStringPainted(true);
 		progress.setIndeterminate(false);
 		progress.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		
+
 		menuBar = new JMenuBar();
 		fileMenu = new JMenu();
 		optionsMenu = new JMenu();
@@ -507,15 +507,13 @@ public class Gui extends JPanel {
 			}
 		});
 		helpMenu.add(aboutMenu);
-		
+
 		logger.debug("Created controls");
-		
+
 		GroupLayout glPanel = new GroupLayout(signingPanel);
-		glPanel.setHorizontalGroup(
-			glPanel.createParallelGroup(Alignment.LEADING)
-				.addGroup(glPanel.createSequentialGroup()
-					.addGap(18)
-					.addGroup(glPanel.createParallelGroup(Alignment.LEADING, false)
+		glPanel.setHorizontalGroup(glPanel.createParallelGroup(Alignment.LEADING).addGroup(glPanel
+				.createSequentialGroup().addGap(18)
+				.addGroup(glPanel.createParallelGroup(Alignment.LEADING, false)
 						.addComponent(contentFileBrowseButton, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
 						.addComponent(signedFileDestLabel, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
 						.addComponent(securityObjectFileBrowseButton, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
@@ -528,87 +526,86 @@ public class Gui extends JPanel {
 						.addComponent(uuidLabel, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
 						.addComponent(cardholderUuidLabel, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
 						.addComponent(signButton, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
-						.addComponent(statusLabel, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
+						.addComponent(statusLabel, GroupLayout.DEFAULT_SIZE, 120,
+								Short.MAX_VALUE)
 						.addComponent(clearButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-					.addGap(18)
-					.addGroup(glPanel.createParallelGroup(Alignment.LEADING)
-						.addGroup(glPanel.createParallelGroup(Alignment.LEADING, false)
-							.addComponent(contentFileTextField, GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
-							.addComponent(signedFileDestTextField, GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
-							.addComponent(securityObjectFileTextField, GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
-							.addComponent(signingKeyFileTextField, GroupLayout.DEFAULT_SIZE, 500, GroupLayout.PREFERRED_SIZE)
-							.addComponent(keyAliasTextField, GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE)
-							.addComponent(passcodePasswordField, GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE)
-							.addComponent(fascnOidTextField, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)
-							.addComponent(fascnTextField, GroupLayout.PREFERRED_SIZE, 400, GroupLayout.PREFERRED_SIZE)
-							.addComponent(uuidOidTextField, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)
-							.addComponent(uuidTextField, GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE)
-							.addComponent(cardholderUuidTextField, GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE))
+				.addGap(18)
+				.addGroup(glPanel.createParallelGroup(Alignment.LEADING).addGroup(glPanel
+						.createParallelGroup(Alignment.LEADING, false)
+						.addComponent(contentFileTextField, GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
+						.addComponent(signedFileDestTextField, GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
+						.addComponent(securityObjectFileTextField, GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
+						.addComponent(signingKeyFileTextField, GroupLayout.DEFAULT_SIZE, 500,
+								GroupLayout.PREFERRED_SIZE)
+						.addComponent(keyAliasTextField, GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE)
+						.addComponent(passcodePasswordField, GroupLayout.PREFERRED_SIZE, 300,
+								GroupLayout.PREFERRED_SIZE)
+						.addComponent(fascnOidTextField, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)
+						.addComponent(fascnTextField, GroupLayout.PREFERRED_SIZE, 400, GroupLayout.PREFERRED_SIZE)
+						.addComponent(uuidOidTextField, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)
+						.addComponent(uuidTextField, GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE)
+						.addComponent(cardholderUuidTextField, GroupLayout.PREFERRED_SIZE, 300,
+								GroupLayout.PREFERRED_SIZE))
 						.addComponent(progress, GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
 						.addComponent(statusScrollPane, GroupLayout.PREFERRED_SIZE, 500, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-		);
-		glPanel.setVerticalGroup(
-			glPanel.createParallelGroup(Alignment.LEADING)
-				.addGroup(glPanel.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(glPanel.createParallelGroup(Alignment.BASELINE)
-						.addComponent(contentFileBrowseButton)
-						.addComponent(contentFileTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(6)
-					.addGroup(glPanel.createParallelGroup(Alignment.LEADING)
-						.addComponent(signedFileDestLabel)
-						.addComponent(signedFileDestTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(6)
-					.addGroup(glPanel.createParallelGroup(Alignment.BASELINE)
-						.addComponent(securityObjectFileBrowseButton)
-						.addComponent(securityObjectFileTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(6)
-					.addGroup(glPanel.createParallelGroup(Alignment.LEADING)
-						.addComponent(signingKeyBrowseButton)
-						.addComponent(signingKeyFileTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(6)
-					.addGroup(glPanel.createParallelGroup(Alignment.BASELINE)
-						.addComponent(keyAliasLabel)
-						.addComponent(keyAliasTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(6)
-					.addGroup(glPanel.createParallelGroup(Alignment.LEADING)
-						.addComponent(passcodeLabel)
-						.addComponent(passcodePasswordField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(6)
-					.addGroup(glPanel.createParallelGroup(Alignment.LEADING)
-						.addComponent(fascnOidLabel)
-						.addComponent(fascnOidTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(6)
-					.addGroup(glPanel.createParallelGroup(Alignment.LEADING)
-						.addComponent(fascnLabel)
-						.addComponent(fascnTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(6)
-					.addGroup(glPanel.createParallelGroup(Alignment.LEADING)
-						.addComponent(uuidOidLabel)
-						.addComponent(uuidOidTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(6)
-					.addGroup(glPanel.createParallelGroup(Alignment.LEADING)
-						.addComponent(uuidLabel)
-						.addComponent(uuidTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(6)
-					.addGroup(glPanel.createParallelGroup(Alignment.LEADING)
-						.addComponent(cardholderUuidLabel)
-						.addComponent(cardholderUuidTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(6)
-					.addGroup(glPanel.createParallelGroup(Alignment.LEADING)
-						.addComponent(statusLabel)
-						.addComponent(progress, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE))
-					.addGap(18)
-					.addGroup(glPanel.createParallelGroup(Alignment.LEADING)
-						.addGroup(glPanel.createSequentialGroup()
-							.addComponent(signButton)
-							.addPreferredGap(ComponentPlacement.RELATED, 101, Short.MAX_VALUE)
-							.addComponent(clearButton))
-						.addComponent(statusScrollPane, GroupLayout.DEFAULT_SIZE, 147, Short.MAX_VALUE))
-					.addContainerGap())
-		);
-		
+				.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
+		glPanel.setVerticalGroup(glPanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(glPanel.createSequentialGroup().addContainerGap()
+						.addGroup(glPanel.createParallelGroup(Alignment.BASELINE).addComponent(contentFileBrowseButton)
+								.addComponent(contentFileTextField, GroupLayout.PREFERRED_SIZE,
+										GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addGap(6)
+						.addGroup(glPanel.createParallelGroup(Alignment.LEADING).addComponent(signedFileDestLabel)
+								.addComponent(signedFileDestTextField, GroupLayout.PREFERRED_SIZE,
+										GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addGap(6)
+						.addGroup(glPanel.createParallelGroup(Alignment.BASELINE)
+								.addComponent(securityObjectFileBrowseButton).addComponent(securityObjectFileTextField,
+										GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+										GroupLayout.PREFERRED_SIZE))
+						.addGap(6)
+						.addGroup(glPanel.createParallelGroup(Alignment.LEADING).addComponent(signingKeyBrowseButton)
+								.addComponent(signingKeyFileTextField, GroupLayout.PREFERRED_SIZE,
+										GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addGap(6)
+						.addGroup(glPanel.createParallelGroup(Alignment.BASELINE)
+								.addComponent(keyAliasLabel).addComponent(keyAliasTextField, GroupLayout.PREFERRED_SIZE,
+										GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addGap(6)
+						.addGroup(glPanel.createParallelGroup(Alignment.LEADING).addComponent(passcodeLabel)
+								.addComponent(passcodePasswordField, GroupLayout.PREFERRED_SIZE,
+										GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addGap(6)
+						.addGroup(glPanel.createParallelGroup(Alignment.LEADING)
+								.addComponent(fascnOidLabel).addComponent(fascnOidTextField, GroupLayout.PREFERRED_SIZE,
+										GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addGap(6)
+						.addGroup(glPanel.createParallelGroup(Alignment.LEADING)
+								.addComponent(fascnLabel).addComponent(fascnTextField, GroupLayout.PREFERRED_SIZE,
+										GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addGap(6)
+						.addGroup(glPanel.createParallelGroup(Alignment.LEADING)
+								.addComponent(uuidOidLabel).addComponent(uuidOidTextField, GroupLayout.PREFERRED_SIZE,
+										GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addGap(6)
+						.addGroup(glPanel.createParallelGroup(Alignment.LEADING)
+								.addComponent(uuidLabel).addComponent(uuidTextField, GroupLayout.PREFERRED_SIZE,
+										GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addGap(6)
+						.addGroup(glPanel.createParallelGroup(Alignment.LEADING).addComponent(cardholderUuidLabel)
+								.addComponent(cardholderUuidTextField, GroupLayout.PREFERRED_SIZE,
+										GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addGap(6)
+						.addGroup(glPanel.createParallelGroup(Alignment.LEADING).addComponent(statusLabel)
+								.addComponent(progress, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE))
+						.addGap(18)
+						.addGroup(glPanel.createParallelGroup(Alignment.LEADING)
+								.addGroup(glPanel.createSequentialGroup().addComponent(signButton)
+										.addPreferredGap(ComponentPlacement.RELATED, 101, Short.MAX_VALUE).addComponent(
+												clearButton))
+								.addComponent(statusScrollPane, GroupLayout.DEFAULT_SIZE, 147, Short.MAX_VALUE))
+						.addContainerGap()));
+
 		logger.debug("Finished layout");
 
 		// add menuBar items and menuBar to the frame
@@ -621,29 +618,31 @@ public class Gui extends JPanel {
 		JComponent panel1 = makeTextPanel("Card encoding controls go here.");
 		tabbedPane.addTab("Card Encoder", null, panel1, "Card Encoder");
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
-//
-//		JComponent panel2 = makeTextPanel("Panel #2");
-//		tabbedPane.addTab("Tab 2", null, panel2, "Does twice as much nothing");
-//		tabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
-//
-//		JComponent panel3 = makeTextPanel("Panel #3");
-//		tabbedPane.addTab("Tab 3", null, panel3, "Still does nothing");
-//		tabbedPane.setMnemonicAt(2, KeyEvent.VK_3);
-//
-//		JComponent panel4 = makeTextPanel("Panel #4 (has a preferred size of 410 x 50).");
-//		panel4.setVisible(false);
-//		tabbedPane.addTab("Tab 4", null, panel4, "Does nothing at all");
-//		tabbedPane.setMnemonicAt(3, KeyEvent.VK_4);
+		//
+		// JComponent panel2 = makeTextPanel("Panel #2");
+		// tabbedPane.addTab("Tab 2", null, panel2, "Does twice as much
+		// nothing");
+		// tabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
+		//
+		// JComponent panel3 = makeTextPanel("Panel #3");
+		// tabbedPane.addTab("Tab 3", null, panel3, "Still does nothing");
+		// tabbedPane.setMnemonicAt(2, KeyEvent.VK_3);
+		//
+		// JComponent panel4 = makeTextPanel("Panel #4 (has a preferred size of
+		// 410 x 50).");
+		// panel4.setVisible(false);
+		// tabbedPane.addTab("Tab 4", null, panel4, "Does nothing at all");
+		// tabbedPane.setMnemonicAt(3, KeyEvent.VK_4);
 
 		// Add the tabbed pane to this panel.
 		this.add(tabbedPane);
-		
+
 		logger.debug("Added tabs");
 
 		// The following line enables us to use scrolling tabs.
 		tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 		signingPanel.setLayout(glPanel);
-		
+
 		logger.debug("Finished GUI creation");
 	}
 
@@ -775,7 +774,7 @@ public class Gui extends JPanel {
 		if (dir.exists()) {
 			currentDirectory += "cards" + File.separator + "ICAM_Card_Objects";
 		}
-			
+
 		contentFileChooser.setCurrentDirectory(new File(currentDirectory));
 		int returnVal = contentFileChooser.showOpenDialog(frame);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -808,16 +807,17 @@ public class Gui extends JPanel {
 	}
 
 	private void openPropertiesFileActionPerformed(java.awt.event.ActionEvent evt) {
-		
+
 		if (!located) {
 			File dir = new File(currentDirectory + "cards" + File.separator + "ICAM_Card_Objects");
 			if (dir.exists()) {
-				currentDirectory +=  "cards" + File.separator + "ICAM_Card_Objects";
+				currentDirectory += "cards" + File.separator + "ICAM_Card_Objects";
 				located = true;
 			}
 		}
 		propertiesFileChooser.setPreferredSize(new Dimension(840, 500));
-		propertiesFileChooser.setFileFilter(new FileNameExtensionFilter("Properties Files", new String[] { "properties" }));
+		propertiesFileChooser
+				.setFileFilter(new FileNameExtensionFilter("Properties Files", new String[] { "properties" }));
 		propertiesFileChooser.setCurrentDirectory(new File(currentDirectory));
 		int returnVal = propertiesFileChooser.showOpenDialog(frame);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -851,8 +851,8 @@ public class Gui extends JPanel {
 				if (prop.containsKey("keyAlias"))
 					keyAliasTextField.setText(prop.getProperty("keyAlias"));
 				if (prop.containsKey("updateSecurityObject"))
-					updateSecurityObject = prop.getProperty("updateSecurityObject").trim().toUpperCase().equals("Y") ? true
-							: false;
+					updateSecurityObject = prop.getProperty("updateSecurityObject").trim().toUpperCase().equals("Y")
+							? true : false;
 				updateSecurityObjectCheckBoxMenuItem.setSelected(updateSecurityObject);
 				if (prop.containsKey("digestAlgorithm"))
 					digestAlgorithm = prop.getProperty("digestAlgorithm").trim();
@@ -1090,9 +1090,10 @@ public class Gui extends JPanel {
 				properties.put("digestAlgorithm", digestAlgorithm);
 				properties.put("signatureAlgorithm", signatureAlgorithm);
 				properties.put("expirationDate", expirationDate);
-				properties.put("name", (piName != null) ? piName : ""); 
+				properties.put("name", (piName != null) ? piName : "");
 				properties.put("employeeAffiliation", (employeeAffiliation != null) ? employeeAffiliation : "");
-				properties.put("agencyCardSerialNumber", (agencyCardSerialNumber != null) ? agencyCardSerialNumber : "");
+				properties.put("agencyCardSerialNumber",
+						(agencyCardSerialNumber != null) ? agencyCardSerialNumber : "");
 				properties.put("pivCardApplicationAid", pivCardApplicationAid);
 				properties.put("pinUsagePolicy", pinUsagePolicy);
 			}

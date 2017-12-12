@@ -11,13 +11,17 @@ import org.apache.logging.log4j.LogManager;
 public class KeystoreException extends Exception {
 
 	private String message = null;
-	
+
 	/**
-	 * Exception for anything related to opening and accessing the .p12 keystore.
-	 * @param errorMessage error message from thrower
-	 * @param className name of the class throwing the exception
+	 * Exception for anything related to opening and accessing the .p12
+	 * keystore.
+	 * 
+	 * @param errorMessage
+	 *            error message from thrower
+	 * @param className
+	 *            name of the class throwing the exception
 	 */
-	public KeystoreException (String errorMessage, String className) {
+	public KeystoreException(String errorMessage, String className) {
 		super();
 		logger = LogManager.getLogger(className);
 		this.message = errorMessage;

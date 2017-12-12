@@ -88,7 +88,8 @@ public class Utils {
 	 * @param inDate
 	 *            date in yyyyMMDD (20171231) format
 	 * @return string with the date formated in yyyyMMMdd (2017DEC31)
-	 * @throws DateParserException if the date is malformed and can't be parsed.
+	 * @throws DateParserException
+	 *             if the date is malformed and can't be parsed.
 	 */
 	public static String toPrintedDate(String inDate) throws DateParserException {
 		SimpleDateFormat format1 = new SimpleDateFormat("yyyyMMdd");
@@ -111,7 +112,8 @@ public class Utils {
 	 * @param dateString
 	 *            a string representing the date from Date()
 	 * @return a byte array of the date appended with "Z"
-	 * @throws DateParserException if the date is malformed and can't be parsed.
+	 * @throws DateParserException
+	 *             if the date is malformed and can't be parsed.
 	 * 
 	 */
 	public static byte[] makeDateArray(String dateString) throws DateParserException {
@@ -122,7 +124,7 @@ public class Utils {
 			}
 			returnval[7] = (byte) 'Z';
 		} catch (NumberFormatException x) {
-			throw new DateParserException ("Could not parse date: " +  dateString + ".", Utils.class.getName());
+			throw new DateParserException("Could not parse date: " + dateString + ".", Utils.class.getName());
 		}
 		return returnval;
 	}
@@ -147,7 +149,8 @@ public class Utils {
 	 * @param s
 	 *            the string to be converted
 	 * @return a byte array containing bytes as represented by argument s
-	 * @throws InvalidDataFormatException if an bad date format is encountered
+	 * @throws InvalidDataFormatException
+	 *             if an bad date format is encountered
 	 */
 	public static byte[] hexStringToByteArray(String s) throws InvalidDataFormatException {
 		int len = s.length();
@@ -156,7 +159,7 @@ public class Utils {
 			for (int i = 0; i < len; i += 2) {
 				data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i + 1), 16));
 			}
-		} catch (Exception e) { 
+		} catch (Exception e) {
 			throw new InvalidDataFormatException("Data format of hex string is invalid " + s, Utils.class.getName());
 		}
 		return data;
@@ -168,7 +171,8 @@ public class Utils {
 	 * @param singleByte
 	 *            the byte to be converted
 	 * @return string of length two bytes representing the byte singleByte
-	 * @throws InvalidDataFormatException if a byte can't be converted 
+	 * @throws InvalidDataFormatException
+	 *             if a byte can't be converted
 	 */
 	public static String byteToHex(byte singleByte) throws InvalidDataFormatException {
 		char[] hexChars = new char[2];
@@ -178,7 +182,8 @@ public class Utils {
 			hexChars[0] = hexArray[v >>> 4];
 			hexChars[1] = hexArray[v & 0x0F];
 		} catch (Exception e) {
-			throw new InvalidDataFormatException("Data format of hex byte is invalid " + Character.digit(singleByte, v), Utils.class.getName());
+			throw new InvalidDataFormatException("Data format of hex byte is invalid " + Character.digit(singleByte, v),
+					Utils.class.getName());
 		}
 		return new String(hexChars);
 	}
@@ -296,7 +301,8 @@ public class Utils {
 		if (properties.containsKey(key)) {
 			value = properties.get(key);
 		} else {
-			throw new NoSuchPropertyException("Properties object doesn't contain a value for " + key, Utils.class.getName());
+			throw new NoSuchPropertyException("Properties object doesn't contain a value for " + key,
+					Utils.class.getName());
 		}
 		return value;
 	}
@@ -325,15 +331,15 @@ public class Utils {
 			try {
 				// Tag
 				if (numberTagBytes == 2) {
-					os.write((byte)(((b & 0xff00) >> 8) & 0xff));
-					os.write((byte)(b & 0x00ff));
+					os.write((byte) (((b & 0xff00) >> 8) & 0xff));
+					os.write((byte) (b & 0x00ff));
 				} else
-					os.write((byte)((b) & 0xff));
+					os.write((byte) ((b) & 0xff));
 				// Length & value
 				if (numberLenBytes == 2) {
-					os.write((byte)((0x80 + numberLenBytes) & 0xff));
-					os.write((byte)(((value.length & 0xff00) >> 8) & 0xff));
-					os.write((byte)(value.length & 0x00ff));
+					os.write((byte) ((0x80 + numberLenBytes) & 0xff));
+					os.write((byte) (((value.length & 0xff00) >> 8) & 0xff));
+					os.write((byte) (value.length & 0x00ff));
 					os.write(value);
 				} else if (numberLenBytes == 1) {
 					os.write((byte) (value.length & 0xff));
@@ -349,7 +355,7 @@ public class Utils {
 		}
 
 		// Add this deprecated relic here, since the CHUID hash includes it.
-		
+
 		if (endTag != 0) {
 			os.write(endTag);
 			os.write((byte) 0x00);
@@ -404,13 +410,14 @@ public class Utils {
 	 *            the data to be parsed
 	 * @param tagPosArray
 	 *            location of the starting tag
-	 * @param tagArragy
+	 * @param tagArray
 	 *            array that holds the tag
 	 * @return a byte array containing just the data corresponding to the tag
 	 *         and the location of the next tag (via the tagPosArray argument.
-	 * @throws TlvParserException if unexpected end-of-data is encountered.
+	 * @throws TlvParserException
+	 *             if unexpected end-of-data is encountered.
 	 */
-	protected static byte[] tlvparse(byte[] data, int[] tagPosArray , int[] tagArray) throws TlvParserException {
+	protected static byte[] tlvparse(byte[] data, int[] tagPosArray, int[] tagArray) throws TlvParserException {
 		byte value[] = null;
 		int len = 0;
 		int tagPos = tagPosArray[0];
@@ -428,7 +435,7 @@ public class Utils {
 				int j = 2;
 				for (len = 0; j < 2 + lenbytes; j++)
 					len = ((len << 8) | (data[tagPos + j]) & 0xff);
-			} else				
+			} else
 				len = data[tagPos + 1];
 
 			if (len > 0) {
@@ -447,10 +454,12 @@ public class Utils {
 		}
 		return value;
 	}
-	
+
 	/**
 	 * Gets the first tag in a byte array
-	 * @param bytes the bytes in a BER-TLV byte arraye
+	 * 
+	 * @param bytes
+	 *            the bytes in a BER-TLV byte arraye
 	 * @return the tag
 	 */
 

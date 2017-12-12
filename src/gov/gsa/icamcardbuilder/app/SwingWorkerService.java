@@ -11,66 +11,64 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 public class SwingWorkerService {
-  private static JProgressBar PROGRESS_BAR;
-  private static JLabel OUTPUT_LABEL;
-  
-  private static JFrame createGUI() {
-    JFrame testFrame = new JFrame( "TestFrame" );
-    PROGRESS_BAR = new JProgressBar(  );
-    PROGRESS_BAR.setMinimum( 0 );
-    PROGRESS_BAR.setMaximum( 100 );
-    OUTPUT_LABEL = new JLabel( "Processing" );
+	private static JProgressBar PROGRESS_BAR;
+	private static JLabel OUTPUT_LABEL;
 
-    testFrame.getContentPane().add( PROGRESS_BAR, BorderLayout.CENTER );
-    testFrame.getContentPane().add( OUTPUT_LABEL, BorderLayout.SOUTH );
+	private static JFrame createGUI() {
+		JFrame testFrame = new JFrame("TestFrame");
+		PROGRESS_BAR = new JProgressBar();
+		PROGRESS_BAR.setMinimum(0);
+		PROGRESS_BAR.setMaximum(100);
+		OUTPUT_LABEL = new JLabel("Processing");
 
-    //add a checkbox as well to proof the UI is still responsive
-    testFrame.getContentPane().add( new JCheckBox( "Click me to "
-            + "proof UI is responsive" ), BorderLayout.NORTH );
-    testFrame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
-    return testFrame;
-  }
+		testFrame.getContentPane().add(PROGRESS_BAR, BorderLayout.CENTER);
+		testFrame.getContentPane().add(OUTPUT_LABEL, BorderLayout.SOUTH);
 
-  public static void main( String[] args ) 
-          throws InvocationTargetException, InterruptedException {
-    EventQueue.invokeAndWait( new Runnable() {
-      @Override
-      public void run() {
-        JFrame frame = createGUI();
-        frame.pack();
-        frame.setVisible( true );
-      }
-    }
-    );
-    
-    //start the SwingWorker outside the EDT
-    MySwingWorker worker = new MySwingWorker( PROGRESS_BAR );
-    worker.execute();
-  }
-  private static class MySwingWorker extends SwingWorker<String, Double> {
-    private final JProgressBar fProgressBar;
-    private MySwingWorker( JProgressBar aProgressBar ) {
-      fProgressBar = aProgressBar;
-    }
+		// add a checkbox as well to proof the UI is still responsive
+		testFrame.getContentPane().add(new JCheckBox("Click me to " + "proof UI is responsive"), BorderLayout.NORTH);
+		testFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		return testFrame;
+	}
 
-    @Override
-    protected String doInBackground() throws Exception {
-      int maxNumber = 10;
-      for( int i = 0; i < maxNumber; i++ ){
-        Thread.sleep( 2000 );//simulate long running process
-        double factor = ((double)(i+1) / maxNumber);
-        System.out.println("Intermediate results ready");
-        publish( factor );//publish the progress
-      }
-      return "Finished";
-    }
+	public static void main(String[] args) throws InvocationTargetException, InterruptedException {
+		EventQueue.invokeAndWait(new Runnable() {
+			@Override
+			public void run() {
+				JFrame frame = createGUI();
+				frame.pack();
+				frame.setVisible(true);
+			}
+		});
 
-    @Override
-    protected void process( List<Double> aDoubles ) {
-      //update the percentage of the progress bar that is done
-      int amount = fProgressBar.getMaximum() - fProgressBar.getMinimum();
-      fProgressBar.setValue( ( int ) (fProgressBar.getMinimum() 
-              + ( amount * aDoubles.get( aDoubles.size() - 1 ))) );
-    }
-  }
+		// start the SwingWorker outside the EDT
+		MySwingWorker worker = new MySwingWorker(PROGRESS_BAR);
+		worker.execute();
+	}
+
+	private static class MySwingWorker extends SwingWorker<String, Double> {
+		private final JProgressBar fProgressBar;
+
+		private MySwingWorker(JProgressBar aProgressBar) {
+			fProgressBar = aProgressBar;
+		}
+
+		@Override
+		protected String doInBackground() throws Exception {
+			int maxNumber = 10;
+			for (int i = 0; i < maxNumber; i++) {
+				Thread.sleep(2000);// simulate long running process
+				double factor = ((double) (i + 1) / maxNumber);
+				System.out.println("Intermediate results ready");
+				publish(factor);// publish the progress
+			}
+			return "Finished";
+		}
+
+		@Override
+		protected void process(List<Double> aDoubles) {
+			// update the percentage of the progress bar that is done
+			int amount = fProgressBar.getMaximum() - fProgressBar.getMinimum();
+			fProgressBar.setValue((int) (fProgressBar.getMinimum() + (amount * aDoubles.get(aDoubles.size() - 1))));
+		}
+	}
 }

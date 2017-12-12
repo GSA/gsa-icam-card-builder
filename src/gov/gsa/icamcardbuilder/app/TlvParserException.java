@@ -1,4 +1,5 @@
 package gov.gsa.icamcardbuilder.app;
+
 import org.apache.logging.log4j.LogManager;
 
 import static gov.gsa.icamcardbuilder.app.Gui.dateFormat;
@@ -10,8 +11,8 @@ import java.util.Date;
 public class TlvParserException extends Exception {
 
 	private String message = null;
-	
-	public TlvParserException (String errorMessage, String className) {
+
+	public TlvParserException(String errorMessage, String className) {
 		super();
 		logger = LogManager.getLogger(className);
 		this.message = errorMessage;

@@ -106,7 +106,7 @@ public class ContentSignerTool {
 	protected static final short fingerprintContainerId = (short) 0x6010;
 	protected static final short facialImageContainerId = (short) 0x6030;
 	protected static final short irisContainerId = (short) 0x1015;
-	
+
 	protected static final int cccCardIdentifier = 0xf0;
 	protected static final int cccCapabilityContainerVersionNumberTag = 0xf1;
 	protected static final int cccCapabilityGrammarVersionNumber = 0xf2;
@@ -135,24 +135,18 @@ public class ContentSignerTool {
 	protected static final int securityObjectDgMapTag = 0xba;
 	protected static final int securityObjectDgHashesTag = 0xbb;
 	protected static final int errorDetectionCodeTag = 0xfe;
-	
+
 	protected static final String defaultDigAlgName = "SHA-256";
 	protected static final String defaultSigAlgName = "RSA";
 
-	protected static final byte[] doGlobalPinMandatory = { 
-		0x2f, 0x40, 0x00
-	};
-			
-	protected static final byte[] doGlobalPinPreferred = { 
-		0x2f, 0x60, 0x20
-	};
-	
-	protected static final byte[] doAppPinPreferred = { 
-		0x2f, 0x60, 0x10
-	};
-	
+	protected static final byte[] doGlobalPinMandatory = { 0x2f, 0x40, 0x00 };
+
+	protected static final byte[] doGlobalPinPreferred = { 0x2f, 0x60, 0x20 };
+
+	protected static final byte[] doAppPinPreferred = { 0x2f, 0x60, 0x10 };
+
 	private boolean clearDg = false;
-	
+
 	private String digestAlgorithmName = defaultDigAlgName;
 	private AlgorithmIdentifier digestAlgorithmAid = null;
 	private String signatureAlgorithmName = defaultSigAlgName;
@@ -183,7 +177,7 @@ public class ContentSignerTool {
 	private String expirationDate = null;
 	private String pinUsagePolicy = "";
 	private String pivCardApplicationAid = "";
-	private HashMap<Integer,String> containerDesc = null;
+	private HashMap<Integer, String> containerDesc = null;
 
 	/**
 	 * Handles CBEFF signing and Security Object updating and signing
@@ -271,7 +265,8 @@ public class ContentSignerTool {
 
 		switch (tag) {
 		case cccCardIdentifier:
-			@SuppressWarnings("unused") LinkedHashMap<Integer, byte[]> cccValues;
+			@SuppressWarnings("unused")
+			LinkedHashMap<Integer, byte[]> cccValues;
 			if ((cccValues = getCccContents(contentFileBytes)) == null) {
 				return;
 			}
@@ -285,9 +280,9 @@ public class ContentSignerTool {
 			// Map the values to the tags that were found in the container
 			if ((doContainer = getDoContents(contentFileBytes)) == null)
 				return;
-			
+
 			doChildren = getDoContents(doContainer.get(discoveryObjectTag));
-			
+
 			if (pinUsagePolicy != null && pinUsagePolicy.length() != 0) {
 				try {
 					if (pivCardApplicationAid.length() > 0 && pinUsagePolicy.length() > 0) {
@@ -310,18 +305,20 @@ public class ContentSignerTool {
 				doContainer.replace(discoveryObjectTag, contentBytes);
 				contentBytes = Utils.valuesToBytes(doContainer, "Discovery Object", 0);
 			} else {
-				// An empty PIN usage policy indicates to clear the Discovery Object (and remove the SO hash) 
+				// An empty PIN usage policy indicates to clear the Discovery
+				// Object (and remove the SO hash)
 				clearDg = true;
 				doContainer.replace(discoveryObjectTag, new byte[0]);
 				contentBytes = Utils.valuesToBytes(doContainer, "Discovery Object", 0);
 			}
 			desiredContainerId = discoveryObjectContainerId;
 			containerBufferBytes = writeDoContainer(contentFile, contentBytes);
-			/* This is a real hack.  The Security Object hash for Discovery Object must not
-			 * include the 7e tag and length.
+			/*
+			 * This is a real hack. The Security Object hash for Discovery
+			 * Object must not include the 7e tag and length.
 			 */
 			byte temp[] = new byte[containerBufferBytes.length - 2];
-			System.arraycopy(containerBufferBytes, 2, temp, 0, containerBufferBytes.length -2);
+			System.arraycopy(containerBufferBytes, 2, temp, 0, containerBufferBytes.length - 2);
 			containerBufferBytes = temp;
 			break;
 		case chuidFascnTag:
@@ -332,7 +329,7 @@ public class ContentSignerTool {
 			LinkedHashMap<Integer, byte[]> chuidValues;
 			if ((chuidValues = getDoContents(contentFileBytes)) == null) {
 				return;
-			}	
+			}
 			try {
 				if (chuidValues.containsKey(chuidFascnTag))
 					chuidValues.replace(chuidFascnTag, Utils.hexStringToByteArray(fascn));
@@ -376,7 +373,7 @@ public class ContentSignerTool {
 					chuidValues.replace(cardholderUuidTag, Utils.hexStringToByteArray(cardholderUuid));
 				else
 					chuidValues.put(cardholderUuidTag, Utils.hexStringToByteArray(cardholderUuid));
-	
+
 				if (chuidValues.containsKey(issuerAsymmetricSignatureTag))
 					chuidValues.remove(issuerAsymmetricSignatureTag);
 			} catch (InvalidDataFormatException e) {
@@ -402,7 +399,7 @@ public class ContentSignerTool {
 		case piOrgAffiliation1Tag:
 		case piOrgAffiliation2Tag:
 			// Not a signed object
-			LinkedHashMap<Integer,byte[]> piValues;
+			LinkedHashMap<Integer, byte[]> piValues;
 			if ((piValues = getDoContents(contentFileBytes)) == null)
 				return;
 
@@ -566,7 +563,7 @@ public class ContentSignerTool {
 				switch (tag) {
 				case securityObjectDgMapTag: // Security Object DG Mapping
 					DgHashMap dgHashMap = new DgHashMap(securityObjectFileBytes);
-					dgHashMap.addDgHash(desiredContainerId, containerDigestBytes);	
+					dgHashMap.addDgHash(desiredContainerId, containerDigestBytes);
 					if (clearDg)
 						dgHashMap.removeDgHash(desiredContainerId);
 
@@ -578,7 +575,7 @@ public class ContentSignerTool {
 					Gui.progress.setValue(50);
 
 					nldsso = new LDSSecurityObject(digestAlgorithmAid, ndghArray);
-					
+
 					try {
 						DEROctetString newRawSo = new DEROctetString(nldsso.getEncoded("DER"));
 
@@ -601,9 +598,11 @@ public class ContentSignerTool {
 								// Write out the complete container object
 								int length = 2 + newMapping.length + 4 + signedSoContentBytes.length + 2;
 
-								writeSecurityObjectContainer(securityObjectFile, newMapping , signedSoContentBytes, length);
+								writeSecurityObjectContainer(securityObjectFile, newMapping, signedSoContentBytes,
+										length);
 								logger.debug("New Security Object mapping length = " + newMapping.length);
-								logger.debug("New Security Object signed object length = " + signedSoContentBytes.length);
+								logger.debug(
+										"New Security Object signed object length = " + signedSoContentBytes.length);
 
 								Gui.progress.setValue(100);
 							}
@@ -632,13 +631,14 @@ public class ContentSignerTool {
 
 		Security.removeProvider(bc.getName());
 	}
-	
+
 	/**
 	 * Loads up class variables with properties.
 	 * 
 	 * @param properties
 	 *            Hashtable of application properties from Gui
-	 * @throws NoSuchPropertyException if a property doesn't exist or is misspelled
+	 * @throws NoSuchPropertyException
+	 *             if a property doesn't exist or is misspelled
 	 */
 	private void getProperties(Hashtable<String, String> properties) throws NoSuchPropertyException {
 		try {
@@ -665,7 +665,7 @@ public class ContentSignerTool {
 			throw new NoSuchPropertyException(e.getMessage(), ContentSignerTool.class.getName());
 		}
 	}
-	
+
 	/**
 	 * Creates a Hashtable of CCC data
 	 * 
@@ -693,7 +693,8 @@ public class ContentSignerTool {
 
 		for (Integer k : list) {
 			value = tagsValues.get(k);
-			logger.debug("Tag = " + String.format("%04X",  k) + ", Len = " + value.length + ", Value = " + Utils.bytesToHex(value));
+			logger.debug("Tag = " + String.format("%04X", k) + ", Len = " + value.length + ", Value = "
+					+ Utils.bytesToHex(value));
 		}
 		return tagsValues;
 	}
@@ -729,7 +730,8 @@ public class ContentSignerTool {
 			value = tagsValues.get(k);
 			try {
 				if (value != null)
-					logger.debug("Tag = " + String.format("%04x, Len = %d, Value = %s", k, value.length, Utils.bytesToHex(value)));
+					logger.debug("Tag = "
+							+ String.format("%04x, Len = %d, Value = %s", k, value.length, Utils.bytesToHex(value)));
 				else
 					logger.debug("Tag = " + String.format("%04x, Len = %d, Value = %s", k, 0, "null"));
 			} catch (Exception e) {
@@ -738,7 +740,7 @@ public class ContentSignerTool {
 		}
 		return tagsValues;
 	}
-	
+
 	/**
 	 * Loads the a private key from a .p12 file and populates a class field.
 	 * 
@@ -747,33 +749,34 @@ public class ContentSignerTool {
 	 * @param passcode
 	 *            the passcode to the .p12 file
 	 * @return X509 certificate for the public key in the .p12 file
-	 * @throws
-	 *            KeystoreException if a problem occurs while trying to access the keystore
+	 * @throws KeystoreException
+	 *             if a problem occurs while trying to access the keystore
 	 */
 	private X509Certificate loadPrivateKeyAndCert(String keyFilePath, char[] passcode) throws KeystoreException {
 		KeyStore ks = null;
 		X509Certificate signingCert = null;
 		File file = new File(keyFilePath);
 
-		if(file.exists() && !file.isDirectory()) { 
+		if (file.exists() && !file.isDirectory()) {
 			try {
 				ks = KeyStore.getInstance("PKCS12", bc);
 				FileInputStream fis = new FileInputStream(keyFilePath);
 				ks.load(fis, passcode);
-				if ((signingCert = (X509Certificate) ks.getCertificate(keyAlias)) != null) {	
+				if ((signingCert = (X509Certificate) ks.getCertificate(keyAlias)) != null) {
 					if ((this.privateKey = (PrivateKey) ks.getKey(keyAlias, passcode)) == null) {
-						throw new KeystoreException ("Cannot load private key from '" + keyFilePath + "'", ContentSignerTool.class.getName());
+						throw new KeystoreException("Cannot load private key from '" + keyFilePath + "'",
+								ContentSignerTool.class.getName());
 					}
 				} else {
-					throw new KeystoreException ("Cannot load certificate from '" + keyFilePath + "'", ContentSignerTool.class.getName());
+					throw new KeystoreException("Cannot load certificate from '" + keyFilePath + "'",
+							ContentSignerTool.class.getName());
 				}
 			} catch (Exception x) {
 				if (!(x instanceof KeystoreException))
-					throw new KeystoreException (x.getMessage(), ContentSignerTool.class.getName());
+					throw new KeystoreException(x.getMessage(), ContentSignerTool.class.getName());
 			}
-		}
-		else {
-			throw new KeystoreException ("Cannot open '" + keyFilePath + "'", ContentSignerTool.class.getName());
+		} else {
+			throw new KeystoreException("Cannot open '" + keyFilePath + "'", ContentSignerTool.class.getName());
 		}
 		return signingCert;
 	}
@@ -909,10 +912,9 @@ public class ContentSignerTool {
 	 *            content File object
 	 * @param contentBytes
 	 *            CCC bytes to write the the container
-	 * @return the bytes in the CCC container file needed by the Security
-	 *         Object
+	 * @return the bytes in the CCC container file needed by the Security Object
 	 */
-	
+
 	@SuppressWarnings("unused")
 	private byte[] writeCccContainer(File contentFile, byte[] contentBytes) {
 
@@ -1047,7 +1049,7 @@ public class ContentSignerTool {
 		}
 		return containerBuffer.array();
 	}
-	
+
 	/**
 	 * Writes the Discovery Object container to a buffer
 	 * 
@@ -1181,14 +1183,15 @@ public class ContentSignerTool {
 
 		try {
 			byte[] authenticatedAttributes = att.getEncoded(ASN1Encoding.DER);
-			sig = Signature.getInstance(digestAlgorithm.replace("-", "").toUpperCase() + "with" + signatureAlgorithm.toUpperCase(), sun);
+			sig = Signature.getInstance(
+					digestAlgorithm.replace("-", "").toUpperCase() + "with" + signatureAlgorithm.toUpperCase(), sun);
 			sig.initSign(privateKey);
 
 			logger.debug("Unsigned authenticated attributes:" + Utils.bytesToHex(authenticatedAttributes));
 
 			sig.update(authenticatedAttributes);
 			byte[] encryptedDigestBytes = sig.sign();
-			
+
 			logger.debug("Signed authenticated attributes:" + Utils.bytesToHex(encryptedDigestBytes));
 
 			ASN1OctetString encryptedDigest = new DEROctetString(encryptedDigestBytes);
@@ -1221,7 +1224,7 @@ public class ContentSignerTool {
 			signedContentBytes = signedContentObject.getEncoded(ASN1Encoding.DER);
 			verifySignature(contentBytes, signedContentBytes);
 		} catch (IOException | NoSuchAlgorithmException | InvalidKeyException | SignatureException
-				| CertificateEncodingException  e) {
+				| CertificateEncodingException e) {
 			logger.error(e.getMessage());
 			Gui.errors = true;
 		}

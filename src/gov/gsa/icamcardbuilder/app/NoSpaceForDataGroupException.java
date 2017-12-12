@@ -1,4 +1,5 @@
 package gov.gsa.icamcardbuilder.app;
+
 import org.apache.logging.log4j.LogManager;
 
 import static gov.gsa.icamcardbuilder.app.Gui.dateFormat;
@@ -11,8 +12,8 @@ import java.util.Date;
 public class NoSpaceForDataGroupException extends Exception {
 
 	private String message = null;
-	
-	public NoSpaceForDataGroupException (String errorMessage, String className) {
+
+	public NoSpaceForDataGroupException(String errorMessage, String className) {
 		super();
 		logger = LogManager.getLogger(className);
 		this.message = errorMessage;
