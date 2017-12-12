@@ -77,57 +77,6 @@ to create the certificates for all of the Gen 3 ICAM Test cards in one shot.
 Each certificate for each Gen 3 ICAM Test card is defined by its own OpenSSL
 `.cnf` file.
 
-### Certificate Policies
-
-The certificate policies for PIV cards that this project uses are below.  Note that 
-they use the NIST test OIDs designated to mimic production OIDs.  Validation
-systems should configure the initial policy set as follows:
-
-|Certificate Name|EE Certificate Policy OID|
-|----------------|-------------------------|
-|PIV Authentication|2.16.840.1.101.3.2.1.48.11|
-|Card Authentication|2.16.840.1.101.3.2.1.48.13|
-|Key Management|2.16.840.1.101.3.2.1.48.12|
-|Digital Signature|2.16.840.1.101.3.2.1.48.9|
-|Content Signing|2.16.840.1.101.3.2.1.48.86|
-
-The certificate policies for PIV-I cards that this project uses are below.  With 
-PIV-I cards, the certificate policies on the certificates must correctly map
-to an initial policy on the validation system.  The Root CA cert contains a 
-policy map as illustrated below.
-
-|Certificate Name|Issuer Subject Domain OID|Issuer Policy Domain OID|
-|----------------|-------------------------|------------------------|
-|PIV Authentication|2.16.840.1.101.3.2.1.48.248|2.16.840.1.101.3.2.1.48.78|
-|Card Authentication|2.16.840.1.101.3.2.1.48.249|2.16.840.1.101.3.2.1.48.79|
-|Key Management|2.16.840.1.101.3.2.1.48.250|2.16.840.1.101.3.2.1.48.3|
-|Digital Signature|2.16.840.1.101.3.2.1.48.251|2.16.840.1.101.3.2.1.48.4|
-|Content Signing|2.16.840.1.101.3.2.1.48.252|2.16.840.1.101.3.2.1.48.80|
-
-### OpenSSL Configuration Files
-Each certificate on each card has its own OpenSSL configuration file, providing
-an ability to create customized certificates for each certificate and card type
-(PIV or PIV-I). The goal here is to create `.p12` files for each certificate you
-plan to load on to the smart card.
-
-The `mkcert.sh` script creates the `.p12` files used by a smart card population
-tool that supports off-card key generation and key injection.  
-
-Type `sh mkcert.sh` with no parameters to get a usage message that will give you a
-clue as to how to specify your end-entity and issuer common names.  The `.p12` file 
-name it creates is based on your input parameters as well as the Subject `CN` and 
-issuer RDN component. The issuer CN should correspond to an existing signing CA file,
-which already exists in the `data` directory.  Omit the `.p12` extension on the
-`sh mkcert.sh` command line.
-
-Once the `.p12` files are created, they will be placed into the `data` directory.
-You must move each `.p12` file to the appropriate folder for loading on to your
-smart cards. Note that different personalization tools may use different forms of
-public/private key pairs.  Most PIV middleware is designed to tell the smart card
-to generate its own key pairs, in which case, the process described thus far may
-need to be updated to reflect on-card key generation and signing by a CA that you
-maintain.
-
 ## Content Signing
 Next, it's time to create the CHUID and CBEFF objects, which also updates the
 Security Object as described below.
