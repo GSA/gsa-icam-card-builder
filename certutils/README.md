@@ -72,29 +72,33 @@ an ability to create customized certificates for each certificate and card type
 (PIV or PIV-I). The goal here is to create `.p12` files for each certificate you
 plan to load on to the smart card.
 
-### Certificate Policies
-The certificate policies for FIPS 201-2 PIV cards that this project uses are 
-below.  Note that they use the NIST test OIDs designated to mimic production OIDs.
-Validation systems should configure the initial policy set as follows:
+### NIST Test Certificate Policiy OIDS
+The certificate policies OIDS for FIPS 201-2 PIV cards that this project uses are 
+below.  They use the NIST test OIDs that aredesignated to mimic production OIDs.
+Validation systems should configure their initial policy sets as follows:
 
 |Certificate Name|EE Certificate Policy OID|
 |----------------|-------------------------|
 |PIV Authentication|2.16.840.1.101.3.2.1.48.11|
 |Card Authentication|2.16.840.1.101.3.2.1.48.13|
+|Card Authentication EKU KPID|2.16.840.1.101.3.6.8|
 |Digital Signature|2.16.840.1.101.3.2.1.48.9|
 |Key Management|2.16.840.1.101.3.2.1.48.9|
 |Content Signing|2.16.840.1.101.3.2.1.48.86|
+|Content Signing EKU KPID|2.16.840.1.101.3.6.7|
 
+### PIV-I Card Certificate Policy OIDs
 The certificate policies for PIV-I cards that this project uses are below.  With 
 PIV-I cards, the certificate policies on the certificates must correctly map
 to an initial policy on the validation system.  The PIV-I Signing CA cert contains
 the Subject Domain policies below, which map to the Issuer Domain policies. 
-Relying parties (validation systems) should be configured for the Issuer Domain
-initial policy set.
+
+*Relying parties (validation systems) should be configured for the Issuer Domain
+initial policy set.*
 
 |Certificate Name|Subject Domain Policy OID|Issuer Domain Policy OID|
 |----------------|-------------------------|------------------------|
-|PIV Authentication|2.16.840.1.101.3.2.1.48.248|2.16.840.1.101.3.2.1.48.78|
+|Authentication|2.16.840.1.101.3.2.1.48.248|2.16.840.1.101.3.2.1.48.78|
 |Card Authentication|2.16.840.1.101.3.2.1.48.249|2.16.840.1.101.3.2.1.48.79|
 |Key Management|2.16.840.1.101.3.2.1.48.250|2.16.840.1.101.3.2.1.48.3|
 |Digital Signature|2.16.840.1.101.3.2.1.48.251|2.16.840.1.101.3.2.1.48.4|
@@ -102,6 +106,51 @@ initial policy set.
 
 The normative reference for these policies can be found at [FPKI CITE](https://www.idmanagement.gov/wp-content/uploads/sites/1171/uploads/FPKI_CITE_v1_0_4.pdf).
 
+### Federal PIV Card Certificate Policy OIDs
+The certificate policy OIDs used by the Federal Government are found
+on Federally-issued PIV cards.
+
+|Certificate Name|EE Certificate Policy OID|
+|----------------|-------------------------|
+|PIV Authentication|2.16.840.1.101.3.2.1.3.13|
+|Card Authentication|2.16.840.1.101.3.2.1.3.17|
+|Card Authentication EKU KPID|2.16.840.1.101.3.6.8|
+|Digital Signature|2.16.840.1.101.3.2.1.3.7*|
+|Key Management|2.16.840.1.101.3.2.1.3.6*|
+|Content Signing|2.16.840.1.101.3.2.1.3.39|
+|Content Signing EKU KPID|2.16.840.1.101.3.6.7|
+
+* These can actually be one or more of:
+2.16.840.1.101.3.2.1.3.6 (id-fpki-common-policy)
+2.16.840.1.101.3.2.1.3.7 (id-fpki-common-hardware)
+2.16.840.1.101.3.2.1.3.16 (id-fpki-common-High)
+
+### PIV-I Card Certificate Policy OIDs
+
+Certificate policies for PIV-I cards below.  With PIV-I cards, the 
+certificate policies on the certificates must correctly map to an 
+initial policy on the relying party validation system.  The PIV-I 
+Signing CA cert and bridge certificates contain mappings from
+Subject Domain policies which map to the Issuer Domain policie below. 
+
+More information can be found at NIST's [Computer Security Register](https://csrc.nist.gov/Projects/Computer-Security-Objects-Register/PKI-Registration)
+
+*Relying parties (validation systems) should be configured for 
+the Issuer Domain initial policy set.*
+
+|Certificate Name|EE Certificate Policy OID|
+|----------------|-------------------------|
+|Authentication|2.16.840.1.101.3.2.1.3.18|
+|Card Authentication|2.16.840.1.101.3.2.1.3.19|
+|Card Authentication EKU KPID|2.16.840.1.101.3.6.8|
+|Digital Signature|2.16.840.1.101.3.2.1.3.18|
+|Key Management|2.16.840.1.101.3.2.1.3.18*|
+|Content Signing|2.16.840.1.101.3.2.1.3.20*|
+|Content Signing EKU KPID|2.16.840.1.101.3.8.7|
+
+* These certificates may contain serveral ssuer policy 
+OIDs, however you'll see id-fpki-certpcy-pivi-hardware
+the most often.
+
 See the [list of issues](https://github.com/GSA/gsa-icam-card-builder/issues) for
 more information.
- 
