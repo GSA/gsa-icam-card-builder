@@ -465,7 +465,7 @@ public class ContentSignerTool {
 				// Fix the image data type if this is a facial image (note this
 				// changes if the file type is .jpg
 				try {
-					byte idType = (byte) Utils.getImageDataType(contentFileBytes, 138);
+					byte idType = Utils.getImageDataType(contentFileBytes, 138);
 					contentFileBytes[127] = idType;
 					logger.debug("Image data type = " + String.format("%s", (idType == 0) ? "JPEG" : "JPEG 2000"));
 				} catch (Exception e) {
