@@ -147,15 +147,24 @@ print "Size of Scanned Image in x Direction." . (($chars[$i++] << 8) | $chars[$i
 print "Size of Scanned Image in y Direction." . (($chars[$i++] << 8) | $chars[$i++]) . "\n";
 print "Horizontal Resolution................" . (($chars[$i++] << 8) | $chars[$i++]) . "\n";
 print "Vertical Resolution.................." . (($chars[$i++] << 8) | $chars[$i++]) . "\n";
-print "Number of finger views..............." . $chars[$i++] . "\n";
+my $nfv = $chars[$i++];
+print "Number of finger views..............." . $nfv . "\n";
 print "Reserved Byte........................" . $chars[$i++] . "\n";
 print "\n";
 
+my %fqh = ( 20 => "20", 40 => "40", 60 => "60", 80 => "80", 100 => "100", 254 => "254", 255 => "255" );
+
 printf "---- Finger View %d\n", (($chars[$i + 1] & 0xF0) >> 4);
 print "Finger Position......................" . $chars[$i++] . "\n";
-print "View Number.........................." . (($chars[$i] & 0xF0) >> 4) . "\n";
-print "Impression type......................" . (($chars[$i++] & 0x0F) << 8) . "\n";
-print "Finger Quality......................." . $chars[$i++] . "\n";
+my $vn = (($chars[$i] & 0xF0) >> 4);
+print "View Number.........................." . $vn . "\n";
+print ">>> Error: View number should be 0 (not $vn) <<<\n" if ($vn != 0 && $nfv == 1);
+my $it = (($chars[$i++] & 0x0F) << 8);
+print "Impression type......................" . $it . "\n";
+print ">>> Error: Impression type should 0 or 2 (not $it) <<<\n" if ($it != 0 && $it != 2);
+my $fq = $chars[$i++];
+print "Finger Quality......................." . $fq . "\n";
+print ">>> Error: Finger quality should be 20, 40, 60, 80, 100, 254, or 255 (not $fq) <<<\n" if (!exists $fqh{$fq});
 my $minutiae_count = $chars[$i];
 print "Number of Minutiae..................." . $chars[$i++] . "\n";
 
@@ -171,16 +180,25 @@ for ($j = 0; $j < $minutiae_count; $j++, $i += 6) {
 		$chars[$i + 5];
 }
 
+exit 0;
+
 print "\n";
 
 $i += 2;
 printf "---- Finger View %d\n", (($chars[$i + 1] & 0xF0) >> 4);
 print "Finger Position......................" . $chars[$i++] . "\n";
-print "View Number.........................." . (($chars[$i] & 0xF0) >> 4) . "\n";
-print "Impression type......................" . (($chars[$i++] & 0x0F) << 8) . "\n";
-print "Finger Quality......................." . $chars[$i++] . "\n";
+$vn = (($chars[$i] & 0xF0) >> 4);
+print "View Number.........................." . $vn . "\n";
+print ">>> Error: View number should be 0 (not $vn) <<<\n" if ($vn != 0 && $nfv == 1);
+$it = (($chars[$i++] & 0x0F) << 8);
+print "Impression type......................" . $it . "\n";
+print ">>> Error: Impression type should 0 or 2 (not $it) <<<\n" if ($it != 0 && $it != 2);
+$fq = $chars[$i++];
+print "Finger Quality......................." . $fq . "\n";
+print ">>> Error: Finger quality should be 20, 40, 60, 80, 100, 254, or 255 (not $fq) <<<\n" if (!exists $fqh{$fq});
 $minutiae_count = $chars[$i];
 print "Number of Minutiae..................." . $chars[$i++] . "\n";
+
 print "\n*** Minutiae ***\n";
 for ($j = 0; $j < $minutiae_count; $j++, $i += 6) {
 	$min_type = (($chars[$i] & 0xC0) >> 6);
