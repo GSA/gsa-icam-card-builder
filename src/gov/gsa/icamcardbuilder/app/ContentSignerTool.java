@@ -106,7 +106,6 @@ public class ContentSignerTool {
 	protected static final short fingerprintContainerId = (short) 0x6010;
 	protected static final short facialImageContainerId = (short) 0x6030;
 	protected static final short irisContainerId = (short) 0x1015;
-
 	protected static final int cccCardIdentifier = 0xf0;
 	protected static final int cccCapabilityContainerVersionNumberTag = 0xf1;
 	protected static final int cccCapabilityGrammarVersionNumber = 0xf2;
@@ -135,18 +134,10 @@ public class ContentSignerTool {
 	protected static final int securityObjectDgMapTag = 0xba;
 	protected static final int securityObjectDgHashesTag = 0xbb;
 	protected static final int errorDetectionCodeTag = 0xfe;
-
 	protected static final String defaultDigAlgName = "SHA-256";
 	protected static final String defaultSigAlgName = "RSA";
 
-	protected static final byte[] doGlobalPinMandatory = { 0x2f, 0x40, 0x00 };
-
-	protected static final byte[] doGlobalPinPreferred = { 0x2f, 0x60, 0x20 };
-
-	protected static final byte[] doAppPinPreferred = { 0x2f, 0x60, 0x10 };
-
 	private boolean clearDg = false;
-
 	private String digestAlgorithmName = defaultDigAlgName;
 	private AlgorithmIdentifier digestAlgorithmAid = null;
 	private String signatureAlgorithmName = defaultSigAlgName;

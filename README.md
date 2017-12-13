@@ -37,6 +37,10 @@ test cards, which are referred to as *Gen 3*:
 
 |Card Number|Description|
 |:--:|:------------------------|
+| 25 | FIPS 201-2 Missing Discovery Object |
+| 26 | FIPS 201-2 Discovery Object Present, PIV Application PIN only |
+| 27 | FIPS 201-2 Discovery Object Present, PIV Application primary |
+| 28 | FIPS 202-2 Discovery Object Present, Global PIN primary |
 | 37 | Golden FIPS 201-2 PIV PPS F=512 D=64 |
 | 38 | Security Object Hash Mismatch |
 | 39 | Golden FIPS 201-2 Fed PIV-I |
@@ -46,14 +50,15 @@ test cards, which are referred to as *Gen 3*:
 | 43 | Revoked OCSP Response Signer Certificate, `pkix-ocsp-nocheck` present  |
 | 44 | Revoked OCSP Response Signer Certificate, no `id-pkix-ocsp-nocheck` present |
 | 44 | Invalid Signature in OCSP Response Signer Certificate |
-| 46 | Golden FIPS 201-2 PIV |
+| 46 | Golden FIPS 201-2 PIV (replaced Card 1) |
 | 47 | Golden FIPS 201-2 PIV SAN Order |
 | 49 | FIPS 201-2 Facial Image CBEFF Expired |
 | 50 | FIPS 201-2 Facial Image CBEFF Expires before CHUID |
 | 51 | FIPS 201-2 Fingerprint CBEFF Expired |
 | 52 | FIPS 201-2 Fingerprint CBEFF Expires before CHUID |
 | 53 | FIPS 201-2 Large Card Auth Cert (2160 bytes) |
-| 54 | Golden FIPS 201-2 NFI PIV-I |
+| 54 | Golden FIPS 201-2 NFI PIV-I (Replaces Card 2) |
+| 55 | FIPS 201-2 PIV Missing Security Object |
 
 The artifacts used to create these cards are included beneath the `cards` 
 directory.  The objects in each card's subdirectory can be encoded directly on 

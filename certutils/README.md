@@ -135,8 +135,8 @@ Subject Domain policies which map to the Issuer Domain policie below.
 
 More information can be found at NIST's [Computer Security Register](https://csrc.nist.gov/Projects/Computer-Security-Objects-Register/PKI-Registration)
 
-*Relying parties (validation systems) should be configured for 
-the Issuer Domain initial policy set.*
+\*Relying parties (validation systems) should be configured for 
+the Issuer Domain initial policy set.\*
 
 |Certificate Name|EE Certificate Policy OID|
 |----------------|-------------------------|
@@ -148,7 +148,7 @@ the Issuer Domain initial policy set.*
 |Content Signing|2.16.840.1.101.3.2.1.3.20*|
 |Content Signing EKU KPID|2.16.840.1.101.3.8.7|
 
-* These certificates may contain serveral ssuer policy 
+\* These certificates may contain serveral ssuer policy 
 OIDs, however you'll see id-fpki-certpcy-pivi-hardware
 the most often.
 
