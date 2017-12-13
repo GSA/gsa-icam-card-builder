@@ -473,4 +473,36 @@ public class Utils {
 		}
 		return tag;
 	}
+	
+	/**
+	 * Gets the facial image data type
+	 * @param containerBytes image container bytes
+	 * @param pos position in container where the image starts
+	 * @return the image data type based on SP 800-76-2
+	 */
+	
+	public static byte getImageDataType (byte[] containerBytes, int pos) throws InvalidImageTypeException {
+
+		int idType = -1;
+		byte jpeg[] = { (byte) 0xff, (byte) 0xd8 };
+		byte jpegSample[] = new byte[jpeg.length];
+		System.arraycopy(containerBytes, pos, jpegSample, 0, jpeg.length);
+		byte jp2still[] = {(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x0c, (byte) 0x6a, (byte) 0x50, (byte) 0x20, (byte) 0x20, (byte) 0x0d, (byte) 0x0a, (byte) 0x87, (byte) 0x0a };
+		byte jp2stillSample[] = new byte[jp2still.length];
+		System.arraycopy(containerBytes, pos, jp2stillSample, 0, jp2still.length);
+		byte jp2cs[] = { (byte) 0xff, (byte) 0x4f, (byte) 0xff, (byte) 0x51 };
+		byte jp2csSample[] = new byte[jp2cs.length];
+		System.arraycopy(containerBytes, pos, jp2csSample, 0, jp2cs.length);
+		
+		if (Arrays.equals(jpeg, jpegSample)) {
+			idType = 0;
+		} else if (Arrays.equals(jp2still, jp2stillSample)) {
+			idType = 1;
+		} else if (Arrays.equals(jp2cs, jp2csSample)){
+			idType = 1;
+		} else {
+			throw new InvalidImageTypeException("Unrecognized image data in CBEFF: " + Utils.bytesToHex(Arrays.copyOfRange(containerBytes, pos, jp2still.length)) + ".", Utils.class.getName());
+		}
+		return (byte) (idType & 0xff);
+	}
 }

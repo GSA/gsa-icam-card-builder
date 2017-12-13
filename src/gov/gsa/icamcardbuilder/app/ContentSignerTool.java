@@ -458,10 +458,19 @@ public class ContentSignerTool {
 			String formatIdentifierString = new String(Arrays.copyOfRange(contentFileBytes, 92, 95));
 
 			if ("FAC".equals(formatIdentifierString)) {
+				// Fix the expression which must be set to 1 (neutral)
+				// Note that expression is a 2-byte field starting at byte 118.
+				contentFileBytes[118] = (byte) 0x00;
+				contentFileBytes[119] = (byte) 0x01;
 				// Fix the image data type if this is a facial image (note this
 				// changes if the file type is .jpg
-				// TODO: Look ahead at image type and determine what value
-				contentFileBytes[127] = (byte) 0;
+				try {
+					byte idType = (byte) Utils.getImageDataType(contentFileBytes, 138);
+					contentFileBytes[127] = idType;
+					logger.debug("Image data type = " + String.format("%s", (idType == 0) ? "JPEG" : "JPEG 2000"));
+				} catch (Exception e) {
+					return;
+				}
 				desiredContainerId = facialImageContainerId;
 				Gui.status.append(dateFormat.format(new Date()) + " - Facial image CBEFF.\n");
 			} else if ("FMR".equals(formatIdentifierString)) {
