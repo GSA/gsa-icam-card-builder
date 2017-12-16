@@ -192,6 +192,7 @@ public class DgHashMap {
 	/**
 	 * Gets the data group hashes from the object
 	 * 
+	 * @return an array of DataGroupHash
 	 */
 	DataGroupHash[] getDgHashes() {
 		int length = this.dgHashMap.values().size();
@@ -205,6 +206,8 @@ public class DgHashMap {
 
 	/**
 	 * Gets the contentInfo from the security object
+	 * 
+	 * @return a ContentInfo object extracted from the Security Object container
 	 */
 	ContentInfo getCountentInfo() {
 		return this.contentInfo;
@@ -220,6 +223,7 @@ public class DgHashMap {
 	/**
 	 * Gets the data group mapping from the object
 	 * 
+	 * @return a byte array containing the data group (DG) mapping
 	 */
 	byte[] getDgMapping() {
 		return dgMap.getBytes();

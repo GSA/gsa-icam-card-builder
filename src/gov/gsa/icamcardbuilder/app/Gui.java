@@ -1,18 +1,5 @@
 package gov.gsa.icamcardbuilder.app;
 
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JFrame;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -35,8 +22,19 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
-
 import javax.swing.AbstractButton;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JFrame;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.event.ChangeEvent;
@@ -46,14 +44,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
-
-import java.awt.Font;
 import javax.swing.SwingConstants;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -65,11 +55,20 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.awt.Font;
 
 public class Gui extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	protected final static String version = "1.8.24";
+	protected final static String version = "1.8.25";
+	protected static String cardsDirectory = null;
+	private static String cardsDirectoryArg = null;
 	protected static boolean debug = true;
 	protected static Logger logger;
 	protected static String decodedPath;
@@ -190,7 +189,7 @@ public class Gui extends JPanel {
 		contentFileBrowseButton.addActionListener(new java.awt.event.ActionListener() {
 			@Override
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				browseButtonActionPerformed(evt);
+				contentFileBrowseButtonActionPerformed(evt);
 			}
 		});
 
@@ -769,13 +768,15 @@ public class Gui extends JPanel {
 		}
 	}
 
-	private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {
-		File dir = new File(currentDirectory + "cards" + File.separator + "ICAM_Card_Objects");
+	private void contentFileBrowseButtonActionPerformed(java.awt.event.ActionEvent evt) {
+		File dir = new File(cardsDirectory);
 		if (dir.exists()) {
-			currentDirectory += "cards" + File.separator + "ICAM_Card_Objects";
+			currentDirectory = cardsDirectory;
 		}
 
 		contentFileChooser.setCurrentDirectory(new File(currentDirectory));
+		String message = "Current directory is " + currentDirectory;
+		logger.info(message);
 		int returnVal = contentFileChooser.showOpenDialog(frame);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			contentFile = contentFileChooser.getSelectedFile();
@@ -809,10 +810,12 @@ public class Gui extends JPanel {
 	private void openPropertiesFileActionPerformed(java.awt.event.ActionEvent evt) {
 
 		if (!located) {
-			File dir = new File(currentDirectory + "cards" + File.separator + "ICAM_Card_Objects");
+			File dir = new File(cardsDirectory);
 			if (dir.exists()) {
-				currentDirectory += "cards" + File.separator + "ICAM_Card_Objects";
+				currentDirectory = cardsDirectory;
 				located = true;
+				String message = "Current directory is " + currentDirectory;
+				logger.info(message);
 			}
 		}
 		propertiesFileChooser.setPreferredSize(new Dimension(840, 500));
@@ -884,8 +887,12 @@ public class Gui extends JPanel {
 					pivCardApplicationAid = prop.getProperty("pivCardApplicationAid").trim();
 				if (prop.containsKey("pinUsagePolicy"))
 					pinUsagePolicy = prop.getProperty("pinUsagePolicy").trim();
-			} catch (IOException ex) {
-				ex.printStackTrace();
+			}			
+			catch (IOException ex) {
+				String message = "Selected file is empty or does not exist.";
+				logger.fatal(message);
+				status.append(dateFormat.format(new Date()) + " - " + message + "\n");
+				errors = true;
 			} finally {
 				if (input != null) {
 					try {
@@ -966,14 +973,6 @@ public class Gui extends JPanel {
 			macOs = true;
 		} else if (osName.toLowerCase().contains("linux")) {
 			linuxOs = true;
-		}
-
-		String path = pathFixup(
-				Gui.class.getProtectionDomain().getCodeSource().getLocation().getPath() + ".." + File.separator);
-		try {
-			currentDirectory = URLDecoder.decode(path, "UTF-8");
-		} catch (UnsupportedEncodingException e1) {
-			currentDirectory = ".." + File.separator;
 		}
 
 		for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -1138,6 +1137,48 @@ public class Gui extends JPanel {
 		logger = LogManager.getLogger(Gui.class.getName());
 		logger.info("Starting...");
 
+		// When running out of a jar file, args[0] is the jar?
+		String path = pathFixup(
+				Gui.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+		try {
+			if (path.endsWith(".jar")) {
+				path += File.separator;
+				String message = "Running from jar file";
+				logger.info(message);
+			} else {
+				String message = "Running from IDE";
+				logger.info(message);
+			}
+			currentDirectory = URLDecoder.decode(path, "UTF-8");
+			String message = "Current directory is " + currentDirectory;
+			logger.info(message);
+		} catch (UnsupportedEncodingException e1) {
+			currentDirectory = path + File.separator + ".." + File.separator;
+		} catch (Exception e) {
+			String message = e.getMessage();
+			logger.error(message);
+			return;
+		}
+		
+		cardsDirectoryArg = "cards" + File.separator + "ICAM_Card_Objects";
+		if (args != null) {
+			if (args.length == 1) {
+				cardsDirectoryArg = new String(pathFixup(args[0]));
+				String message = "Cards directory argument is " + cardsDirectoryArg;
+				logger.info(message);
+			}
+			if (args.length == 2) {
+				cardsDirectoryArg = new String(pathFixup(args[1]));
+				String message = "Cards directory argument is " + cardsDirectoryArg;
+				logger.info(message);
+			}
+		}
+		
+		cardsDirectory = pathFixup(currentDirectory + ".." + File.separator + cardsDirectoryArg);
+		
+		String message = "Cards directory is " + cardsDirectory;
+		logger.info(message);
+		
 		// Schedule a job for the event dispatch thread:
 		// creating and showing this application's GUI.
 		SwingUtilities.invokeLater(new Runnable() {

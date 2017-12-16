@@ -64,7 +64,7 @@
 		<jar destfile="${dir.jarfile}/gsa-icam-card-builder.jar">
 			<manifest>
 				<attribute name="Main-Class" value="gov.gsa.icamcardbuilder.app.Gui" />
-				<attribute name="Class-Path" value=". lib/log4j-api-2.8.2.jar lib/log4j-core-2.8.2.jar lib/bccore-jdk15on-157.jar lib/bcmail-jdk15on-157.jar lib/bcpg-jdk15on-157.jar lib/bcpkix-jdk15on-157.jar lib/bcprov-jdk15on-157.jar lib/bctls-jdk15on-157.jar" />
+				<attribute name="Class-Path" value=". lib/log4j-api-2.8.2.jar lib/log4j-core-2.8.2.jar lib/bccore-jdk15on-158.jar lib/bcmail-jdk15on-158.jar lib/bcpkix-jdk15on-158.jar lib/bcprov-jdk15on-158.jar" />
 			</manifest>
 			<fileset dir="${dir.jarfile}" />
 		</jar>
@@ -73,9 +73,11 @@
 		<fileset dir="${dir.buildfile}/lib" includes="**/*.jar"/>
 		<fileset dir="${dir.buildfile}/src/gov/gsa/icamcardbuilder/app/" includes="**/*.class"/>
 	</path>
-	<target name="classes">
+	<target name="classes" depends="distclean">
 		<javac includeantruntime="false" 
-			debug="on" srcdir="${dir.buildfile}/src/gov/gsa/icamcardbuilder/app/" 
+			debug="true"
+			debuglevel="lines,vars,source"
+			srcdir="${dir.buildfile}/src/gov/gsa/icamcardbuilder/app/" 
 			destdir="${dir.buildfile}/bin"
 			target="1.8">
 			<classpath refid="classpath"/>
@@ -93,7 +95,7 @@
 		</delete>
 		<delete dir="${dir.distro}/" />
 	</target>
-	<target name="zipfile" depends="distclean,staging,javadocs">
+	<target name="zipfile" depends="staging">
 		<zip destfile="${dir.jarfile}/gsa-icam-card-builder.zip" basedir="${dir.distro}" />
 		<copy todir="${dir.distro}/">
 			<fileset dir="${dir.jarfile}/">
@@ -103,7 +105,7 @@
 	</target>
 	<target name="javadocs">
 		<javadoc access="private" author="true" classpath="" destdir="${dir.distro}/doc/"
-			doctitle="GSA PIV Signing Tool" nodeprecated="false"
+			doctitle="GSA ICAM Card Builder" nodeprecated="false"
 			nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false"
 			packagenames="gov.gsa.icamcardbuilder.app"
 			source="1.8" sourcepath="src" splitindex="true" use="true" version="true">
