@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# binchuid.pl v1.7
+# binchuid.pl v1.7.4
 # vim: set ts=2 nowrap
 #
 # Usage: binchuid.pl <File containing CHUID in binary format> 

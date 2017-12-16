@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# toraw.pl v1.7
+# toraw.pl v1.7.4
 # vim: ts=2 nowrap
 #
 # Usage: ./toraw.pl --fascn=FASC-N [--upper] --delim=delimiter

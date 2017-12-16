@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# tofascn.pl v1.7
+# tofascn.pl v1.7.4
 # vim: ts=2 nowrap
 #
 #
