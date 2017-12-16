@@ -218,11 +218,7 @@ print "Quality.............................." . (($chars[$i++] << 8) | $chars[$i
 
 print "---- Image Data (at $i) ----\n";
 
-<<<<<<< HEAD
 my %types = (-1 => "Unknown", 0 => "JPEG", 1 => "JPEG 2000", 2 => "JPEG 2000 Codestream");
-=======
-my %types = (-1 => "Unknown", 0 => "JPEG", 1 => "JPEG 2000", 2 => "JPEG 2000 CS");
->>>>>>> 328c3af69f3d05d6bdb1676e9fb520d6b4859b9c
 
 # Here we map actual image data type found in the image to the Image Information->Image Data Type
 my %idt_hash = (0 => 0, 1 => 1, 2 => 1);
@@ -247,17 +243,10 @@ my @headers = (\@jpheader, \@jp2header, \@jp2000header);
 my $actualtype = image_matches(\@headers, \@chars, $i);
 
 if ($imagedtype != $idt_hash{$actualtype}) {
-<<<<<<< HEAD
 	print ">>> Error: Actual image type ($types{$actualtype}) doesn't match stated Image Data Type ($types{$imagedtype}) <<<\n";
 }
 
 my $imageext = ($actualtype == 0) ? ".jpg" : ($actualtype == 1) ? ".jp2" : ($actualtype == 2) ? ".jpc" : ".dat";
-=======
-	print ">>> Error: Actual image data type ($types{$actualtype}) doesn't match stated Image Data Type ($types{$imagedtype}) <<<\n";
-}
-
-my $imageext = ($actualtype == 0) ? ".jpg" : ($actualtype == 1) ? ".jp2" : ($actualtype == 2) ? ".j2c" : ".dat";
->>>>>>> 328c3af69f3d05d6bdb1676e9fb520d6b4859b9c
 
 my $imagelength = 0;
 
