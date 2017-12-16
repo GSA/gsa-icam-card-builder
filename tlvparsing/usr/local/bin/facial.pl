@@ -207,8 +207,8 @@ for ($j = 0; $j < $nfpoints; $j++) {
 print "---- Image Information ----\n";
 print "Facial Image Type...................." . $chars[$i++] . "\n";
 my $imagedtype = $chars[$i];
-
 print "Image Data Type......................" . $chars[$i++] . "\n";
+print ">>> Image data type should be 0 or 1 (not $imagedtype) <<<\n" if ($imagedtype != 0 and $imagedtype != 1);
 print "Width................................" . (($chars[$i++] << 8) | $chars[$i++]) . "\n";
 print "Height..............................." . (($chars[$i++] << 8) | $chars[$i++]) . "\n";
 print "Image Color Space...................." . $chars[$i++] . "\n";
@@ -216,22 +216,22 @@ print "Source Type.........................." . $chars[$i++] . "\n";
 print "Device Type.........................." . (($chars[$i++] << 8) | $chars[$i++]) . "\n";
 print "Quality.............................." . (($chars[$i++] << 8) | $chars[$i++]) . "\n";
 
-print "---- Image Data ----\n";
+print "---- Image Data (at $i) ----\n";
 
-my %types = (-1 => "Unknown", 0 => "JPEG", 1 => "JPEG 2000", 2 => "JPEG 2000");
+my %types = (-1 => "Unknown", 0 => "JPEG", 1 => "JPEG 2000", 2 => "JPEG 2000 CS");
 
 # Here we map actual image data type found in the image to the Image Information->Image Data Type
 my %idt_hash = (0 => 0, 1 => 1, 2 => 1);
 
 # Create arrays of all magic bytes we will be looking for
 
-# JPEG
+# JPEG (.jpg)
 my @jpheader = (0xFF, 0xD8);
 
-# JPEG2000 still
+# JPEG2000 still (.jp2)
 my @jp2header = (0x00, 0x00, 0x00, 0x0c, 0x6a, 0x50, 0x20, 0x20, 0x0d, 0x0a, 0x87, 0x0a);
 
-# JPEG2000 codestream
+# JPEG2000 codestream (.j2c)
 my @jp2000header = (0xff, 0x4f, 0xff, 0x51);
 
 # Stick them all in an array
@@ -243,10 +243,10 @@ my @headers = (\@jpheader, \@jp2header, \@jp2000header);
 my $actualtype = image_matches(\@headers, \@chars, $i);
 
 if ($imagedtype != $idt_hash{$actualtype}) {
-	print ">>> Error: Image Data Type ($types{$actualtype}) doesn't match Image Data Type ($types{$imagedtype}) <<<\n";
+	print ">>> Error: Actual image data type ($types{$actualtype}) doesn't match stated Image Data Type ($types{$imagedtype}) <<<\n";
 }
 
-my $imageext = ($actualtype == 0) ? ".jpg" : ($actualtype == 1) ? ".jp2" : ($actualtype == 2) ? ".jp2k" : ".dat";
+my $imageext = ($actualtype == 0) ? ".jpg" : ($actualtype == 1) ? ".jp2" : ($actualtype == 2) ? ".j2c" : ".dat";
 
 my $imagelength = 0;
 
