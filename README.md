@@ -195,7 +195,29 @@ reference implementation.
 * `agencyCardSerialNumber=123456789`
   This parameter is only used for Printed Information containers.  It specifies
   the agency card serial number printed on the back of the card.
-  
+For Discovery Object properties files, two additional properties are used.
+#If both pivCardApplication and pinUsagePolicy are empty,
+#the Discovery Object will be written with a zero length and its
+#hash will be removed from the Security Object's DG Hashes.
+* `pivCardApplicationAid=a000000308000010000100`
+  This allows you to alter the PIV card AID, which you should do only if you
+  know what you're doing.
+
+  `pinUsagePolicy=6010`
+  PIN useage policy controls whether the Application PIN or Global PIN is
+  the preferred PIN. The following rules apply:
+  1. No discovery object (insert '#' in front of this and the previous property. 
+  Your system should send the PIV application PIN to the card and indicate it is the PIV 
+  Application PIN.
+  2. Discovery object is present and `pinUsagePolicy` is set to 4000.  Your system
+  should send the PIV application PIN to the card and indicate it is the PIV Application PIN.
+  3. Discovery object is present and `pinUsagePolicy` is set to 6010.. Your system
+  should send the PIV Application PIN to the card and indicate it is the PIV Application PIN.
+  4. Discovery object is present and `pinUsagePolicy` is set to 6020.. Your system
+  should send the Global Application PIN to the card and indicate it is the PIV Global PIN.
+
+Future releases will expand on the Discovery Object for supporting VCI and OCC.  
+
 Other properties files can be created and used to sign fingerprint or iris
 CBEFFs.  The intent is to create property files for each biometric object
 on each ICAM card.

@@ -119,7 +119,7 @@
 			<zipfileset dir="${dir.buildfile}/src/" prefix="src/" />
 			<zipfileset dir="${dir.buildfile}/cards/" prefix="cards/" />
 			<zipfileset dir="${dir.buildfile}/certutils/" prefix="certutils/" />
-			<zipfileset dir="${dir.buildfile}/doc/" prefix="doc/" />
+			<zipfileset dir="${dir.distro}/doc/" prefix="doc/" />
 			<zipfileset dir="${dir.buildfile}/lib/" prefix="lib/" />
 			<zipfileset dir="${dir.buildfile}/logs/" prefix="log/" />
 			<zipfileset dir="${dir.buildfile}/" prefix="./" >
