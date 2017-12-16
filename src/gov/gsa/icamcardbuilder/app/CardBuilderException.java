@@ -12,7 +12,7 @@ public class CardBuilderException extends Exception {
 
 	private String message = null;
 
-	public CardBuilderException (String errorMessage, String className) {
+	public CardBuilderException(String errorMessage, String className) {
 		super();
 		logger = LogManager.getLogger(className);
 		this.message = errorMessage;

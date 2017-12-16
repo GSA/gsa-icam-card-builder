@@ -202,6 +202,8 @@ public class DgMap {
 	/**
 	 * Indicates whether DG mapping object is empty or null returns true if the
 	 * DG mapping object has no entries and false if there are entries
+	 * 
+	 * @return true of the map is empty, false if it is not empty
 	 */
 	protected boolean isEmpty() {
 		return this.dgMap.isEmpty();

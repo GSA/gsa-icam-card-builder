@@ -182,16 +182,28 @@ public class ContentSignerTool {
 	 */
 	/**
 	 * @param contentFile
+	 *            file containing content to be signed
 	 * @param securityObjectFile
+	 *            file containing the Security Object
 	 * @param properties
+	 *            object containing various properties extracted from
+	 *            .properties files associated with the object being created and
+	 *            signed
 	 */
 	protected ContentSignerTool(File contentFile, File securityObjectFile, Hashtable<String, String> properties) {
 
 		logger = LogManager.getLogger(ContentSignerTool.class.getName());
 		// TODO: Break security object stuff into separate class
 
-		Security.addProvider(new BouncyCastleProvider());
-		Security.addProvider(new SunRsaSign());
+		try {
+			Security.addProvider(new BouncyCastleProvider());
+			Security.addProvider(new SunRsaSign());
+		} catch (Exception e) {
+			String message = "Unable to add provider: " + e.getMessage();
+			logger.info(message);
+			Gui.status.append(dateFormat.format(new Date()) + " - " + message + "\n");
+			return;
+		}
 		try {
 			getProperties(properties);
 		} catch (NoSuchPropertyException e1) {
