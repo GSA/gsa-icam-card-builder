@@ -283,3 +283,5 @@ if ($container_flag == 1 && $i < scalar @chars) {
 $octets = pack ("H*", $unencoded);
 print MIME::Base64::encode($octets);
 exit 0;
+
+__END__

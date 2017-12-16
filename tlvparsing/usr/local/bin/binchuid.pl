@@ -134,3 +134,5 @@ print "Length of hashable data: " . length($hashable) . "\n";
 print "Message Digest: " . sha256_hex($hashable);
 
 exit 0;
+
+__END__

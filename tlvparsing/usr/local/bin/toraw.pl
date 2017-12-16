@@ -37,3 +37,5 @@ die "Invalid output length ($raw)\n" if (length $raw != 50 + ((length ($delim)) 
 print "$raw\n";
 
 exit 0;
+
+__END__

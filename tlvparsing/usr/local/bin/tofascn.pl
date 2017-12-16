@@ -36,3 +36,5 @@ die "Invalid output length ($fascn)\n" if (length $fascn != 32);
 print "$fascn\n";
 
 exit 0;
+
+__END__
