@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 #
 # Usage: mkcert.sh 
 #   -s|--subject subjectDN 
@@ -64,6 +64,8 @@ function usage() {
 	echo "  [-p prefix]"
 	echo "  [-c rsa2048|secp384r1]"
 	echo "$WHERE"
+	echo
+	echo "You executed " "$@"
 	echo "Exiting with exit code $1"
 	exit $1
 }
@@ -96,8 +98,13 @@ ECCALG=prime256v1
 RSAALG=2048
 PREFIX=icam
 CAKEY=default
-TEMP=`getopt -o bws:i:n:t:e:r:p:c: -l subject-cn:,issuer-cn:,number:,type:,ecc:,rsa:,prefix:,cakey: -n 'mkcert.sh' -- "$@"`
-eval set -- "$TEMP"
+APPLE=$(expr $MACHTYPE : "^.*apple")
+if [ $APPLE -eq 0 ]; then
+	TEMP=`getopt -o bws:i:n:t:e:r:p:c: -l subject-cn:,issuer-cn:,number:,type:,ecc:,rsa:,prefix:,cakey: -n 'mkcert.sh' -- "$@"`
+	eval set -- "$TEMP"
+else
+	TEMP=`getopt bws:i:n:t:e:r:p:c: -- "$@"`
+fi
 
 # extract options and their arguments into variables.
 while true ; do
@@ -149,13 +156,14 @@ while true ; do
 				*) usage 1 ;;
 			esac ;;
 		--) shift ; break ;;
-		*) echo "Internal error!" ; exit 1 ;;
+		"") echo "Empty"; break ;;
+		*) echo "Internal error: $1" ; exit 1 ;;
 	esac
 done
 
 # Mandatory values must be supplied on the command line
 
-if [ z"$SUBJCN" = "z" -o z"$ISSUER" == "z" -o z"$TYPE" == "z" ]; then
+if [ z"$SUBJCN" = "z" -o z"$ISSUER" == "z" -o z"$NUMBER" == "z" -o z"$TYPE" == "z" ]; then
 	usage 2
 fi
 
