@@ -1174,7 +1174,7 @@ public class Gui extends JPanel {
 			}
 		}
 		
-		cardsDirectory = pathFixup(currentDirectory + ".." + File.separator + cardsDirectoryArg);
+		cardsDirectory = pathFixup(cardsDirectoryArg);
 		
 		String message = "Cards directory is " + cardsDirectory;
 		logger.info(message);
