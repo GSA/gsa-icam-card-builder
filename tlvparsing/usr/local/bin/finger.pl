@@ -180,8 +180,6 @@ for ($j = 0; $j < $minutiae_count; $j++, $i += 6) {
 		$chars[$i + 5];
 }
 
-exit 0;
-
 print "\n";
 
 $i += 2;
