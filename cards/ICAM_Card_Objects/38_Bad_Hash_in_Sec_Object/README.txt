@@ -11,7 +11,7 @@ and update the security object file with the hash.
 
 The file c38-printed-information2.properties has a different
 agency card serial number than c38-printed-information.properties.
-Therefore, by re-creating printed information object without
+Therefore, by re-creating a printed information object without
 updating the security object will leave the original hash in
 the security object, but the printed information container
 created by c38-printed-information3.properties will result in
