@@ -33,7 +33,7 @@ process() {
 
 cd ../cards/ICAM_Card_Objects
 
-for D in 25 26 27 28 38 39 41 42 43 44 45 46 47 49 50 51 52 53 54 55
+for D in 25 26 27 28 37 38 39 41 42 43 44 45 46 47 49 50 51 52 53 54 55
 do
 	pushd $D* >/dev/null 2>&1
 	X=$(openssl x509 -serial -subject -in '3 - ICAM_PIV_Auth_SP_800-73-4.crt' -noout) 
