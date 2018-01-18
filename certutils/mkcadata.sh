@@ -10,6 +10,7 @@
 CR=$(echo -n $'\r')
 CWD=$(pwd)
 LOCAL=$CWD/index.new
+rm -f $LOCAL
 
 process() {
 	STAT=$1
