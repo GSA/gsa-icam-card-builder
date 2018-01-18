@@ -15,8 +15,8 @@ email_in_dn = no
 default_ca = ca_rsa2048
 
 [ ca_rsa2048 ]
-private_key = ${dir}/pem/ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.private.pem 
-certificate = ${dir}/pem/ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.crt 
+private_key = ${dir}/pem/ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.private.pem
+certificate = ${dir}/pem/ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.crt
 
 [ ca_secp384r1 ]
 private_key = ${dir}/pem/ICAM_Test_Card_PIV-I_P-384_Signing_CA_gold_gen3.private.pem

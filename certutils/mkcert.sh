@@ -7,19 +7,18 @@
 #       piv-dig-sig|pivi-dig-sig|piv-key-mgmt|pivi-key-mgmt|
 #       piv-key-hist1..20|pivi-key-hist1..20|
 #       piv-content-signer*|pivi-content-signer*>
+#       piv-ocsp*|pivi-ocsp*>
 #   [-b|--batch] 
-#   [-w|--win32] 
-#   [-n|--number cardnumber]
-#   [-e|--ecc prime256v1|secp384r1]
-#   [-r|--rsa 1024|2048|3072|4096]
-#   [-p|--prefix prefix]
 #   [-c|--cakey rsa2048|secp384r1]
+#   [-e|--ecc prime256v1|secp384r1]
+#   [-n|--number cardnumber]
+#   [-p|--prefix prefix]
+#   [-r|--rsa 1024|2048|3072|4096]
+#   [-w|--win32] 
+#   [-x|--expires] 
 #
 WHERE="
   Where:
-
-   -b puts this script and the various OpenSSL commands into batch mode, requiring
-   no input from the user.
 
    -w generates certificates with slightly weaker keys due to a deficiency in Win32.
    This is only necessary when using Win32-based software to inject keys on to the
@@ -35,34 +34,43 @@ WHERE="
    -t type denotes the type of card (piv oi pivi) and type of cert.  Types can be
     piv-auth, piv-card-auth, pivi-auth, pivi-card-auth, piv-dig-sig
     pivi-dig-sig, piv-key-mgmt, pivi-key-mgmt, piv-key-hist1..20, pivi-key-hist1..20,
-    piv-content-signer*, or pivi-content-signer*.
+    piv-content-signer*, pivi-content-signer*, piv-ocsp*, or pivi-ocsp*.
+
+   -b puts this script and the various OpenSSL commands into batch mode, requiring
+   no input from the user.
+   -c cakey the CA key length/type used to sign the request.  Default is \"rsa2048\".
+
+   -e ECCalgorithm specifies the name of the ECC algorithm. Does not apply to 
+   RSA-based certs.
 
    -n cardnumber is the card number which is used to locate the appropriate OpenSSL
+
    configuration file which should always end in \"c<cardnumber>.cnf\".  If you plan 
    to create your own configuration files, follow this naming convention: 
 
      prefix + \"-\" + type + \"-c\" + cardnumber + \".cnf\". 
      e.g. mytest-piv-auth-c32.cnf
 
-   -e ECCalgorithm specifies the name of the ECC algorithm. Does not apply to 
-   RSA-based certs.
+   -p prefix the prefix to the coniguration file name.  Default is \"icam\".
 
    -r RSAbitlength specifies the length of the RSA key in bits. Does not apply to 
    ECC-based certs.
 
-   -p prefix the prefix to the coniguration file name.  Default is \"icam\".
-
-   -c cakey the CA key length/type used to sign the request.  Default is \"rsa2048\".
+   -x ExpirationDateTime (in UCT format)
 "
 
 function usage() {
-	echo "Usage: $0 [-b][-w] -s SubjectCN -i IssuerCN -n cardnumber"
+	echo "Usage: $0 -s SubjectCN -i IssuerCN -n cardnumber"
 	echo "  -t piv-auth|piv-card-auth|pivi-auth|pivi-card-auth|piv-dig-sig|pivi-dig-sig|"
 	echo "      piv-key-mgmt|pivi-key-mgmt|piv-key-hist1..20|pivi-key-hist1..20"
+	echo "      piv-content-signer*|pivi-content-signer*|piv-ocsp*|pivi-ocsp*"
+	echo "OPTIONS:"
+	echo "  [-b]"
+	echo "  [-c rsa2048|secp384r1]"
 	echo "  [-e prime256v1|secp384r1]"
 	echo "  [-r 1024|2048|3072|4096]"
 	echo "  [-p prefix]"
-	echo "  [-c rsa2048|secp384r1]"
+	echo "  [-w]"
 	echo "$WHERE"
 	echo
 	echo "You executed " "$@"
@@ -98,9 +106,10 @@ ECCALG=prime256v1
 RSAALG=2048
 PREFIX=icam
 CAKEY=default
+ENDDATE=
 APPLE=$(expr $MACHTYPE : "^.*apple")
 if [ $APPLE -eq 0 ]; then
-	TEMP=`getopt -o bws:i:n:t:e:r:p:c: -l subject-cn:,issuer-cn:,number:,type:,ecc:,rsa:,prefix:,cakey: -n 'mkcert.sh' -- "$@"`
+	TEMP=`getopt -o bws:i:n:t:e:r:p:c:x: -l subject-cn:,issuer-cn:,number:,type:,ecc:,rsa:,prefix:,cakey:,expires: -n 'mkcert.sh' -- "$@"`
 	eval set -- "$TEMP"
 else
 	TEMP=`getopt bws:i:n:t:e:r:p:c: -- "$@"`
@@ -143,12 +152,18 @@ while true ; do
 			case "$2" in
 				piv-auth|piv-card-auth|pivi-auth|pivi-card-auth| \
 				piv-dig-sig|piv-key-mgmt|pivi-dig-sig|pivi-key-mgmt| \
-				piv-key-hist*|pivi-key-hist*|piv-*-signer*|pivi-*-signer*) TYPE=$2 ; shift 2 ;;
+				piv-key-hist*|pivi-key-hist*| \
+				piv-*-signer*|pivi-*-signer*| \
+				piv-ocsp*|pivi-ocsp*) TYPE=$2 ; shift 2 ;;
 				*) usage 1 ;;
 			esac ;;
 		-p|--prefix) 
 			case "$2" in
 				*) PREFIX=$2 ; shift 2 ;;
+			esac ;;
+		-x|--expires) 
+			case "$2" in
+				*) ENDDATE=$2 ; shift 2 ;;
 			esac ;;
 		-c|--cakey) 
 			case "$2" in
@@ -161,32 +176,52 @@ while true ; do
 	esac
 done
 
-# Mandatory values must be supplied on the command line
+TYPE=$(echo $TYPE | tr "[:upper:]" "[:lower:]")
 
-if [ z"$SUBJCN" = "z" -o z"$ISSUER" == "z" -o z"$NUMBER" == "z" -o z"$TYPE" == "z" ]; then
-	usage 2
+if [ $(expr $TYPE : ".*-signer") -lt 7 -a $(expr $TYPE : ".*-ocsp") -lt 5 ]; then
+	SPECIAL=0
+else
+	SPECIAL=1
 fi
 
 # FCN is the file name with spaces and other wierd characters converted to "_"
 
 FCN=$(cleanup "$SUBJCN")
 ISSUER=$(cleanup "$ISSUER")
-TYPE=$(echo $TYPE | tr "[:upper:]" "[:lower:]")
 
-# End dates of certificates need to be nested
+# Mandatory values must be supplied on the command line
 
-if [ $(expr $TYPE : ".*-signer") -ge 7 ]; then
+if [ $SPECIAL -eq 0 ]; then
+	if [ z"$SUBJCN" == "z" -o z"$ISSUER" == "z" -o z"$NUMBER" == "z" -o z"$TYPE" == "z" ]; then
+		usage 2
+	fi
+else
+	if [ z"$SUBJCN" == "z" -o z"$ISSUER" == "z" -o z"$TYPE" == "z" ]; then
+		usage 2
+	fi
+fi
+
+STARTDATE=171202000000Z
+
+# Default notBefore and notAfter of certificates need to be nested
+# within signingCA certs.
+
+if [ z"$ENDDATE" == "z" ]; then
+	if [ $SPECIAL -eq 1 ]; then
+		ENDDATE=321230235959Z
+	else
+		ENDDATE=321201235959Z
+	fi
+fi
+
+if [ $SPECIAL -eq 1 ]; then
 	CNF="$(pwd)/$PREFIX-$TYPE.cnf"
-	STARTDATE=171202000000Z
-	ENDDATE=321230235959Z
 else
 	CNF="$(pwd)/$PREFIX-$TYPE-c$NUMBER.cnf"
-	STARTDATE=171202000000Z
-	ENDDATE=321201235959Z
 fi
 
 if [ ! -f "$CNF" ]; then
-	echo "$CNF was not found.  Exiting."
+	echo "Config file '$CNF' was not found.  Exiting."
 	exit 4
 fi
 
@@ -222,6 +257,10 @@ elif [[ z$TYPE == "zpiv-key-hist"* ]] || [[ z$TYPE* == "zpivi-key-hist"* ]]; the
 	SUBJ="/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=$CN"
 	if [ z"$ECCALG" == "z" ]; then KEY=RSA; fi
 elif [[ z$TYPE == "zpiv-content"* ]] || [[ z$TYPE* == "zpivi-content"* ]]; then
+	CN=$(echo $SUBJCN | sed 's/_/ /g')
+	SUBJ="/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=$CN"
+	if [ z"$ECCALG" == "z" ]; then KEY=RSA; fi
+elif [[ z$TYPE == "zpiv-ocsp"* ]] || [[ z$TYPE* == "zpivi-ocsp"* ]]; then
 	CN=$(echo $SUBJCN | sed 's/_/ /g')
 	SUBJ="/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=$CN"
 	if [ z"$ECCALG" == "z" ]; then KEY=RSA; fi
