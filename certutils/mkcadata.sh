@@ -7,10 +7,9 @@
 #
 # Redirect the output to a file named "data/database/index.txt"
 
-CR=$(echo -n -e "\r")
+CR=$(echo -n $'\r')
 CWD=$(pwd)
-DEST=$CWD/data/database/index.txt
-/bin/mv $DEST $DEST.old 2>/dev/null
+LOCAL=$CWD/index.new
 
 process() {
 	STAT=$1
@@ -20,13 +19,13 @@ process() {
 	SER=$(expr $1 : "serial=\(.*\)")
 	shift
 	SUB=$(expr "$*" : "subject= \(.*\)")
-	TAB=$(echo -n -e "\t")
+	TAB=$(echo -n $'\t')
 	if [ r$STAT == r"R" ]; then
 		REV=$EXP
 	else
 		REV=
 	fi
-	echo "${STAT}${TAB}${EXP}${TAB}${REV}${TAB}${SER}${TAB}unknown${TAB}${SUB}" >>$DEST
+	echo "${STAT}${TAB}${EXP}${TAB}${REV}${TAB}${SER}${TAB}unknown${TAB}${SUB}" >>$LOCAL
 }
 
 # Start here
@@ -78,13 +77,24 @@ done
 SIGNCERTS="ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt \
 	ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.crt"
 
-cp $DEST .
-cp $(dirname $DEST)/index.txt.attr .
+# The actual datbase location
+DEST=$CWD/data/database/index.txt
+
+# Back it up
+/bin/mv $DEST $DEST.old 2>/dev/null
+
+# Sort the results into a new database
+sort -t$'\t' -k4 $LOCAL >$DEST
+
+# Copy the real database artifacts
+cp -p $DEST .
+cp -p $(dirname $DEST)/index.txt.attr .
 tar cvf responder-certs.tar $OCSPCERTS $SIGNCERTS index.txt index.txt.attr
 rm -f index.txt
-cp -p responder-certs.tar ../../../responder
+mv responder-certs.tar ../../../responder
 
+# Backup AIA, CRLs, and SIA
 tar cvf aiacrlsia.tar aia crls sia
-cp -p aiacrlsia.tar ../../../responder
-rm -f aiacrlsia.tar
+mv aiacrlsia.tar ../../../responder
+
 popd >/dev/null 2>&1
