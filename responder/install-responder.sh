@@ -6,6 +6,23 @@
 
 # Usage: -d option will just install data
 
+trap 'echo -e "\x0a**** Caught keyboard signaal *****"; exit 2' 2 3 15
+
+timer() {
+  SECS=120
+  while [ $SECS -gt 0 ]; do
+    if [ $SECS -ge 100 ]; then
+      echo -n "$SECS seconds."; echo -n $'\b\b\b\b\b\b\b\b\b\b\b\b'
+    elif [ $SECS -ge 10 ]; then
+      echo -n "$SECS seconds."; echo -n $'\b\b\b\b\b\b\b\b\b\b\b'
+    else
+      echo -n "$SECS seconds."; echo -n $'\b\b\b\b\b\b\b\b\b\b'
+    fi
+    sleep 1
+    SECS=$(expr $SECS - 1)
+  done
+}
+
 if [ $# -eq 1 -a $1 == "-d" ]; then 
   echo "Certificates and revocation data update."
   DATAONLY=1
@@ -23,7 +40,7 @@ CRLHOST=1 # Change to zero if not hosting CRL/AIA/SIA on this VM
 CWD=$(pwd)
 cp responder-certs.tar /etc/pki/CA
 cd /etc/pki/CA
-tar xvf responder-certs.tar
+tar xv --no-same-owner --no-same-permissions -f responder-certs.tar
 
 # Then, run this script to create OCSP response signer keys and certs.  
 # Split .p12 files from ICAM_CA_and_Signer files to be used in
@@ -78,13 +95,27 @@ mv ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.crt PIV-I_Signing_CA.crt
 
 echo "unique_subject = no" >index.txt.attr
 
-if [ $DATAONLY -eq 1 -a -d /var/www/http.apl-test.cite.fpki-lab.gov ]; then
-  pushd http.apl-test.cite.fpki-lab.gov >/dev/null 2>&1
-    if [ -f $CWD/aiacrlssia.tar ]; then
-      tar xv --no-same-owner --no-same-permissions -f $CWD/aiacrlssia.tar
+if [ $DATAONLY -eq 1 -a $CRLHOST -eq 1 ]; then
+  if [ -d /var/www/http.apl-test.cite.fpki-lab.gov ]; then
+    pushd http.apl-test.cite.fpki-lab.gov >/dev/null 2>&1
+    if [ -f $CWD/aiacrlsia.tar ]; then
+      tar xv --no-same-owner --no-same-permissions -f $CWD/aiacrlsia.tar
     fi
-  popd >/dev/null 2>&1
-  echo "Data has been updated. Exiting."
+    popd >/dev/null 2>&1
+  fi
+  systemctl stop ocspd.service
+  systemctl stop httpd.service
+  echo -n "Data has been updated. The serivces will restart in "; timer
+  echo
+  nohup systemctl start httpd.service >/dev/null 2>&1
+  nohup systemctl start ocspd.service >/dev/null 2>&1
+  echo
+  echo "The services have been restarted."
+  echo "----------------------------------------------------------------------------------"
+  sleep 2
+  systemctl status httpd.service
+  systemctl status ocspd.service
+  echo "----------------------------------------------------------------------------------"
   exit 0
 fi
 
@@ -166,8 +197,8 @@ if [ $CRLHOST -eq 1 ]; then
   mkdir -p http.apl-test.cite.fpki-lab.gov/crls
   mkdir -p http.apl-test.cite.fpki-lab.gov/logs
   pushd http.apl-test.cite.fpki-lab.gov >/dev/null 2>&1
-    if [ -f $CWD/aiacrlssia.tar ]; then
-      tar xv --no-same-owner --no-same-permissions -f $CWD/aiacrlssia.tar
+    if [ -f $CWD/aiacrlsia.tar ]; then
+      tar xv --no-same-owner --no-same-permissions -f $CWD/aiacrlsia.tar
     fi
   popd >/dev/null 2>&1
 fi

@@ -31,9 +31,8 @@ process() {
 
 # Start here
 
-cd ../cards/ICAM_Card_Objects
-
-for D in 25 26 27 28 37 38 39 41 42 43 44 45 46 47 49 50 51 52 53 54 55
+pushd ../cards/ICAM_Card_Objects >/dev/null 2>&1
+for D in 25 26 27 28 37 38 39 41 42 43 44 45 46 47 49 50 51 52 53 54 55 56 
 do
 	pushd $D* >/dev/null 2>&1
 	X=$(openssl x509 -serial -subject -in '3 - ICAM_PIV_Auth_SP_800-73-4.crt' -noout) 
@@ -50,12 +49,14 @@ do
 	process V $Y $X
 	popd >/dev/null 2>&1
 done
+popd >/dev/null 2>&1
 
-pushd ICAM_CA_and_Signer >/dev/null 2>&1
+pushd ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer >/dev/null 2>&1
+	X=$(openssl x509 -serial -subject -in ICAM_Test_Card_PIV_Content_Signer_Expiring_-_gold_gen3.crt -noout) 
+	Y=$(openssl x509 -in ICAM_Test_Card_PIV_Content_Signer_Expiring_-_gold_gen3.crt -outform der | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
+	process V $Y $X
 
-OCSPCERTS="ICAM_Test_Card_PIV_Content_Signer_-_gold_gen3.p12 \
-	ICAM_Test_Card_PIV-I_Content_Signer_-_gold_gen3.p12 \
-	ICAM_Test_Card_PIV_OCSP_Expired_Signer_gen3.p12 \
+OCSPCERTS="ICAM_Test_Card_PIV_OCSP_Expired_Signer_gen3.p12 \
 	ICAM_Test_Card_PIV_OCSP_Invalid_Signature_gen3.p12 \
 	ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Not_Present_gen3.p12 \
 	ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Present_gen3.p12 \
@@ -90,12 +91,12 @@ sort -t$'\t' -k4 $LOCAL >$DEST
 # Copy the real database artifacts
 cp -p $DEST .
 cp -p $(dirname $DEST)/index.txt.attr .
-tar cvf responder-certs.tar $OCSPCERTS $SIGNCERTS index.txt index.txt.attr
+tar cv --owner=root --group=root -f responder-certs.tar $OCSPCERTS $SIGNCERTS index.txt index.txt.attr
 rm -f index.txt
 mv responder-certs.tar ../../../responder
 
 # Backup AIA, CRLs, and SIA
-tar cvf aiacrlsia.tar aia crls sia
+tar cv --owner=root --group=root -f aiacrlsia.tar aia crls sia
 mv aiacrlsia.tar ../../../responder
 
 popd >/dev/null 2>&1
