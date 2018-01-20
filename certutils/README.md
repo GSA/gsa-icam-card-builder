@@ -1,5 +1,5 @@
 ## Certificate Utilities
-There are two utilities in this directory.  The purpose, usage instructions and
+There are multiple utilities in this directory.  The purpose, usage instructions and
 other information is provided in the following sections. 
 
 These utilities are to be run in a Linux, MAC OS X, or Cygwin environment only.
@@ -7,12 +7,18 @@ There is currently no DOS Command Window or Windows Power Shell equivalent.
 
 ### Purpose
 In order to customize the certificates to create certain test case scenarios,
-we need a way to configure and generate them.  When a certificate is generated,
-the public and private key are stored in a PKCS12 file which allows the appropriate
-key to be injected into the card and the certificate to be written to the 
-corresponding container.  If on-card key generation is used, then these utilities
-are not needed.  Key injection is a way to expedite test card population.  It
-should *never* be used to create production cards.
+we need a way to configure and generate them. There are 3 types of End Entity
+(EE) certificates.
+
+1. PIV and PIV-I card certificates
+2. Content signer certificates
+3. OCSP response signer certificates
+
+When a certificate is generated, the public and private key are stored in a PKCS12
+file which allows the appropriate key to be injected into the card and the certificate
+to be written to the corresponding container.  If on-card key generation is used,
+then these utilities are not needed.  Key injection is a way to expedite test card
+population.  Itshould *never* be used to create production cards.
 
 ### Batch Mode Generation
 A batch-mode utility, `makeall.sh` creates the four certificates for all ICAM
@@ -20,6 +26,9 @@ test cards that use the SP 800-73-4 (FIPS 201-2) data model.  It creates the
 PKCS12 `.p12` files and copies them into the appropriate "cards/ICAM_Card_Objects"
 directory.  It also creates a standardized file name for software that may be
 hard-coded to look for specific `.p12` file names.
+
+Certificates that are supposed to be revoked as part of a test case are first 
+created, and then revoked using OpenSSL's `openssl ca` command.
 
 ### Single Certificate Generation
 The `certutils` directory contains a bash script, `mkcert.sh` that uses command
@@ -65,6 +74,19 @@ public/private key pairs.  Most PIV middleware is designed to tell the smart car
 to generate its own key pairs, in which case, the process described thus far may
 need to be updated to reflect on-card key generation and signing by a CA that you
 maintain.
+
+#### mkcadata.sh
+
+The `mkcadata.sh` script traverses all of the card directories as well as the
+content and OCSP signing directories to re-index the CA database and collect all
+artifacts needed for the OCSP responder and AIA/SIA/CRL server.  The OCSP response
+artifacts are stored in `aiacrlsia.tar` and the AIA, SIA, and CRL files are
+stored in `responder-certs.tar`.  This allows the deployment can be split so OCSP
+can be deployed separately from AIA, SIA, and CRL service.
+
+Note that `aiacrlsia.tar` and `responder-certs.tar` are copied to the
+[responder](https://github.com/GSA/gsa-icam-card-builder/tree/master/responder)
+directory.
 
 ### OpenSSL Configuration Files
 Each certificate on each card has its own OpenSSL configuration file, providing
