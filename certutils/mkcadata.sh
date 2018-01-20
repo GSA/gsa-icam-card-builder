@@ -92,6 +92,8 @@ reindex() {
 	popd >/dev/null 2>&1
 }
 
+rm -f $LOCAL
+
 if [ $# -eq 1 -a $1 == "-r" ]; then
 	reindex
 fi
