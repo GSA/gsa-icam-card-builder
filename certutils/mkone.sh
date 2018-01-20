@@ -68,26 +68,26 @@
 #cp -p data/pem/$SUBJ.crt "$DEST"
 #
 ## OCSP revoked signer with id-pkix-ocsp-nocheck present using RSA 2048 (RSA 2048 CA)
-SUBJ=ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Present_gen3 
-ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3
-CONFIG=$CWD/icam-piv-ocsp-revoked-nocheck-not-present.cnf
-CRL=ICAMTestCardGen3SigningCA
-sh mkcert.sh -b -s $SUBJ -i $ISSUER -t piv-ocsp-revoked-nocheck-present -r 2048 --cakey rsa2048 || exit $?
-DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
-cp -p data/$SUBJ.p12 "$DEST"
-cp -p data/pem/$SUBJ.crt "$DEST"
-revoke $SUBJ $ISSUER $CONFIG $CRL
+#SUBJ=ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Present_gen3 
+#ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3
+#CONFIG=$CWD/icam-piv-ocsp-revoked-nocheck-not-present.cnf
+#CRL=ICAMTestCardGen3SigningCA
+#sh mkcert.sh -b -s $SUBJ -i $ISSUER -t piv-ocsp-revoked-nocheck-present -r 2048 --cakey rsa2048 || exit $?
+#DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
+#cp -p data/$SUBJ.p12 "$DEST"
+#cp -p data/pem/$SUBJ.crt "$DEST"
+#revoke $SUBJ $ISSUER $CONFIG $CRL
 #
 ## OCSP revoked signer with id-pkix-ocsp-nocheck NOT presetnt using RSA 2048 (RSA 2048 CA)
-SUBJ=ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Not_Present_gen3 
-ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3
-CONFIG=$CWD/icam-piv-ocsp-revoked-nocheck-present.cnf
-CRL=ICAMTestCardGen3SigningCA
-sh mkcert.sh -b -s $SUBJ -i $ISSUER -t piv-ocsp-revoked-nocheck-not-present -r 2048 --cakey rsa2048 || exit $?
-DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
-cp -p data/$SUBJ.p12 "$DEST"
-cp -p data/pem/$SUBJ.crt "$DEST"
-revoke $SUBJ $ISSUER $CONFIG $CRL
+#SUBJ=ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Not_Present_gen3 
+#ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3
+#CONFIG=$CWD/icam-piv-ocsp-revoked-nocheck-present.cnf
+#CRL=ICAMTestCardGen3SigningCA
+#sh mkcert.sh -b -s $SUBJ -i $ISSUER -t piv-ocsp-revoked-nocheck-not-present -r 2048 --cakey rsa2048 || exit $?
+#DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
+#cp -p data/$SUBJ.p12 "$DEST"
+#cp -p data/pem/$SUBJ.crt "$DEST"
+#revoke $SUBJ $ISSUER $CONFIG $CRL
 #
 ## OCSP invalid signature using RSA 2048 (RSA 2048 CA)
 #SUBJ=ICAM_Test_Card_PIV_OCSP_Invalid_Sig_Signer_gen3
@@ -122,3 +122,10 @@ revoke $SUBJ $ISSUER $CONFIG $CRL
 #DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
 #cp -p data/$SUBJ.p12 "$DEST"
 #cp -p data/pem/$SUBJ.crt "$DEST"
+#
+## Early expiring PIV Content signer using RSA 2048 (RSA 2048 CA) not a permanent ICAM test card
+SUBJ=ICAM_Test_Card_PIV_Content_Signer_Expiring_-_gold_gen3 
+sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -t piv-content-signer-gen3 -r 2048 --cakey rsa2048 -x 201202000000Z || exit $?
+DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
+cp -p data/$SUBJ.p12 "$DEST"
+cp -p data/pem/$SUBJ.crt "$DEST"
