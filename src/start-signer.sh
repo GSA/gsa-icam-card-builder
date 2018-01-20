@@ -10,7 +10,7 @@ if [ ! -d $1 ]; then
   echo "Error: $1 doesn't exist. Continuing."
 fi
 
-java -Dlog4j.configurationFile=resources/log4j2.xml -jar GSA-ICAM-Card-Builder.jar gov.gsa.icamcardbuilder.app.Gui $1
+java -Dlog4j.configurationFile=resources/log4j2.xml -jar gsa-icam-card-builder.jar gov.gsa.icamcardbuilder.app.Gui $1
 
 echo -n "Press <RETURN> to close this window: "
 read ans
