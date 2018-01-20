@@ -17,7 +17,7 @@ cp -p data/pem/$SUBJ.crt "$DEST"
 
 ## Early expiring PIV Content signer using RSA 2048 (RSA 2048 CA) not a permanent ICAM test card
 SUBJ=ICAM_Test_Card_PIV_Content_Signer_Expiring_-_gold_gen3 
-sh -x mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -t piv-content-signer-gen3 -r 2048 --cakey rsa2048 -x 201202000000Z || exit $?
+sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -t piv-content-signer-gen3 -r 2048 --cakey rsa2048 -x 201202000000Z || exit $?
 DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
 cp -p data/$SUBJ.p12 "$DEST"
 cp -p data/pem/$SUBJ.crt "$DEST"
