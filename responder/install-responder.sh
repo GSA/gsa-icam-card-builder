@@ -336,8 +336,6 @@ systemctl enable httpd.service
 
 systemctl start httpd.service
 systemctl status httpd.service
-echo -n "Press <RETURN> to continue or <CTL-Z> to grab a shell: "
-read ans
 
 # OSCP
 
