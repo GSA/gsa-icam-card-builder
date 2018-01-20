@@ -53,7 +53,7 @@ for F in \\
   ICAM_Test_Card_PIV_OCSP_Expired_Signer_gen3.p12 \\
   ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Not_Present_gen3.p12 \\
   ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Present_gen3.p12 \\
-  ICAM_Test_Card_PIV_OCSP_Invalid_Signature_gen3.p12 \\
+  ICAM_Test_Card_PIV_OCSP_Invalid_Sig_Signer_gen3.p12 \\
   ICAM_Test_Card_PIV-I_OCSP_Valid_Signer_gen3.p12
 do
     COUNT=\$(expr \$COUNT + 1)
@@ -97,7 +97,7 @@ echo "unique_subject = no" >index.txt.attr
 
 if [ $DATAONLY -eq 1 -a $CRLHOST -eq 1 ]; then
   if [ -d /var/www/http.apl-test.cite.fpki-lab.gov ]; then
-    pushd http.apl-test.cite.fpki-lab.gov >/dev/null 2>&1
+    pushd /var/www/http.apl-test.cite.fpki-lab.gov >/dev/null 2>&1
     if [ -f $CWD/aiacrlsia.tar ]; then
       tar xv --no-same-owner --no-same-permissions -f $CWD/aiacrlsia.tar
     fi
@@ -328,6 +328,10 @@ if [ $? -eq 1 ]; then
   /bin/mv /tmp/httpd.conf /etc/httpd/conf/httpd.conf
 fi
 
+# Start up at boot
+
+systemctl enable httpd.service
+
 # Apache should start up.
 
 systemctl start httpd.service
@@ -504,8 +508,7 @@ ExecStop=/bin/kill -TERM "\`cat /var/run/ocsp/*.pid\`"
 WantedBy=multi-user.target
 %%
 
-cd /etc/systemd/system/multi-user.target.wants
-ln -s /usr/lib/systemd/system/ocspd.service .
 systemctl daemon-reload
+systemctl enable ocspd.service
 systemctl start ocspd.service
 systemctl status ocspd.service

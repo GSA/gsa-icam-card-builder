@@ -17,6 +17,7 @@ default_ca = ca_rsa2048
 [ ca_rsa2048 ]
 private_key = ${dir}/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.private.pem 
 certificate = ${dir}/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt 
+crl_extensions = crl_ext
 
 [ policy_match ]
 C = match
@@ -30,6 +31,9 @@ prompt = yes
 distinguished_name = req_distinguished_name
 attributes = req_attributes
 req_extensions = v3_req
+
+[ crl_ext ]
+authorityKeyIdentifier=keyid:always,issuer:always
 
 [ req_distinguished_name ]
 C = Country Name
