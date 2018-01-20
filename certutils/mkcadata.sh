@@ -62,6 +62,9 @@ reindex() {
 		done
 	popd >/dev/null 2>&1
 
+	cp -p ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/*.crt data/pem
+	cp -p ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/*.p12 data
+
 	pushd ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer >/dev/null 2>&1
 		pwd
 		X=$(openssl x509 -serial -subject -in ICAM_Test_Card_PIV_Content_Signer_Expiring_-_gold_gen3.crt -noout) 
