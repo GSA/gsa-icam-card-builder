@@ -331,12 +331,12 @@ cp -p data/ICAM_Test_Card_PIV*SP_800-73-4_Missing_SO.p12 "$DEST"
 cp -p data/pem/ICAM_Test_Card_PIV*SP_800-73-4_Missing_SO.crt "$DEST"
 
 ## Card 56 (will be in FRTC 1.3.3 Rev D)
-T="Exp_before_CHUID"
+T="Signer_Expires"
 sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Auth_SP_800-73-4_$T -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 56 -t piv-auth -x 201201235959Z || exit $?
 sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Card_Auth_SP_800-73-4_$T -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 56 -t piv-card-auth -x 201201235959Z || exit $?
 sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Dig_Sig_SP_800-73-4_$T -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 56 -t piv-dig-sig -x 201201235959Z || exit $?
 sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Key_Mgmt_Auth_SP_800-73-4_$T -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 56 -t piv-key-mgmt -x 201201235959Z || exit $?
-DEST="../cards/ICAM_Card_Objects/56_FIPS_201-2_Content_Signer_Exp_before_CHUID"
+DEST="../cards/ICAM_Card_Objects/56_FIPS_201-2_$T"
 cp -p data/ICAM_*_$T.p12 "$DEST"
 cp -p data/pem/ICAM_*_$T.crt "$DEST"
 renameIn "$DEST" 1 1
