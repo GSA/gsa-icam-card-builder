@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#vim: set ts=2 nowrap
+# vim: set ts=2 nowrap
 # Copy this file to the directory on the VM where you've copied the
 # tar file, responder-certs.tar.  Then run it by typing "sh install-responder.sh"
 
@@ -23,7 +23,7 @@ timer() {
   done
 }
 
-if [ $# -eq 1 -a $1 == "-d" ]; then 
+if [ $# -eq 1 -a x$1 == x"-d" ]; then 
   echo "Certificates and revocation data update."
   DATAONLY=1
 else
@@ -49,6 +49,7 @@ tar xv --no-same-owner --no-same-permissions -f responder-certs.tar
 cat << %% >splitp12.sh
 COUNT=0
 for F in \\
+  ICAM_Test_Card_PIV_OCSP_Valid_Signer_gen1-2.p12 \\
   ICAM_Test_Card_PIV_OCSP_Valid_Signer_gen3.p12 \\
   ICAM_Test_Card_PIV_OCSP_Expired_Signer_gen3.p12 \\
   ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Not_Present_gen3.p12 \\
@@ -59,11 +60,12 @@ do
     COUNT=\$(expr \$COUNT + 1)
     case \$COUNT in
     1) N=ocsp ;;
-    2) N=ocspExpired ;;
-    3) N=ocspNocheckNotPresent ;;
-    4) N=ocspRevoked ;;
-    5) N=ocspInvalidSig ;;
-    6) N=ocsp-pivi ;;
+    2) N=ocspGen3 ;;
+    3) N=ocspExpired ;;
+    4) N=ocspNocheckNotPresent ;;
+    5) N=ocspRevoked ;;
+    6) N=ocspInvalidSig ;;
+    7) N=ocsp-pivi ;;
     esac
 
     # Get the signer private and public keys
@@ -90,10 +92,13 @@ done
 sh splitp12.sh
 chmod 600 *.key
 
-mv ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt PIV_Signing_CA.crt
-mv ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.crt PIV-I_Signing_CA.crt
+mv ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2.crt PIV_Signing_CA_gen1-2.crt
+mv ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt PIV_Signing_CA_gen3.crt
+mv ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.crt PIV-I_Signing_CA_gen3.crt
 
-echo "unique_subject = no" >index.txt.attr
+systemctl stop ocspd.service
+systemctl disable ocspd.service
+systemctl stop httpd.service
 
 if [ $DATAONLY -eq 1 -a $CRLHOST -eq 1 ]; then
   if [ -d /var/www/http.apl-test.cite.fpki-lab.gov ]; then
@@ -103,8 +108,7 @@ if [ $DATAONLY -eq 1 -a $CRLHOST -eq 1 ]; then
     fi
     popd >/dev/null 2>&1
   fi
-  systemctl stop ocspd.service
-  systemctl stop httpd.service
+  
   echo -n "Data has been updated. The serivces will restart in "; timer
   echo
   nohup systemctl start httpd.service >/dev/null 2>&1
@@ -135,6 +139,7 @@ if [ $CRLHOST -eq 1 ]; then
   grep http.apl-test.cite.fpki-lab.gov /etc/host >/dev/null 2>&1; GC=$(expr $? + $GC)
 fi
 grep ocsp.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
+grep ocspGen3.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
 grep ocspExpired.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
 grep ocspInvalidSig.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1 >/dev/null 2>&1; GC=$(expr $? + $GC)
 grep ocspRevoked.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
@@ -144,7 +149,7 @@ grep ocsp-pivi.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr 
 if [ $GC -gt 0 ]; then
   cp -p /etc/hosts /etc/hosts.$$
   grep -v lab.gov /etc/hosts >/tmp/hosts
-  echo "$IPADDR $HOSTNAME http.apl-test.cite.fpki-lab.gov ocsp.apl-test.cite.fpki-lab.gov ocspExpired.apl-test.cite.fpki-lab.gov ocspInvalidSig.apl-test.cite.fpki-lab.gov ocspRevoked.apl-test.cite.fpki-lab.gov ocspNocheckNotPresent.apl-test.cite.fpki-lab.gov ocsp-pivi.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
+  echo "$IPADDR $HOSTNAME http.apl-test.cite.fpki-lab.gov ocsp.apl-test.cite.fpki-lab.gov ocspGen3.apl-test.cite.fpki-lab.gov ocspExpired.apl-test.cite.fpki-lab.gov ocspInvalidSig.apl-test.cite.fpki-lab.gov ocspRevoked.apl-test.cite.fpki-lab.gov ocspNocheckNotPresent.apl-test.cite.fpki-lab.gov ocsp-pivi.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
   /bin/mv /tmp/hosts /etc/hosts
 fi
 
@@ -167,6 +172,7 @@ firewall-cmd --permanent --zone=trusted --add-port=2562/tcp
 firewall-cmd --permanent --zone=trusted --add-port=2563/tcp
 firewall-cmd --permanent --zone=trusted --add-port=2564/tcp
 firewall-cmd --permanent --zone=trusted --add-port=2565/tcp
+firewall-cmd --permanent --zone=trusted --add-port=2566/tcp
 firewall-cmd --reload
 
 # Apache2:
@@ -176,6 +182,7 @@ yum install httpd -y
 cd /var/www/ || (echo "Failed to access /var/www"; exit 1)
 for D in \
   ocsp.apl-test.cite.fpki-lab.gov/logs \
+  ocspGen3.apl-test.cite.fpki-lab.gov/logs \
   ocspExpired.apl-test.cite.fpki-lab.gov/logs \
   ocspRevoked.apl-test.cite.fpki-lab.gov/logs \
   ocspNocheckNotPresent.apl-test.cite.fpki-lab.gov/logs \
@@ -213,6 +220,7 @@ semanage port -a -t http_port_t -p tcp 2562
 semanage port -a -t http_port_t -p tcp 2563
 semanage port -a -t http_port_t -p tcp 2564
 semanage port -a -t http_port_t -p tcp 2565
+semanage port -a -t http_port_t -p tcp 2566
 
 # Scripts to install Apache virtual hosts
 
@@ -245,13 +253,25 @@ cat << %% >ocsp.apl-test.cite.fpki-lab.gov.conf
 </VirtualHost>
 %%
 
+cat << %% >ocspGen3.apl-test.cite.fpki-lab.gov.conf
+<VirtualHost ocspGen3.apl-test.cite.fpki-lab.gov:80>
+  ServerName ocspGen3.apl-test.cite.fpki-lab.gov
+  DocumentRoot /dev/null
+  RewriteEngine on
+  RewriteCond %{CONTENT_TYPE} !^application/ocsp-request$
+  RewriteRule ^/(.*) http://localhost:2561/ [P]
+  ErrorLog /var/www/ocspGen3.apl-test.cite.fpki-lab.gov/logs/error.log
+  CustomLog /var/www/ocspGen3.apl-test.cite.fpki-lab.gov/logs/requests.log combined
+</VirtualHost>
+%%
+
 cat << %% >ocspExpired.apl-test.cite.fpki-lab.gov.conf
 <VirtualHost ocspExpired.apl-test.cite.fpki-lab.gov:80>
   ServerName ocspExpired.apl-test.cite.fpki-lab.gov
   DocumentRoot /dev/null
   RewriteEngine on
   RewriteCond %{CONTENT_TYPE} !^application/ocsp-request$
-  RewriteRule ^/(.*) http://localhost:2561/ [P]
+  RewriteRule ^/(.*) http://localhost:2562/ [P]
   ErrorLog /var/www/ocspExpired.apl-test.cite.fpki-lab.gov/logs/error.log
   CustomLog /var/www/ocspExpired.apl-test.cite.fpki-lab.gov/logs/requests.log combined
 </VirtualHost>
@@ -263,7 +283,7 @@ cat << %% >ocspInvalidSig.apl-test.cite.fpki-lab.gov.conf
   DocumentRoot /dev/null
   RewriteEngine on
   RewriteCond %{CONTENT_TYPE} !^application/ocsp-request$
-  RewriteRule ^/(.*) http://localhost:2562/ [P]
+  RewriteRule ^/(.*) http://localhost:2563/ [P]
   ErrorLog /var/www/ocspInvalidSig.apl-test.cite.fpki-lab.gov/logs/error.log
   CustomLog /var/www/ocspInvalidSig.apl-test.cite.fpki-lab.gov/logs/requests.log combined
 </VirtualHost>
@@ -275,7 +295,7 @@ cat << %% >ocspRevoked.apl-test.cite.fpki-lab.gov.conf
   DocumentRoot /dev/null
   RewriteEngine on
   RewriteCond %{CONTENT_TYPE} !^application/ocsp-request$
-  RewriteRule ^/(.*) http://localhost:2563/ [P]
+  RewriteRule ^/(.*) http://localhost:2564/ [P]
   ErrorLog /var/www/ocspRevoked.apl-test.cite.fpki-lab.gov/logs/error.log
   CustomLog /var/www/ocspRevoked.apl-test.cite.fpki-lab.gov/logs/requests.log combined
 </VirtualHost>
@@ -287,7 +307,7 @@ cat << %% >ocspNocheckNotPresent.apl-test.cite.fpki-lab.gov.conf
   DocumentRoot /dev/null
   RewriteEngine on
   RewriteCond %{CONTENT_TYPE} !^application/ocsp-request$
-  RewriteRule ^/(.*) http://localhost:2564/ [P]
+  RewriteRule ^/(.*) http://localhost:2565/ [P]
   ErrorLog /var/www/ocspNocheckNotPresent.apl-test.cite.fpki-lab.gov/logs/error.log
   CustomLog /var/www/ocspNocheckNotPresent.apl-test.cite.fpki-lab.gov/logs/requests.log combined
 </VirtualHost>
@@ -299,7 +319,7 @@ cat << %% >ocsp-pivi.apl-test.cite.fpki-lab.gov.conf
   DocumentRoot /dev/null
   RewriteEngine on
   RewriteCond %{CONTENT_TYPE} !^application/ocsp-request$
-  RewriteRule ^/(.*) http://localhost:2565/ [P]
+  RewriteRule ^/(.*) http://localhost:2566/ [P]
   ErrorLog /var/www/ocsp-pivi.apl-test.cite.fpki-lab.gov/logs/error.log
   CustomLog /var/www/ocsp-pivi.apl-test.cite.fpki-lab.gov/logs/requests.log combined
 </VirtualHost>
@@ -363,11 +383,11 @@ rm -f /var/run/ocsp/*
 while true
 do
   openssl ocsp \\
-  -index \$CADIR/index.txt \\
+  -index \$CADIR/piv-gen1-2-index.txt \\
   -port 2560 \\
   -rsigner \$CADIR/ocsp.crt \\
   -rkey \$CADIR/ocsp.key \\
-  -CA \$CADIR/PIV_Signing_CA.crt \\
+  -CA \$CADIR/PIV_Signing_CA_gen1-2.crt \\
   -text \\
   -out /var/log/ocsp-log.txt >>/var/log/ocsp-output 2>&1 &
   PID=\$!
@@ -378,17 +398,37 @@ done
 ) &
 echo \$! >/var/run/ocsp/ocsp.pid
 
-# ocspExpired.apl-test.cite.fpki-lab.gov -> http://localhost:2561
+# ocspGen3.apl-test.cite.fpki-lab.gov -> http://localhost:2561
+(\\
+while true
+do
+  openssl ocsp \\
+  -index \$CADIR/piv-gen3-index.txt \\
+  -port 2561 \\
+  -rsigner \$CADIR/ocspGen3.crt \\
+  -rkey \$CADIR/ocspGen3.key \\
+  -CA \$CADIR/PIV_Signing_CA_gen3.crt \\
+  -text \\
+  -out /var/log/ocspGen3-log.txt >>/var/log/ocspGen3-output 2>&1 &
+  PID=\$!
+  trap 'kill \$!; exit' 1 2 1 2 15
+  wait
+  sleep 60
+done
+) &
+echo \$! >/var/run/ocsp/ocspGen3.pid
+
+# ocspExpired.apl-test.cite.fpki-lab.gov -> http://localhost:2562
 
 (\\
 while true
 do
   openssl ocsp \\
-  -index \$CADIR/index.txt \\
-  -port 2561 \\
+  -index \$CADIR/piv-gen3-index.txt \\
+  -port 2562 \\
   -rsigner \$CADIR/ocspExpired.crt \\
   -rkey \$CADIR/ocspExpired.key \\
-  -CA \$CADIR/PIV_Signing_CA.crt \\
+  -CA \$CADIR/PIV_Signing_CA_gen3.crt \\
   -text \\
   -out /var/log/ocspExpired-log.txt >>/var/log/ocspExpired-output 2>&1 &
   PID=\$!
@@ -399,17 +439,17 @@ done
 ) &
 echo \$! >/var/run/ocsp/ocspExpired.pid
 
-# ocspInvalidSig.apl-test.cite.fpki-lab.gov -> http://localhost:2562
+# ocspInvalidSig.apl-test.cite.fpki-lab.gov -> http://localhost:2563
 
 (\\
 while true
 do
   openssl ocsp \\
-  -index \$CADIR/index.txt \\
-  -port 2562 \\
+  -index \$CADIR/piv-gen3-index.txt \\
+  -port 2563 \\
   -rsigner \$CADIR/ocspInvalidSig.crt \\
   -rkey \$CADIR/ocspInvalidSig.key \\
-  -CA \$CADIR/PIV_Signing_CA.crt \\
+  -CA \$CADIR/PIV_Signing_CA_gen3.crt \\
   -text \\
   -out /var/log/ocspInvalidSig-log.txt >>/var/log/ocspInvalidSig-output 2>&1 &
   PID=\$!
@@ -420,17 +460,17 @@ done
 )&
 echo \$! >/var/run/ocsp/ocspInvalidSig.pid
 
-# ocspRevoked.apl-test.cite.fpki-lab.gov ->  http://localhost:2563
+# ocspRevoked.apl-test.cite.fpki-lab.gov ->  http://localhost:2564
 
 (\\
 while true
 do
   openssl ocsp \\
-  -index \$CADIR/index.txt \\
-  -port 2563 \\
+  -index \$CADIR/piv-gen3-index.txt \\
+  -port 2564 \\
   -rsigner \$CADIR/ocspRevoked.crt \\
   -rkey \$CADIR/ocspRevoked.key \\
-  -CA \$CADIR/PIV_Signing_CA.crt \\
+  -CA \$CADIR/PIV_Signing_CA_gen3.crt \\
   -text \\
   -out /var/log/ocspRevoked-log.txt >>/var/log/ocspRevoked-output 2>&1 &
   PID=\$!
@@ -441,17 +481,17 @@ done
 )&
 echo \$! >/var/run/ocsp/ocspRevoked.pid
 
-# ocspNocheckNotPresent.apl-test.cite.fpki-lab.gov -> http://localhost:2564
+# ocspNocheckNotPresent.apl-test.cite.fpki-lab.gov -> http://localhost:2565
 
 (\\
 while true
 do
   openssl ocsp \\
-  -index \$CADIR/index.txt \\
-  -port 2564 \\
+  -index \$CADIR/piv-gen3-index.txt \\
+  -port 2565 \\
   -rsigner \$CADIR/ocspNocheckNotPresent.crt \\
   -rkey \$CADIR/ocspNocheckNotPresent.key \\
-  -CA \$CADIR/PIV_Signing_CA.crt \\
+  -CA \$CADIR/PIV_Signing_CA_gen3.crt \\
   -text \\
   -out /var/log/ocspNocheckNotPresent-log.txt >>/var/log/ocspNocheckNotPresent-output 2>&1 &
   PID=\$!
@@ -462,17 +502,17 @@ done
 )&
 echo \$! >/var/run/ocsp/ocspNocheckNotPresent.pid
 
-# ocsp-pivi.apl-test.cite.fpki-lab.gov -> http://localhost:2565
+# ocsp-pivi.apl-test.cite.fpki-lab.gov -> http://localhost:2566
 
 (\\
 while true
 do
   openssl ocsp \\
-  -index \$CADIR/index.txt \\
-  -port 2565 \\
+  -index \$CADIR/pivi-gen3-index.txt \\
+  -port 2566 \\
   -rsigner \$CADIR/ocsp-pivi.crt \\
   -rkey \$CADIR/ocsp-pivi.key \\
-  -CA \$CADIR/PIV-I_Signing_CA.crt \\
+  -CA \$CADIR/PIV-I_Signing_CA_gen3.crt \\
   -text \\
   -out /var/log/ocsp-pivi-log.txt >>/var/log/ocsp-pivi-output 2>&1 &
   PID=\$!
