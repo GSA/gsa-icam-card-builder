@@ -10,6 +10,7 @@
 		<mkdir dir="${dir.distro}/cards/" />
 		<mkdir dir="${dir.distro}/doc/" />
 		<mkdir dir="${dir.distro}/tlvparsing/" />		
+		<mkdir dir="${dir.distro}/responder/" />	
 		<mkdir dir="${dir.distro}/logs/" />
 		<mkdir dir="${dir.distro}/certutils/" />
 		<mkdir dir="${dir.distro}/cards/ICAM_Card_Objects/" />
@@ -46,6 +47,11 @@
 		</copy>
 		<copy todir="${dir.distro}/tlvparsing/">
 			<fileset dir="${dir.buildfile}/tlvparsing/">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+		<copy todir="${dir.distro}/responder/">
+			<fileset dir="${dir.buildfile}/responder/">
 				<include name="**/*" />
 			</fileset>
 		</copy>
@@ -126,6 +132,7 @@
 			<zipfileset dir="${dir.buildfile}/cards/" prefix="cards/" />
 			<zipfileset dir="${dir.buildfile}/certutils/" prefix="certutils/" />
 			<zipfileset dir="${dir.buildfile}/tlvparsing/" prefix="tlvparsing/" />
+			<zipfileset dir="${dir.buildfile}/responder/" prefix="responder/" />
 			<zipfileset dir="${dir.buildfile}/doc/" prefix="doc/" />
 			<zipfileset dir="${dir.buildfile}/lib/" prefix="lib/" />
 			<zipfileset dir="${dir.buildfile}/logs/" prefix="log/" />
