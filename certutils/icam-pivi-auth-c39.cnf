@@ -3,7 +3,7 @@ default_ca = ca_default
 
 [ ca_default ]
 dir = .
-database = database/index.txt 
+database = database/pivi-gen3-index.txt 
 unique_subject = no
 new_certs_dir = .
 private_key = pem/ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.private.pem 
@@ -12,7 +12,7 @@ name_opt = ca_default
 x509_extensions = ee_ext
 default_days = 2190 
 default_md = sha256
-serial = database/serial
+serial = database/pivi-gen3-serial
 policy = policy_match
 email_in_dn = no
 

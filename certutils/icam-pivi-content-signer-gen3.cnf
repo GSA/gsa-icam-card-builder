@@ -1,13 +1,13 @@
 [ default]
 dir = .
 new_certs_dir = $dir
-database = ${dir}/database/index.txt 
+database = ${dir}/database/pivi-gen3-index.txt 
 unique_subject = no
 name_opt = utf8
 x509_extensions = ee_ext
 default_days = 2190 
 default_md = sha256
-serial = database/serial
+serial = database/pivi-gen3-serial
 policy = policy_match
 email_in_dn = no
 
@@ -58,6 +58,6 @@ authorityKeyIdentifier = keyid:issuer
 subjectKeyIdentifier = hash
 extendedKeyUsage = critical,2.16.840.1.101.3.8.7
 keyUsage = critical,digitalSignature
-authorityInfoAccess = caIssuers;URI:http://http.apl-test.cite.fpki-lab.gov/aia/certsIssuedToPIV-ISigningCA.p7c,OCSP;URI:http://ocsp.apl-test.cite.fpki-lab.gov
+authorityInfoAccess = caIssuers;URI:http://http.apl-test.cite.fpki-lab.gov/aia/certsIssuedToPIV-ISigningCA.p7c,OCSP;URI:http://ocsp-pivi.apl-test.cite.fpki-lab.gov
 crlDistributionPoints = URI:http://http.apl-test.cite.fpki-lab.gov/crls/ICAMTestCardPIV-ISigningCA.crl
 certificatePolicies = ia5org,2.16.840.1.101.3.2.1.48.252

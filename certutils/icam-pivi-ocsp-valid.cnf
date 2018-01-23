@@ -1,13 +1,13 @@
 [ default]
 dir = .
 new_certs_dir = $dir
-database = ${dir}/database/index.txt 
+database = ${dir}/database/pivi-gen3-index.txt 
 unique_subject = no
 name_opt = utf8
 x509_extensions = v3_ocsp
 default_days = 2190 
 default_md = sha256
-serial = database/serial
+serial = database/pivi-gen3-serial
 policy = policy_match
 email_in_dn = no
 

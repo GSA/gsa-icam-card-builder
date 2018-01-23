@@ -3,7 +3,7 @@ default_ca = ca_default
 
 [ ca_default ]
 dir = .
-database = database/index.txt 
+database = database/piv-gen3-index.txt 
 unique_subject = no
 new_certs_dir = .
 private_key = pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.private.pem 
@@ -12,7 +12,7 @@ name_opt = ca_default
 x509_extensions = ee_ext
 default_days = 2190 
 default_md = sha256
-serial = database/serial
+serial = database/piv-gen3-serial
 policy = policy_match
 email_in_dn = no
 
@@ -62,7 +62,7 @@ caIssuers;URI.0 = http://http.apl-test.cite.fpki-lab.gov/aia/certsIssuedToICAMTe
 caIssuers;URI.1 = ldap://some.wierd.ldap2.server.gov/ou=ICAM Test Cards, o=U.S. Government, c=US?cACertificate, crossCertificatePair
 caIssuers;URI.2 = ldap://some.wierd.ldap3.server.gov/ou=ICAM Test Cards, o=U.S. Government, c=US?cACertificate, crossCertificatePair
 caIssuers;URI.3 = ldap://some.wierd.ldap4.server.gov/ou=ICAM Test Cards, o=U.S. Government, c=US?cACertificate, crossCertificatePair
-OCSP;URI.0 = http://ocsp.apl-test.cite.fpki-lab.gov/
+OCSP;URI.0 = http://ocspGen3.apl-test.cite.fpki-lab.gov/
 
 [ crldp_sect ]
 URI.0 = http://http.apl-test.cite.fpki-lab.gov/crls/ICAMTestCardGen3SigningCA.crl
