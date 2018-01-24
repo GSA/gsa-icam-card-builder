@@ -56,26 +56,22 @@ process() {
 	SUB=$(expr "$*" : "subject= \(.*\)")
 	TAB=$(echo -n $'\t')
 	if [ r$STAT == r"R" ]; then
-		REV=$EXP
+		REV=$(date +%y%m%d%H%M%SZ)
 	else
 		REV=
 	fi
 	case $GEN in
 	piv-gen1-2) 
-		DEST=$PIVGEN1_LOCAL
-		break ;;
+		DEST=$PIVGEN1_LOCAL ;;
 	piv-gen3) 
-		DEST=$PIVGEN3_LOCAL
-		break ;;
+		DEST=$PIVGEN3_LOCAL ;;
 	pivi-gen1-2) 
-		DEST=$PIVIGEN1_LOCAL
-		break ;;
+		DEST=$PIVIGEN1_LOCAL ;;
 	pivi-gen3) 
-		DEST=$PIVIGEN3_LOCAL
-		break ;;
+		DEST=$PIVIGEN3_LOCAL ;;
 	*)
-		"Unknown destination: [$GEN]"
-		break ;;
+		echo "Unknown destination: [$GEN]"
+		exit 1
 	esac
 	echo "${STAT}${TAB}${EXP}${TAB}${REV}${TAB}${SER}${TAB}unknown${TAB}${SUB}" >>$DEST
 }
@@ -94,10 +90,9 @@ splitp12() {
 reindex() {
 	pushd ../cards/ICAM_Card_Objects >/dev/null 2>&1
 		echo "Creating index for Gen1-2 PIV certs..."
-		#for D in 01 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
-		for D in 01 24
+		for D in 01 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
 		do
-			pushd $D* >/dev/null 2>&1
+			pushd ${D}_* >/dev/null 2>&1
 				pwd
 				if [ ! -f '3 - PIV_Auth.crt' ]; then splitp12 '3 - PIV_Auth.p12' '3 - PIV_Auth.crt'; fi
 				N="ICAM_Test_Card_${D}_PIV_Auth.crt"
@@ -121,7 +116,7 @@ reindex() {
 		echo "Creating index for Gen1-2 PIV-I certs..."
 		for D in 02 
 		do
-			pushd $D* >/dev/null 2>&1
+			pushd ${D}_* >/dev/null 2>&1
 				pwd
 				if [ ! -f '3 - PIV_Auth.crt' ]; then splitp12 '3 - PIV_Auth.p12' '3 - PIV_Auth.crt'; fi
 				N="ICAM_Test_Card_${D}_PIV_Auth.crt"
@@ -143,10 +138,9 @@ reindex() {
 		done
 
 		echo "Creating index for Gen3 PIV certs..."
-		#for D in 25 26 27 28 37 38 41 42 43 44 45 46 47 49 50 51 52 53 55 56 
-		for D in 25 
+		for D in 25 26 27 28 37 38 41 42 43 44 45 46 47 49 50 51 52 53 55 56
 		do
-			pushd $D* >/dev/null 2>&1
+			pushd ${D}_* >/dev/null 2>&1
 				pwd
 				X=$(openssl x509 -serial -subject -in '3 - ICAM_PIV_Auth_SP_800-73-4.crt' -noout) 
 				Y=$(openssl x509 -in '3 - ICAM_PIV_Auth_SP_800-73-4.crt' -outform der | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
@@ -174,7 +168,7 @@ reindex() {
 		echo "Creating index for Gen3 PIV-I certs..."
 		for D in 39 54
 		do
-			pushd $D* >/dev/null 2>&1
+			pushd ${D}_* >/dev/null 2>&1
 				pwd
 				X=$(openssl x509 -serial -subject -in '3 - ICAM_PIV_Auth_SP_800-73-4.crt' -noout) 
 				Y=$(openssl x509 -in '3 - ICAM_PIV_Auth_SP_800-73-4.crt' -outform der | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
@@ -223,10 +217,10 @@ reindex() {
 		/bin/mv $PIVIGEN3_DEST $PIVIGEN3_DEST.old 2>/dev/null
 	
 		# Sort the results into a new database
-		sort -t$'\t' -k4 $PIVGEN1_LOCAL >$PIVGEN1_DEST
-		sort -t$'\t' -k4 $PIVGEN3_LOCAL >$PIVGEN3_DEST
-		sort -t$'\t' -k4 $PIVIGEN1_LOCAL >$PIVIGEN1_DEST
-		sort -t$'\t' -k4 $PIVIGEN3_LOCAL >$PIVIGEN3_DEST
+		sort -u -n -t$'\t' -k4 $PIVGEN1_LOCAL >$PIVGEN1_DEST
+		sort -u -n -t$'\t' -k4 $PIVGEN3_LOCAL >$PIVGEN3_DEST
+		sort -u -n -t$'\t' -k4 $PIVIGEN1_LOCAL >$PIVIGEN1_DEST
+		sort -u -n -t$'\t' -k4 $PIVIGEN3_LOCAL >$PIVIGEN3_DEST
 	popd >/dev/null 2>&1
 }
 
@@ -272,7 +266,9 @@ revoke $SUBJ $ISSUER $CONFIG $CRL
 
 pushd data >/dev/null 2>&1
 	pwd
+
 	# Copy the real database artifacts
+
 	for F in $PIVGEN1_DEST $PIVGEN3_DEST $PIVIGEN1_DEST $PIVIGEN3_DEST
 	do
 		echo "unique_subject = no" >${F}.attr
@@ -301,6 +297,13 @@ pushd data >/dev/null 2>&1
 		${PIVIGEN1_DEST}.attr \
 		${PIVIGEN3_DEST}.attr
 
+	rm -f $PIVGEN1_DEST ${PIVGEN1_DEST}.attr
+	rm -f $PIVGEN3_DEST ${PIVGEN3_DEST}.attr
+	rm -f $PIVIGEN1_DEST ${PIVIGEN1_DEST}.attr
+	rm -f $PIVIGEN3_DEST ${PIVIGEN3_DEST}.attr
+
+	# AIA, SIA, CRLs
+
 	cp -pr ../../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/{aia,sia,crls} .
 
 	# Backup AIA, CRLs, and SIA
@@ -316,7 +319,3 @@ rm -f $PIVGEN1_LOCAL
 rm -f $PIVGEN3_LOCAL
 rm -f $PIVIGEN1_LOCAL
 rm -f $PIVIGEN3_LOCAL
-rm -f $PIVGEN1_DEST ${PIVGEN1_DEST}.attr
-rm -f $PIVGEN3_DEST ${PIVGEN3_DEST}.attr
-rm -f $PIVIGEN1_DEST ${PIVIGEN1_DEST}.attr
-rm -f $PIVIGEN3_DEST ${PIVIGEN3_DEST}.attr

@@ -20,10 +20,11 @@ revoke() {
 		openssl ca -config $CONFIG -keyfile pem/$ISSUER.private.pem -cert pem/$ISSUER.crt -revoke pem/$SUBJ.crt
 		openssl ca -config $CONFIG -status $SERIAL 2>&1 | grep -vy "using" | sed 's/^.*=//g; s/ (.*$//g'
 		DAYS=$(( ($(date '+%s' -d "2032-12-30") - $(date '+%s')) / 86400 ))
-		openssl ca -config $CONFIG -keyfile pem/$ISSUER.private.pem -cert pem/$ISSUER.crt -gencrl -crl_reason cessationOfOperation -crldays $DAYS -out $CRL.crl.pem
-		openssl crl -inform p -in $CRL.crl.pem -outform der -out $CRL.crl
-		rm -f $CRL.crl.pem
-		rm -f $ISSUER.private.pem
-		cp -p $CRL.crl ../../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls
+		openssl ca -config $CONFIG -keyfile pem/$ISSUER.private.pem -cert pem/$ISSUER.crt -gencrl -crl_reason cessationOfOperation -crldays $DAYS -out pem/$CRL.crl.pem
+		openssl crl -inform p -in pem/$CRL.crl.pem -outform der -out $CRL.crl
+		rm -f pem/$CRL.crl.pem
+		rm -f pem/$ISSUER.private.pem
+		cp $CRL.crl ../../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls
+		rm -f $CRL.crl
 	popd >/dev/null
 }
