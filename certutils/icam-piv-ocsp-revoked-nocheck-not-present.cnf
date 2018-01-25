@@ -7,7 +7,7 @@ name_opt = utf8
 x509_extensions = v3_ocsp
 default_days = 2190 
 default_md = sha256
-serial = database/piv-gen3-serial
+serial = ${dir}/database/piv-gen3-serial
 policy = policy_match
 email_in_dn = no
 

@@ -92,6 +92,13 @@ DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
 cp -p data/$SUBJ.p12 "$DEST"
 cp -p data/pem/$SUBJ.crt "$DEST"
 
+## Gen3 OCSP PIV-I valid signer using RSA 2048 (RSA 2048 CA)
+SUBJ=ICAM_Test_Card_PIV-I_OCSP_Valid_Signer_gen3 
+sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3 -t pivi-ocsp-valid -r 2048 --cakey rsa2048 || exit $?
+DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
+cp -p data/$SUBJ.p12 "$DEST"
+cp -p data/pem/$SUBJ.crt "$DEST"
+
 ## Gen3 OCSP invalid signature using RSA 2048 (RSA 2048 CA)
 SUBJ=ICAM_Test_Card_PIV_OCSP_Invalid_Sig_Signer_gen3
 NAME=$(echo $SUBJ | sed 's/[&_]/ /g')

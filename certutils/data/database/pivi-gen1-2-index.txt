@@ -1,1 +1,0 @@
-V	321201235959Z		5853CCE2521801412004	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM PIV-I Authentication

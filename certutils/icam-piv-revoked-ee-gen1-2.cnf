@@ -1,14 +1,14 @@
 [ default]
 dir = .
 new_certs_dir = $dir
-database = ${dir}/database/piv-gen1-2-index.txt 
+database = ${dir}/database/piv-gen1-2-index.txt
 unique_subject = no
 name_opt = utf8
 x509_extensions = v3_ext
 default_days = 2190 
 default_md = sha256
 serial = ${dir}/database/piv-gen1-2-serial
-policy = policy_match
+policy = policy_anything
 email_in_dn = no
 
 [ ca ]
@@ -17,6 +17,7 @@ default_ca = ca_rsa2048
 [ ca_rsa2048 ]
 private_key = ${dir}/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2.private.pem 
 certificate = ${dir}/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2.crt 
+unique_subject = no
 crl_extensions = crl_ext
 
 [ policy_match ]

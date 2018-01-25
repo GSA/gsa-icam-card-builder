@@ -107,6 +107,7 @@ RSAALG=2048
 PREFIX=icam
 CAKEY=default
 ENDDATE=
+CANAME=
 APPLE=$(expr $MACHTYPE : "^.*apple")
 if [ $APPLE -eq 0 ]; then
 	TEMP=`getopt -o bws:i:n:t:e:r:p:c:x: -l subject-cn:,issuer-cn:,number:,type:,ecc:,rsa:,prefix:,cakey:,expires: -n 'mkcert.sh' -- "$@"`
@@ -293,6 +294,8 @@ export CN="$CN"
 export SN="$SN"
 EE_P12=$FCN.p12
 SCA_P12=$ISSUER.p12
+if [ $(expr "$FCN" : ".*PIV-I.*$") -ge 5 ]; then T=pivi; else T=piv; fi
+if [ $(expr "$CNF" : ".*gen3.*$") -ge 4 ]; then G=gen3; else G=gen1-2; fi
 
 NAME=$(basename $EE_P12 .p12 | sed 's/[&_]/ /g')
 echo
@@ -361,7 +364,7 @@ if [ $? -ne 0 ]; then
 	exit 7
 fi
 
-SERIAL=$(cat database/serial)
+SERIAL=$(cat "database/${T}-${G}-serial")
 
 openssl ca \
 	-config "$CNF" \
