@@ -1,3 +1,8 @@
+Bag Attributes
+    localKeyID: BF CF 7C C4 5C 56 6A E3 7B CA E1 33 6C 01 17 04 6E 7E CE AB 
+    friendlyName: ICAM Test Card PIV OCSP Revoked Signer No Check Not Present gen3
+subject=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV OCSP Revoked Signer No Check Not Present gen3
+issuer=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Signing CA
 -----BEGIN CERTIFICATE-----
 MIIFfTCCA+WgAwIBAgIKYAAAAAAAAAAACjANBgkqhkiG9w0BAQsFADBlMQswCQYD
 VQQGEwJVUzEYMBYGA1UEChMPVS5TLiBHb3Zlcm5tZW50MRgwFgYDVQQLEw9JQ0FN

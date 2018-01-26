@@ -7,6 +7,12 @@
 #
 # It then creates tar files with the artfacts needed to run a responder
 #
+
+export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
+exec 19>/tmp/mkcadata.log
+BASH_XTRACEFD=19
+set -x
+
 . ./revoke.sh
 
 CWD=$(pwd)
@@ -238,8 +244,8 @@ reindex() {
 			if [ "${T}-${G}" == "pivi-gen1-2" ]; then
 				T="piv"
 			fi
-			process "$T-$G" $STATUS $Y $X
 			echo "${PAD}${CTR}: ${C}..."
+			process "$T-$G" $STATUS $Y $X
 		done
 	popd >/dev/null 2>&1
 }
@@ -301,7 +307,8 @@ ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2
 CONFIG=${CWD}/icam-piv-revoked-ee-gen1-2.cnf
 CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardSigningCA.crl
 revoke $SUBJ $ISSUER $CONFIG pem $CRL
-if [ $? -gt 0 ]; then exit 1; fi
+RETCODE=$?
+if [ $RETCODE -gt 0 ]; then echo "Revoke failed, returned $RETCODE"; exit 1; fi
 sortbyser $PIVGEN1_LOCAL
 
 ## Gen1-2 Card 24 Revoked PIV Card Auth 
@@ -350,6 +357,7 @@ rm -f $PIVGEN1_LOCAL ${PIVGEN1_LOCAL}.attr
 rm -f $PIVGEN3_LOCAL ${PIVGEN3_LOCAL}.attr
 rm -f $PIVIGEN1_LOCAL ${PIVIGEN1_LOCAL}.attr
 rm -f $PIVIGEN3_LOCAL ${PIVIGEN3_LOCAL}.attr
+rm -f data/pem/*.private.key
 
 # AIA, SIA, CRLs
 
