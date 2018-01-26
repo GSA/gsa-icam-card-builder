@@ -2,7 +2,7 @@
 
 # Revokes a specified cert
 #
-# Usage: revoke $SUBJ $ISSUER $CONFIG $CRL
+# Usage: revoke $SUBJ $ISSUER $CONFIG $SRCDIR $CRL
 
 CWD=$(pwd)
 
