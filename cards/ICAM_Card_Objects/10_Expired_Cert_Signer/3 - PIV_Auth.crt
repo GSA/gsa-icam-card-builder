@@ -1,8 +1,3 @@
-Bag Attributes
-    localKeyID: A7 33 E5 D6 40 11 81 87 0A CB A6 3E 46 4E 2E B9 B7 32 B5 72 
-    friendlyName: expired issuer - PIV Auth
-subject=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM PIV Authentication
-issuer=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Signing CA - Expired
 -----BEGIN CERTIFICATE-----
 MIIFvjCCBCagAwIBAgIKWFPM4lIYAUEgATANBgkqhkiG9w0BAQsFADBvMQswCQYD
 VQQGEwJVUzEYMBYGA1UEChMPVS5TLiBHb3Zlcm5tZW50MRgwFgYDVQQLEw9JQ0FN

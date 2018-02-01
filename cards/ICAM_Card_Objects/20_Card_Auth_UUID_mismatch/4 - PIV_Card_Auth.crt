@@ -1,8 +1,3 @@
-Bag Attributes
-    localKeyID: BC 64 74 DD 68 B6 D6 95 DE 41 C6 F6 3E B5 3E 8E C8 88 52 1E 
-    friendlyName: ID mismatch - PIV-I Card Auth
-subject=/C=US/O=U.S. Government/OU=ICAM Test Cards/serialNumber=aaaaaaaa-d180-124d-e044-000f202b235a
-issuer=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Signing CA
 -----BEGIN CERTIFICATE-----
 MIIFmDCCBACgAwIBAgIKWFPM4lIYAUEgBTANBgkqhkiG9w0BAQsFADBlMQswCQYD
 VQQGEwJVUzEYMBYGA1UEChMPVS5TLiBHb3Zlcm5tZW50MRgwFgYDVQQLEw9JQ0FN

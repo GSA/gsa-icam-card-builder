@@ -1,8 +1,3 @@
-Bag Attributes
-    localKeyID: D4 48 28 91 D8 64 A1 83 86 C3 CE 6F 64 C6 59 7E BC D6 C1 47 
-    friendlyName: revoked - PIV Auth new serial
-subject=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM PIV Authentication
-issuer=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Signing CA
 -----BEGIN CERTIFICATE-----
 MIIGFTCCBH2gAwIBAgIJANGPyPdlV6bSMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNV
 BAYTAlVTMRgwFgYDVQQKEw9VLlMuIEdvdmVybm1lbnQxGDAWBgNVBAsTD0lDQU0g

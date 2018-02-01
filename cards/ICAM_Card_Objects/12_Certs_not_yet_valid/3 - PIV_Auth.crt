@@ -1,8 +1,3 @@
-Bag Attributes
-    localKeyID: 75 A5 3C B6 3D 71 E9 D6 EF 84 16 51 96 2A CC B8 44 47 12 E4 
-    friendlyName: notyetvalid - PIV Auth
-subject=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM PIV Authentication
-issuer=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Signing CA
 -----BEGIN CERTIFICATE-----
 MIIFpjCCBA6gAwIBAgIKWFPM4lIYAUEgATANBgkqhkiG9w0BAQsFADBlMQswCQYD
 VQQGEwJVUzEYMBYGA1UEChMPVS5TLiBHb3Zlcm5tZW50MRgwFgYDVQQLEw9JQ0FN

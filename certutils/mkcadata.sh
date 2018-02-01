@@ -40,9 +40,9 @@ SIGNCERTS="ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2.crt \
 	ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.crt"
 
 CONTCERTS="ICAM_Test_Card_PIV_Content_Signer_-_gold_gen1-2.p12 \
-	ICAM_Test_Card_PIV_Revoked_Content_Signer_gen1-2.p12 \
 	ICAM_Test_Card_PIV_Content_Signer_-_gold_gen3.p12 \
 	ICAM_Test_Card_PIV_Content_Signer_Expiring_-_gold_gen3.p12 \
+	ICAM_Test_Card_PIV_Revoked_Content_Signer_gen1-2.p12 \
 	ICAM_Test_Card_PIV-I_Content_Signer_-_gold_gen1-2.p12 \
 	ICAM_Test_Card_PIV-I_Content_Signer_-_gold_gen3.p12"
 
@@ -95,22 +95,37 @@ process() {
 }
 
 p12tocert() {
-	openssl pkcs12 \
-		-in "$1" \
-		-clcerts \
-		-passin pass: \
-		-nokeys \
-		-out "$2" >/dev/null 2>&1
+	# Avoid unnecessarily updating .crt file
+	P12UPDT=$(stat --printf="%Y\n" "$1")
+	CRTUPDT=$(expr $P12UPDT - 60)
+	if [ -f "$1" -a -f "$2" ]; then
+		CRTUPDT=$(stat --printf="%Y\n" "$2")
+	fi
+	if [ $P12UPDT -ge $CRTUPDT ]; then
+		openssl pkcs12 \
+			-in "$1" \
+			-passin pass: \
+			-nokeys 2>&19 | \
+		perl -n -e 'if (!(/^Subject/i | /^Issuer/i | /^Bag/i | /^ /)) { print $_; }' >$2 2>/dev/null
+	fi
 }
 
 p12tokey() {
-    openssl pkcs12 \
-    	-in $1 \
-    	-nocerts \
-	    -nodes \
-	    -passin pass: \
-	    -passout pass: \
-	    -out "$2" >/dev/null 2>&1
+	# Avoid unnecessarily updating .crt file
+	P12UPDT=$(stat --printf="%Y\n" "$1")
+	KEYUPDT=$(expr $P12UPDT - 60)
+	if [ -f "$1" -a -f "$2" ]; then
+		KEYUPDT=$(stat --printf="%Y\n" "$2")
+	fi
+	if [ $P12UPDT -ge $KEYUPDT ]; then
+		openssl pkcs12 \
+			-in "$1" \
+			-nocerts \
+			-nodes \
+			-passin pass: \
+			-passout pass: 2>&19 | \
+		perl -n -e 'if (!(/^Bag/i | /^ / | /^Key/)) { print $_; }' >$2 2>/dev/null
+	fi
 }
 
 # Re-index the index.txt file
@@ -124,48 +139,47 @@ reindex() {
 
 	pushd ../cards/ICAM_Card_Objects >/dev/null 2>&1
 		echo "Creating index for Gen1-2 PIV certs..."
-		#for D in 01 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 23 24
-		for D in 01 24
+		for D in 01 23 24
 		do
 			pushd ${D}_* >/dev/null 2>&1
 				pwd
-				p12tocert '3 - PIV_Auth.p12' '3 - PIV_Auth.crt'
-				N="ICAM_Test_Card_${D}_PIV_Auth.crt"
-				cp '3 - PIV_Auth.crt' ${CWD}/data/pem/$N
-				X=$(openssl x509 -serial -subject -in ${CWD}/data/pem/$N -noout) 
-				Y=$(openssl x509 -in ${CWD}/data/pem/$N -outform der | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
-				if [ $(expr "$F" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
+				F="3 - PIV_Auth.p12"
+				G=$(basename "$F" .p12).crt
+				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
+				X=$(openssl x509 -serial -subject -in "$G" -noout) 
+				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
+				if [ $(expr "$X" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
 				process piv-gen1-2 $STATUS $Y $X
 
-				p12tocert '4 - PIV_Card_Auth.p12' '4 - PIV_Card_Auth.crt'
-				N="ICAM_Test_Card_${D}_PIV_Card_Auth.crt"
-				cp '4 - PIV_Card_Auth.crt' ${CWD}/data/pem/$N
-				X=$(openssl x509 -serial -subject -in ${CWD}/data/pem/$N -noout) 
-				Y=$(openssl x509 -in ${CWD}/data/pem/$N -outform der | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
-				if [ $(expr "$F" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
+				F="4 - PIV_Card_Auth.p12"
+				G=$(basename "$F" .p12).crt
+				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
+				X=$(openssl x509 -serial -subject -in "$G" -noout) 
+				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
+				if [ $(expr "$X" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
 				process piv-gen1-2 $STATUS $Y $X
 			popd >/dev/null 2>&1
 		done
 
 		echo "Creating index for Gen1-2 PIV-I certs (in piv-gen1-2 index)..."
-		for D in 02 19 20 21 22
+		for D in 02 19 21 22
 		do
 			pushd ${D}_* >/dev/null 2>&1
 				pwd
-				p12tocert '3 - PIV_Auth.p12' '3 - PIV_Auth.crt'
-				N="ICAM_Test_Card_${D}_PIV_Auth.crt"
-				cp '3 - PIV_Auth.crt' ${CWD}/data/pem/$N
-				X=$(openssl x509 -serial -subject -in ${CWD}/data/pem/$N -noout) 
-				Y=$(openssl x509 -in ${CWD}/data/pem/$N -outform der | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
-				if [ $(expr "$F" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
+				F="3 - PIV_Auth.p12"
+				G=$(basename "$F" .p12).crt
+				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
+				X=$(openssl x509 -serial -subject -in "$G" -noout) 
+				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
+				if [ $(expr "$X" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
 				process piv-gen1-2 $STATUS $Y $X
 
-				p12tocert '4 - PIV_Card_Auth.p12' '4 - PIV_Card_Auth.crt'
-				N="ICAM_Test_Card_${D}_PIV_Auth.crt"
-				cp '3 - PIV_Auth.crt' ${CWD}/data/pem/$N
-				X=$(openssl x509 -serial -subject -in ${CWD}/data/pem/$N -noout) 
-				Y=$(openssl x509 -in ${CWD}/data/pem/$N -outform der | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
-				if [ $(expr "$F" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
+				F="4 - PIV_Card_Auth.p12"
+				G=$(basename "$F" .p12).crt
+				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
+				X=$(openssl x509 -serial -subject -in "$G" -noout) 
+				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
+				if [ $(expr "$X" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
 				process piv-gen1-2 $STATUS $Y $X
 			popd >/dev/null 2>&1
 		done
@@ -175,24 +189,36 @@ reindex() {
 		do
 			pushd ${D}_* >/dev/null 2>&1
 				pwd
-				X=$(openssl x509 -serial -subject -in '3 - ICAM_PIV_Auth_SP_800-73-4.crt' -noout) 
-				Y=$(openssl x509 -in '3 - ICAM_PIV_Auth_SP_800-73-4.crt' -outform der | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
-				if [ $(expr "$F" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
+				F="3 - ICAM_PIV_Auth_SP_800-73-4.p12"
+				G=$(basename "$F" .p12).crt
+				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
+				X=$(openssl x509 -serial -subject -in "$G" -noout) 
+				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
+				if [ $(expr "$X" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
 				process piv-gen3 $STATUS $Y $X
 
+				F="4 - ICAM_PIV_Dig_Sig_SP_800-73-4.p12"
+				G=$(basename "$F" .p12).crt
+				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
 				X=$(openssl x509 -serial -subject -in '4 - ICAM_PIV_Dig_Sig_SP_800-73-4.crt' -noout)
-				Y=$(openssl x509 -in '4 - ICAM_PIV_Dig_Sig_SP_800-73-4.crt' -outform der | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
-				if [ $(expr "$F" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
+				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
+				if [ $(expr "$X" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
 				process piv-gen3 $STATUS $Y $X
 
-				X=$(openssl x509 -serial -subject -in '5 - ICAM_PIV_Key_Mgmt_SP_800-73-4.crt' -noout)
-				Y=$(openssl x509 -in '5 - ICAM_PIV_Key_Mgmt_SP_800-73-4.crt' -outform der | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
-				if [ $(expr "$F" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
+				F="5 - ICAM_PIV_Key_Mgmt_SP_800-73-4.p12"
+				G=$(basename "$F" .p12).crt
+				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
+				X=$(openssl x509 -serial -subject -in "$G" -noout)
+				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
+				if [ $(expr "$X" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
 				process piv-gen3 $STATUS $Y $X
 
-				X=$(openssl x509 -serial -subject -in '6 - ICAM_PIV_Card_Auth_SP_800-73-4.crt' -noout)
-				Y=$(openssl x509 -in '6 - ICAM_PIV_Card_Auth_SP_800-73-4.crt' -outform der | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
-				if [ $(expr "$F" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
+				F="6 - ICAM_PIV_Card_Auth_SP_800-73-4.p12"
+				G=$(basename "$F" .p12).crt
+				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
+				X=$(openssl x509 -serial -subject -in "$G" -noout)
+				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
+				if [ $(expr "$X" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
 				process piv-gen3 $STATUS $Y $X
 			popd >/dev/null 2>&1
 		done
@@ -202,20 +228,36 @@ reindex() {
 		do
 			pushd ${D}_* >/dev/null 2>&1
 				pwd
-				X=$(openssl x509 -serial -subject -in '3 - ICAM_PIV_Auth_SP_800-73-4.crt' -noout) 
-				Y=$(openssl x509 -in '3 - ICAM_PIV_Auth_SP_800-73-4.crt' -outform der | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
+				F="3 - ICAM_PIV_Auth_SP_800-73-4.p12"
+				G=$(basename "$F" .p12).crt
+				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
+				X=$(openssl x509 -serial -subject -in "$G" -noout) 
+				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
+				if [ $(expr "$X" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
 				process pivi-gen3 V $Y $X
 
-				X=$(openssl x509 -serial -subject -in '4 - ICAM_PIV_Dig_Sig_SP_800-73-4.crt' -noout)
-				Y=$(openssl x509 -in '4 - ICAM_PIV_Dig_Sig_SP_800-73-4.crt' -outform der | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
+				F="4 - ICAM_PIV_Dig_Sig_SP_800-73-4.p12"
+				G=$(basename "$F" .p12).crt
+				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
+				X=$(openssl x509 -serial -subject -in "$G" -noout)
+				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
+				if [ $(expr "$X" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
 				process pivi-gen3 V $Y $X
 
-				X=$(openssl x509 -serial -subject -in '5 - ICAM_PIV_Key_Mgmt_SP_800-73-4.crt' -noout)
-				Y=$(openssl x509 -in '5 - ICAM_PIV_Key_Mgmt_SP_800-73-4.crt' -outform der | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
+				F="5 - ICAM_PIV_Key_Mgmt_SP_800-73-4.p12"
+				G=$(basename "$F" .p12).crt
+				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
+				X=$(openssl x509 -serial -subject -in "$G" -noout)
+				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
+				if [ $(expr "$X" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
 				process pivi-gen3 V $Y $X
 
-				X=$(openssl x509 -serial -subject -in '6 - ICAM_PIV_Card_Auth_SP_800-73-4.crt' -noout)
-				Y=$(openssl x509 -in '6 - ICAM_PIV_Card_Auth_SP_800-73-4.crt' -outform der | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
+				F="6 - ICAM_PIV_Card_Auth_SP_800-73-4.p12"
+				G=$(basename "$F" .p12).crt
+				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
+				X=$(openssl x509 -serial -subject -in "$G" -noout)
+				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
+				if [ $(expr "$X" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
 				process pivi-gen3 V $Y $X
 			popd >/dev/null 2>&1
 		done
@@ -229,18 +271,22 @@ reindex() {
 		do
 			CTR=$(expr $CTR + 1); if [ $CTR -lt 10 ]; then PAD="0"; else PAD=""; fi
 
-			F=$(basename $C .p12).crt
-			if [ ! -f "$F" ]; then p12tocert "$C" "pem/$F"; fi
+			F="pem/$(basename $C .p12).crt"
+			if [ ! -f "$F" ]; then p12tocert "$C" "$F"; fi
 			K="pem/$(basename $C .p12).private.key"
 			if [ ! -f "$K" ]; then p12tokey "$C" "$K"; fi
 
-			X=$(openssl x509 -serial -subject -in "pem/$F" -noout) 
-			Y=$(openssl x509 -in "pem/$F" -outform der | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
+			X=$(openssl x509 -serial -subject -in "$F" -noout) 
+			Y=$(openssl x509 -in "$F" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
 
-			if [ $(expr "$F" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
-			if [ $(expr "$F" : ".*PIV-I.*$") -ge 5 ]; then T=pivi; else T=piv; fi
-			if [ $(expr "$F" : ".*gen3.*$") -ge 4 ]; then G=gen3; else G=gen1-2; fi
+			# Note dependency on name.  TODO: Change this to subject
+
+			if [ $(expr "$X" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
+			if [ $(expr "$X" : ".*PIV-I.*$") -ge 5 ]; then T=pivi; else T=piv; fi
+			if [ $(expr "$X" : ".*gen3.*$") -ge 4 ]; then G=gen3; else G=gen1-2; fi
+
 			# Lump Gen1 PIV-I with PIV
+
 			if [ "${T}-${G}" == "pivi-gen1-2" ]; then
 				T="piv"
 			fi
@@ -290,7 +336,7 @@ revoke $SUBJ $ISSUER $CONFIG pem $CRL
 if [ $? -gt 0 ]; then exit 1; fi
 sortbyser $PIVGEN3_LOCAL
 
-## Gen1-2 Content Signing Cert
+### Gen1-2 Content Signing Cert
 echo "Gen1-2 Content Signing Cert..."
 SUBJ=ICAM_Test_Card_PIV_Revoked_Content_Signer_gen1-2
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2

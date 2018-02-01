@@ -1,8 +1,3 @@
-Bag Attributes
-    localKeyID: AA CA 2F 4A B2 A4 DD 60 83 6F 4E 8F 65 36 0F DB E1 57 11 F3 
-    friendlyName: tampered - PIV Authentication
-subject=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM PIV Authentication
-issuer=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Signing CA
 -----BEGIN CERTIFICATE-----
 MIIFpjCCBA6gAwIBAgIKWFPM4lIYAUEgATANBgkqhkiG9w0BAQsFADBlMQswCQYD
 VQQGEwJVUzEYMBYGA1UEChMPVS5TLiBHb3Zlcm5tZW50MRgwFgYDVQQLEw9JQ0FN
