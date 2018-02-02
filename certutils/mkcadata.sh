@@ -148,7 +148,7 @@ reindex() {
 				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
 				X=$(openssl x509 -serial -subject -in "$G" -noout) 
 				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
-				if [ $(expr "$X" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
+				STATUS=V
 				process piv-gen1-2 $STATUS $Y $X
 
 				F="4 - PIV_Card_Auth.p12"
@@ -156,7 +156,8 @@ reindex() {
 				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
 				X=$(openssl x509 -serial -subject -in "$G" -noout) 
 				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
-				if [ $(expr "$X" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
+				STATUS=V
+				process piv-gen1-2 $STATUS $Y $X
 				process piv-gen1-2 $STATUS $Y $X
 			popd >/dev/null 2>&1
 		done
@@ -171,7 +172,7 @@ reindex() {
 				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
 				X=$(openssl x509 -serial -subject -in "$G" -noout) 
 				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
-				if [ $(expr "$X" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
+				STATUS=V
 				process piv-gen1-2 $STATUS $Y $X
 
 				F="4 - PIV_Card_Auth.p12"
@@ -179,7 +180,7 @@ reindex() {
 				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
 				X=$(openssl x509 -serial -subject -in "$G" -noout) 
 				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
-				if [ $(expr "$X" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
+				STATUS=V
 				process piv-gen1-2 $STATUS $Y $X
 			popd >/dev/null 2>&1
 		done
@@ -194,7 +195,7 @@ reindex() {
 				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
 				X=$(openssl x509 -serial -subject -in "$G" -noout) 
 				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
-				if [ $(expr "$X" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
+				STATUS=V
 				process piv-gen3 $STATUS $Y $X
 
 				F="4 - ICAM_PIV_Dig_Sig_SP_800-73-4.p12"
@@ -202,7 +203,7 @@ reindex() {
 				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
 				X=$(openssl x509 -serial -subject -in '4 - ICAM_PIV_Dig_Sig_SP_800-73-4.crt' -noout)
 				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
-				if [ $(expr "$X" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
+				STATUS=V
 				process piv-gen3 $STATUS $Y $X
 
 				F="5 - ICAM_PIV_Key_Mgmt_SP_800-73-4.p12"
@@ -210,7 +211,7 @@ reindex() {
 				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
 				X=$(openssl x509 -serial -subject -in "$G" -noout)
 				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
-				if [ $(expr "$X" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
+				STATUS=V
 				process piv-gen3 $STATUS $Y $X
 
 				F="6 - ICAM_PIV_Card_Auth_SP_800-73-4.p12"
@@ -218,7 +219,7 @@ reindex() {
 				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
 				X=$(openssl x509 -serial -subject -in "$G" -noout)
 				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
-				if [ $(expr "$X" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
+				STATUS=V
 				process piv-gen3 $STATUS $Y $X
 			popd >/dev/null 2>&1
 		done
@@ -233,7 +234,7 @@ reindex() {
 				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
 				X=$(openssl x509 -serial -subject -in "$G" -noout) 
 				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
-				if [ $(expr "$X" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
+				STATUS=V
 				process pivi-gen3 V $Y $X
 
 				F="4 - ICAM_PIV_Dig_Sig_SP_800-73-4.p12"
@@ -241,7 +242,7 @@ reindex() {
 				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
 				X=$(openssl x509 -serial -subject -in "$G" -noout)
 				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
-				if [ $(expr "$X" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
+				STATUS=V
 				process pivi-gen3 V $Y $X
 
 				F="5 - ICAM_PIV_Key_Mgmt_SP_800-73-4.p12"
@@ -249,7 +250,7 @@ reindex() {
 				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
 				X=$(openssl x509 -serial -subject -in "$G" -noout)
 				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
-				if [ $(expr "$X" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
+				STATUS=V
 				process pivi-gen3 V $Y $X
 
 				F="6 - ICAM_PIV_Card_Auth_SP_800-73-4.p12"
@@ -257,7 +258,7 @@ reindex() {
 				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
 				X=$(openssl x509 -serial -subject -in "$G" -noout)
 				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
-				if [ $(expr "$X" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
+				STATUS=V
 				process pivi-gen3 V $Y $X
 			popd >/dev/null 2>&1
 		done
@@ -326,8 +327,8 @@ revoke $SUBJ $ISSUER $CONFIG pem $CRL
 if [ $? -gt 0 ]; then exit 1; fi
 sortbyser $PIVGEN3_LOCAL
 
-## OCSP revoked signer with id-pkix-ocsp-nocheck NOT presetnt using RSA 2048 (RSA 2048 CA)
-echo "OCSP revoked signer with id-pkix-ocsp-nocheck NOT presetnt using RSA 2048 (RSA 2048 CA)..."
+## OCSP revoked signer with id-pkix-ocsp-nocheck NOT present using RSA 2048 (RSA 2048 CA)
+echo "OCSP revoked signer with id-pkix-ocsp-nocheck NOT present using RSA 2048 (RSA 2048 CA)..."
 SUBJ=ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Not_Present_gen3 
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3
 CONFIG=${CWD}/icam-piv-ocsp-revoked-nocheck-present.cnf
