@@ -12,6 +12,8 @@ export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
 exec 19>/tmp/mkcadata.log
 BASH_XTRACEFD=19
 set -x
+export GEN1CRL=1
+export GEN3CRL=1
 
 . ./revoke.sh
 
@@ -323,7 +325,7 @@ SUBJ=ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Present_gen3
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3
 CONFIG=${CWD}/icam-piv-ocsp-revoked-nocheck-not-present.cnf
 CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardGen3SigningCA.crl
-revoke $SUBJ $ISSUER $CONFIG pem $CRL
+revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN3CRL
 if [ $? -gt 0 ]; then exit 1; fi
 sortbyser $PIVGEN3_LOCAL
 
@@ -333,7 +335,7 @@ SUBJ=ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Not_Present_gen3
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3
 CONFIG=${CWD}/icam-piv-ocsp-revoked-nocheck-present.cnf
 CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardGen3SigningCA.crl
-revoke $SUBJ $ISSUER $CONFIG pem $CRL
+revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN3CRL
 if [ $? -gt 0 ]; then exit 1; fi
 sortbyser $PIVGEN3_LOCAL
 
@@ -343,7 +345,7 @@ SUBJ=ICAM_Test_Card_PIV_Revoked_Content_Signer_gen1-2
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2
 CONFIG=${CWD}/icam-piv-revoked-ee-gen1-2.cnf
 CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardSigningCA.crl
-revoke $SUBJ $ISSUER $CONFIG pem $CRL
+revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN1CRL
 if [ $? -gt 0 ]; then exit 1; fi
 sortbyser $PIVGEN1_LOCAL
 
@@ -353,7 +355,7 @@ SUBJ=ICAM_Test_Card_24_PIV_Auth
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2
 CONFIG=${CWD}/icam-piv-revoked-ee-gen1-2.cnf
 CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardSigningCA.crl
-revoke $SUBJ $ISSUER $CONFIG pem $CRL
+revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN1CRL
 RETCODE=$?
 if [ $RETCODE -gt 0 ]; then echo "Revoke failed, returned $RETCODE"; exit 1; fi
 sortbyser $PIVGEN1_LOCAL
@@ -364,7 +366,7 @@ SUBJ=ICAM_Test_Card_24_PIV_Card_Auth
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2
 CONFIG=${CWD}/icam-piv-revoked-ee-gen1-2.cnf
 CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardSigningCA.crl
-revoke $SUBJ $ISSUER $CONFIG pem $CRL
+revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN1CRL
 if [ $? -gt 0 ]; then exit 1; fi
 sortbyser $PIVGEN1_LOCAL
 
