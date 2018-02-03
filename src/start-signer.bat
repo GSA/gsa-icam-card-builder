@@ -11,6 +11,6 @@ IF NOT EXIST %1 GOTO NOWINDIR
    ECHO %1 DOES NOT EXIST.  CONTINUING.
 :NOWINDIR
 
-java -Dlog4j.configurationFile=resources/log4j2.xml -jar GSA-ICAM-Card-Builder.jar gov.gsa.icamcardbuilder.app.Gui %1
+java -Dlog4j.configurationFile=resources/log4j2.xml -jar gsa-icam-card-builder.jar gov.gsa.icamcardbuilder.app.Gui %1
 
 pause
