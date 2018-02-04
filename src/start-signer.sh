@@ -7,10 +7,13 @@
 # isn't being verified.
 
 if [ ! -d $1 ]; then
-  echo "Error: $1 doesn't exist. Continuing."
+  echo "Error: $1 doesn't exist.  Using cards/ICAM_Card_Objects
+  ROOT=cards/ICAM_Card_Objects
+else
+  ROOT=$1
 fi
 
-java -Dlog4j.configurationFile=resources/log4j2.xml -jar gsa-icam-card-builder.jar gov.gsa.icamcardbuilder.app.Gui $1
+java -Dlog4j.configurationFile=resources/log4j2.xml -jar gsa-icam-card-builder.jar gov.gsa.icamcardbuilder.app.Gui $ROOT
 
 echo -n "Press <RETURN> to close this window: "
 read ans
