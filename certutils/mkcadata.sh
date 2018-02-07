@@ -22,39 +22,49 @@ PIVGEN1_DEST=$CWD/data/database/piv-gen1-2-index.txt
 PIVGEN3_DEST=$CWD/data/database/piv-gen3-index.txt
 PIVIGEN1_DEST=$CWD/data/database/pivi-gen1-2-index.txt
 PIVIGEN3_DEST=$CWD/data/database/pivi-gen3-index.txt
+PIVGEN3P384_DEST=$CWD/data/database/piv-gen3-p384-index.txt
 
 PIVGEN1_LOCAL=$CWD/piv-gen1-2-index.txt
 PIVGEN3_LOCAL=$CWD/piv-gen3-index.txt
 PIVIGEN1_LOCAL=$CWD/pivi-gen1-2-index.txt
 PIVIGEN3_LOCAL=$CWD/pivi-gen3-index.txt
+PIVGEN3P384_LOCAL=$CWD/piv-gen3-p384-index.txt
 
 cp $PIVGEN1_DEST $PIVGEN1_LOCAL
 cp $PIVGEN3_DEST $PIVGEN3_LOCAL
 cp $PIVIGEN1_DEST $PIVIGEN1_LOCAL
 cp $PIVIGEN3_DEST $PIVIGEN3_LOCAL
+cp $PIVGEN3P384_DEST $PIVGEN3P384_LOCAL
 
 cp -p ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/*.crt data/pem
 cp -p ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/*.p12 data
 rm -f /tmp/hashes.txt
 
-SIGNCERTS="ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2.crt \
-	ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt \
-	ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.crt"
+SIGNCAP12S="ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2.p12 \
+	ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.p12 \
+	ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.p12 \
+	ICAM_Test_Card_PIV_P-384_Signing_CA_gold_gen3.p12"
 
-CONTCERTS="ICAM_Test_Card_PIV_Content_Signer_-_gold_gen1-2.p12 \
+CONTP12S="ICAM_Test_Card_PIV_Content_Signer_-_gold_gen1-2.p12 \
 	ICAM_Test_Card_PIV_Content_Signer_-_gold_gen3.p12 \
 	ICAM_Test_Card_PIV_Content_Signer_Expiring_-_gold_gen3.p12 \
 	ICAM_Test_Card_PIV_Revoked_Content_Signer_gen1-2.p12 \
 	ICAM_Test_Card_PIV-I_Content_Signer_-_gold_gen1-2.p12 \
-	ICAM_Test_Card_PIV-I_Content_Signer_-_gold_gen3.p12"
+	ICAM_Test_Card_PIV-I_Content_Signer_-_gold_gen3.p12 \
+	ICAM_Test_Card_PIV_RSA_Issued_Intermediate_CVC_Signer.p12 \
+	ICAM_Test_Card_PIV_ECC_Issued_P-256_SM_Certificate_Signer_2.p12 \
+	ICAM_Test_Card_PIV_ECC_Issued_P-384_SM_Certificate_Signer_3.p12"
 
-OCSPCERTS="ICAM_Test_Card_PIV_OCSP_Expired_Signer_gen3.p12 \
+OCSPP12S="ICAM_Test_Card_PIV_OCSP_Expired_Signer_gen3.p12 \
 	ICAM_Test_Card_PIV_OCSP_Invalid_Sig_Signer_gen3.p12 \
 	ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Not_Present_gen3.p12 \
 	ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Present_gen3.p12 \
 	ICAM_Test_Card_PIV_OCSP_Valid_Signer_gen1-2.p12 \
 	ICAM_Test_Card_PIV_OCSP_Valid_Signer_gen3.p12 \
-	ICAM_Test_Card_PIV-I_OCSP_Valid_Signer_gen3.p12"
+	ICAM_Test_Card_PIV-I_OCSP_Valid_Signer_gen3.p12 \
+	ICAM_Test_Card_PIV_OCSP_Valid_Signer_P384_gen3.p12"
+
+CERTLIST=""
 
 sortbyser() {
 	SRC=$1
@@ -83,6 +93,8 @@ process() {
 	piv-gen1-2) 
 		DEST=$PIVGEN1_LOCAL ;;
 	piv-gen3) 
+		DEST=$PIVGEN3_LOCAL ;;
+	piv-gen3-p384) 
 		DEST=$PIVGEN3_LOCAL ;;
 	pivi-gen1-2) 
 		DEST=$PIVIGEN1_LOCAL ;;
@@ -138,6 +150,7 @@ reindex() {
 	>$PIVGEN3_LOCAL
 	>$PIVIGEN1_LOCAL
 	>$PIVIGEN3_LOCAL
+	>$PIVGEN3P384_LOCAL
 
 	pushd ../cards/ICAM_Card_Objects >/dev/null 2>&1
 		echo "Creating index for Gen1-2 PIV certs..."
@@ -266,27 +279,41 @@ reindex() {
 		done
 	popd 
 
-	echo "Adding OCSP response and content signing certs to indices..."
+	echo "Adding OCSP response, content signing certs to indices..."
 	pushd data >/dev/null 2>&1
 		pwd
 		CTR=0
-		for C in $OCSPCERTS $CONTCERTS
+		for C in $OCSPP12S $CONTP12S
 		do
 			CTR=$(expr $CTR + 1); if [ $CTR -lt 10 ]; then PAD="0"; else PAD=""; fi
 
+			if [ ! -f $C ]; then
+				echo "$C was not found."
+				exit 1
+			fi
 			F="pem/$(basename $C .p12).crt"
 			if [ ! -f "$F" ]; then p12tocert "$C" "$F"; fi
-			K="pem/$(basename $C .p12).private.key"
+			K="pem/$(basename $C .p12).private.pem"
 			if [ ! -f "$K" ]; then p12tokey "$C" "$K"; fi
 
 			X=$(openssl x509 -serial -subject -in "$F" -noout) 
 			Y=$(openssl x509 -in "$F" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
 
-			# Note dependency on name.  TODO: Change this to subject
+			if [ -z "$CERTLIST" ]; then CERTLIST=$(basename $F); else CERTLIST="${CERTLIST} $(basename $F)"; fi
 
-			if [ $(expr "$X" : ".*Revoked.*$") -ge 7 ]; then STATUS=R; else STATUS=V; fi
+			cp $F ..
+
+			STATUS=V
+
 			if [ $(expr "$X" : ".*PIV-I.*$") -ge 5 ]; then T=pivi; else T=piv; fi
-			if [ $(expr "$X" : ".*gen3.*$") -ge 4 ]; then G=gen3; else G=gen1-2; fi
+
+			if [ $(expr "$X" : ".*RSA.*$") -ge 3 -a $(expr "$X" : ".*CVC.*$") -ge 3 ]; then G=gen3
+			elif [ $(expr "$X" : ".*ECC.*$") -ge 3 -a $(expr "$X" : ".*P-256.*$") -ge 5 ]; then G=gen3-p384
+			elif [ $(expr "$X" : ".*ECC.*$") -ge 3 -a $(expr "$X" : ".*P-384.*$") -ge 5 ]; then G=gen3-p384
+			elif [ $(expr "$X" : ".*P-384.*$") -ge 5 ]; then G=gen3-p384
+			elif [ $(expr "$X" : ".*gen3.*$") -ge 4 ]; then G=gen3
+			else G=gen1-2
+			fi
 
 			# Lump Gen1 PIV-I with PIV
 
@@ -296,11 +323,29 @@ reindex() {
 			echo "${PAD}${CTR}: ${C}..."
 			process "$T-$G" $STATUS $Y $X
 		done
+
+		echo "Extracting certs from signing CA .p12 files..."
+
+		for C in $SIGNCAP12S
+		do
+			if [ ! -f $C ]; then
+				echo "$C was not found."
+				exit 1
+			else
+				echo "${C}..."
+			fi
+			F="pem/$(basename $C .p12).crt"
+			if [ ! -f "$F" ]; then p12tocert "$C" "$F"; fi
+			K="pem/$(basename $C .p12).private.pem"
+			if [ ! -f "$K" ]; then p12tokey "$C" "$K"; fi
+			if [ -z "$CERTLIST" ]; then CERTLIST=$(basename $F); else CERTLIST="${CERTLIST} $(basename $F)"; fi
+			cp -p $F ..
+		done
 	popd >/dev/null 2>&1
 }
 
 if [ $# -eq 1 -a r$1 == r"-r" ]; then
-	rm -f $PIVGEN1_LOCAL $PIVGEN3_LOCAL $PIVIGEN3_LOCAL
+	rm -f $PIVGEN1_LOCAL $PIVGEN3_LOCAL $PIVIGEN3_LOCAL $PIVGEN3P384_LOCAL
 	reindex
 fi
 
@@ -310,6 +355,7 @@ fi
 /bin/mv $PIVGEN3_DEST $PIVGEN3_DEST.old 2>/dev/null
 /bin/mv $PIVIGEN1_DEST $PIVIGEN1_DEST.old 2>/dev/null
 /bin/mv $PIVIGEN3_DEST $PIVIGEN3_DEST.old 2>/dev/null
+/bin/mv $PIVGEN3P384_DEST $PIVGEN3P384_DEST.old 2>/dev/null
 
 # Move into place
 
@@ -317,6 +363,7 @@ cp -p $PIVGEN1_LOCAL $PIVGEN1_DEST
 cp -p $PIVGEN3_LOCAL $PIVGEN3_DEST
 cp -p $PIVIGEN1_LOCAL $PIVIGEN1_DEST
 cp -p $PIVIGEN3_LOCAL $PIVIGEN3_DEST
+cp -p $PIVGEN3P384_LOCAL $PIVGEN3P384_DEST
 
 echo "Revoking known revoked certs..."
 ## OCSP revoked signer with id-pkix-ocsp-nocheck present using RSA 2048 (RSA 2048 CA)
@@ -370,43 +417,32 @@ revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN1CRL
 if [ $? -gt 0 ]; then exit 1; fi
 sortbyser $PIVGEN1_LOCAL
 
-for F in $PIVGEN1_DEST $PIVGEN3_DEST $PIVIGEN1_DEST $PIVIGEN3_DEST
+for F in $PIVGEN1_DEST $PIVGEN3_DEST $PIVIGEN1_DEST $PIVIGEN3_DEST $PIVGEN3P384_DEST
 do
 	echo "unique_subject = no" >${F}.attr
 	cp -p ${F}.attr .
 done
 
-pushd data >/dev/null 2>&1
-	pwd
-	for F in $SIGNCERTS
-	do
-		if [ ! -f pem/$F -a -f $(basename $F .crt).p12 ]; then p12tocert $(basename $F .p12) pem/$F; fi
-		cp -p pem/$F ..
-	done
-	for F in $OCSPCERTS
-	do
-		cp -p $F ..
-	done
-popd >/dev/null 2>&1
-
 tar cv --owner=root --group=root -f responder-certs.tar \
-	$OCSPCERTS \
-	$SIGNCERTS \
+	$CERTLIST \
 	$(basename $PIVGEN1_LOCAL) \
 	$(basename $PIVGEN3_LOCAL) \
 	$(basename $PIVIGEN1_LOCAL) \
 	$(basename $PIVIGEN3_LOCAL) \
+	$(basename $PIVGEN3P384_LOCAL) \
 	$(basename ${PIVGEN1_LOCAL}.attr) \
 	$(basename ${PIVGEN3_LOCAL}.attr) \
 	$(basename ${PIVIGEN1_LOCAL}.attr) \
-	$(basename ${PIVIGEN3_LOCAL}.attr)
+	$(basename ${PIVIGEN3_LOCAL}.attr) \
+	$(basename ${PIVGEN3P384_LOCAL}.attr)
 
-rm -f $OCSPCERTS $SIGNCERTS
+rm -f $OCSPCERTS $SIGNCERTS $CERTLIST
 rm -f $PIVGEN1_LOCAL ${PIVGEN1_LOCAL}.attr
 rm -f $PIVGEN3_LOCAL ${PIVGEN3_LOCAL}.attr
 rm -f $PIVIGEN1_LOCAL ${PIVIGEN1_LOCAL}.attr
 rm -f $PIVIGEN3_LOCAL ${PIVIGEN3_LOCAL}.attr
-rm -f data/pem/*.private.key
+rm -f $PIVGEN3P384_LOCAL ${PIVGEN3P384_LOCAL}.attr
+rm -f data/pem/*.private.pem
 
 # AIA, SIA, CRLs
 

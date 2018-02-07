@@ -15,6 +15,7 @@ default_md = sha256
 serial = database/piv-gen3-serial
 policy = policy_match
 email_in_dn = no
+crl_extensions = crl_ext
 
 [ policy_match ]
 C = match
@@ -22,6 +23,9 @@ O = optional
 OU = optional
 CN = optional
 emailAddress = optional
+
+[ crl_ext ]
+authorityKeyIdentifier=keyid:always,issuer:always
 
 [ req ]
 prompt = yes

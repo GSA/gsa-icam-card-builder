@@ -54,90 +54,52 @@
 #
 ## OCSP valid signer using RSA 2048 (RSA 2048 CA)
 #SUBJ=ICAM_Test_Card_PIV_OCSP_Valid_Signer_gen3 
-#sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -t piv-ocsp-valid -r 2048 --cakey rsa2048 || exit $?
+#sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -t piv-ocsp-valid-gen3-rsa -r 2048 --cakey rsa2048 || exit $?
 #DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
 #cp -p data/$SUBJ.p12 "$DEST"
 #cp -p data/pem/$SUBJ.crt "$DEST"
 #
-## OCSP expired signer using RSA 2048 (RSA 2048 CA)
-#SUBJ=ICAM_Test_Card_PIV_OCSP_Expired_Signer_gen3 
-#sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -t piv-ocsp-expired -r 2048 --cakey rsa2048 -x 171202000000Z || exit $?
-#DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
-#cp -p data/$SUBJ.p12 "$DEST"
-#cp -p data/pem/$SUBJ.crt "$DEST"
-#
-## OCSP revoked signer with id-pkix-ocsp-nocheck present using RSA 2048 (RSA 2048 CA)
-#SUBJ=ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Present_gen3 
-#ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3
-#CONFIG=$CWD/icam-piv-ocsp-revoked-nocheck-not-present.cnf
-#CRL=ICAMTestCardGen3SigningCA
-#sh mkcert.sh -b -s $SUBJ -i $ISSUER -t piv-ocsp-revoked-nocheck-present -r 2048 --cakey rsa2048 || exit $?
-#DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
-#cp -p data/$SUBJ.p12 "$DEST"
-#cp -p data/pem/$SUBJ.crt "$DEST"
-#revoke $SUBJ $ISSUER $CONFIG $CRL
-#
-## OCSP revoked signer with id-pkix-ocsp-nocheck NOT presetnt using RSA 2048 (RSA 2048 CA)
-#SUBJ=ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Not_Present_gen3 
-#ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3
-#CONFIG=$CWD/icam-piv-ocsp-revoked-nocheck-present.cnf
-#CRL=ICAMTestCardGen3SigningCA
-#sh mkcert.sh -b -s $SUBJ -i $ISSUER -t piv-ocsp-revoked-nocheck-not-present -r 2048 --cakey rsa2048 || exit $?
-#DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
-#cp -p data/$SUBJ.p12 "$DEST"
-#cp -p data/pem/$SUBJ.crt "$DEST"
-#revoke $SUBJ $ISSUER $CONFIG $CRL
-#
-## OCSP invalid signature using RSA 2048 (RSA 2048 CA)
-#SUBJ=ICAM_Test_Card_PIV_OCSP_Invalid_Sig_Signer_gen3
-#NAME=$(echo $SUBJ | sed 's/[&_]/ /g')
-#sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -t piv-ocsp-invalid-sig -r 2048 --cakey rsa2048 || exit $?
-#
-# Extract private/publilc keys from the .p12
-#openssl pkcs12 -in data/$SUBJ.p12 -nocerts -nodes -passin pass: -passout pass: -out data/pem/$SUBJ.private.pem 
-#openssl pkcs12 -in data/$SUBJ.p12 -clcerts -passin pass: -nokeys -out data/pem/$SUBJ.crt
-#
-## Manipulate the cert
-#SIZE=$(du -b data/pem/$SUBJ.crt | awk '{ print $1 }')
-#P1=$(expr $SIZE - 36)
-#P3=$(expr $P1 + 4)
-#dd if=data/pem/$SUBJ.crt bs=1 count=$P1 >/tmp/p1
-#echo -n -e "\x41\x42\x43\x44" >/tmp/p2
-#dd if=data/pem/$SUBJ.crt bs=1 skip=$P3 >/tmp/p3
-#cat /tmp/p1 /tmp/p2 /tmp/p3 >data/pem/$SUBJ.crt
-#cat data/pem/$SUBJ.private.pem data/pem/$SUBJ.crt >data/pem/$SUBJ.combined.pem
-#
-## Put the .p12 back together
-#openssl pkcs12 -export -name "$NAME" -passout pass: -in data/pem/$SUBJ.combined.pem -macalg sha256 -out data/$SUBJ.p12
-#DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
-#cp -p data/$SUBJ.p12 "$DEST"
-#cp -p data/pem/$SUBJ.crt "$DEST"
-#rm -f data/pem/$SUBJ.combined.pem
-#rm -f data/pem/$SUBJ.private.pem
-##
-## OCSP PIV-I valid signer using RSA 2048 (RSA 2048 CA)
-#SUBJ=ICAM_Test_Card_PIV-I_OCSP_Valid_Signer_gen3 
-#sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3 -t pivi-ocsp-valid -r 2048 --cakey rsa2048 || exit $?
-#DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
-#cp -p data/$SUBJ.p12 "$DEST"
-#cp -p data/pem/$SUBJ.crt "$DEST"
-#
-#
-## Card 56 (will be in FRTC 1.3.3 Rev D)
-#T="Signer_Expires"
-#sh mkcert.sh -w -b -s "ICAM_Test_Card_PIV_Auth_SP_800-73-4_$T" -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 56 -t piv-auth -x 201201235959Z || exit $?
-#sh mkcert.sh -w -b -s "ICAM_Test_Card_PIV_Dig_Sig_SP_800-73-4_$T" -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 56 -t piv-dig-sig -x 201201235959Z || exit $?
-#sh mkcert.sh -w -b -s "ICAM_Test_Card_PIV_Key_Mgmt_Auth_SP_800-73-4_$T" -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 56 -t piv-key-mgmt -x 201201235959Z || exit $?
-#sh mkcert.sh -w -b -s "ICAM_Test_Card_PIV_Card_Auth_SP_800-73-4_$T" -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 56 -t piv-card-auth -x 201201235959Z || exit $?
-#DEST="../cards/ICAM_Card_Objects/56_FIPS_201-2_Signer_Expires"
-#cp -p data/ICAM_Test_Card*_$T.p12 "$DEST"
-#cp -p data/pem/ICAM_Test_Card*_$T.crt "$DEST"
-##renameIn "$DEST" 1 1
+
+## Gen3 Secure Messaging Key Establishment using ECC P-256 with intermediate CVC (RSA 2048 CA)
+SUBJ=ICAM_Test_Card_PIV_RSA_Issued_Intermediate_CVC_Signer
+sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -t piv-content-signer-gen3-rsa -e prime256v1 -c rsa2048 || exit $?
+DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
+cp -p data/$SUBJ.p12 "$DEST"
+cp -p data/pem/$SUBJ.crt "$DEST"
+
+## Gen3 Secure Messaging Key Establishment using ECC P-256 (ECC P-384 CA)
+SUBJ=ICAM_Test_Card_PIV_ECC_Issued_P-256_SM_Certificate_Signer_2
+sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_P-384_Signing_CA_gold_gen3 -t piv-content-signer-gen3-p384 -e prime256v1 -c secp384r1 || exit $?
+DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
+cp -p data/$SUBJ.p12 "$DEST"
+cp -p data/pem/$SUBJ.crt "$DEST"
+
+## OCSP Gen3 valid OCSP signer using ECC P-384 (ECC P-384)
+SUBJ=ICAM_Test_Card_PIV_OCSP_Valid_Signer_P384_gen3 
+sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_P-384_Signing_CA_gold_gen3 -t piv-ocsp-valid-gen3-p384 -r 2048 --cakey secp384r1 || exit $?
+DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
+cp -p data/$SUBJ.p12 "$DEST"
+cp -p data/pem/$SUBJ.crt "$DEST"
+
+## Gen3 Secure Messaging Key Establishment using ECC P-256 (ECC P-384 CA)
+SUBJ=ICAM_Test_Card_PIV_ECC_Issued_P-256_SM_Certificate_Signer_2
+sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_P-384_Signing_CA_gold_gen3 -t piv-content-signer-gen3-p384 -e prime256v1 -c secp384r1 || exit $?
+DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
+cp -p data/$SUBJ.p12 "$DEST"
+cp -p data/pem/$SUBJ.crt "$DEST"
+
+## Gen3 Secure Messaging Key Establishment using ECC P-384 (ECC P-384 CA)
+SUBJ=ICAM_Test_Card_PIV_ECC_Issued_P-384_SM_Certificate_Signer_3
+sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_P-384_Signing_CA_gold_gen3 -t piv-content-signer-gen3-p384 -e secp384r1 -c secp384r1 || exit $?
+DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
+cp -p data/$SUBJ.p12 "$DEST"
+cp -p data/pem/$SUBJ.crt "$DEST"
+
 ## Card 37
 sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Auth_SP_800-73-4_PPS -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 37 -t piv-auth
 sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Dig_Sig_SP_800-73-4_PPS -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 37 -t piv-dig-sig
 sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Key_Mgmt_SP_800-73-4_PPS -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 37 -t piv-key-mgmt
-sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Card_Auth_SP_800-73-4_PPS -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 37 -t piv-card-auth
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Card_Auth_SP_800-73-4_PPS -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 37 -t piv-card-auth -e prime256v1
 sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Key_Hist1_SP_800-73-4_PPS -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 37 -t piv-key-hist1
 sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Key_Hist2_SP_800-73-4_PPS -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 37 -t piv-key-hist2
 sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Key_Hist3_SP_800-73-4_PPS -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 37 -t piv-key-hist3
@@ -146,4 +108,6 @@ sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Key_Hist5_SP_800-73-4_PPS -i ICAM_Test_
 DEST="../cards/ICAM_Card_Objects/37_Golden_FIPS_201-2_PIV_PPS_F=512_D=64"
 cp -p data/ICAM_Test_Card_PIV_*SP_800-73-4_PPS.p12 "$DEST"
 cp -p data/pem/ICAM_Test_Card_PIV_*SP_800-73-4_PPS.crt "$DEST"
+cp -p data/ICAM_Test_Card_PIV_ECC_Issued_P-256_SM_Certificate_Signer_2.p12 "$DEST"
+cp -p data/pem/ICAM_Test_Card_PIV_ECC_Issued_P-256_SM_Certificate_Signer_2.crt "$DEST"
 renameIn "$DEST" 1 1

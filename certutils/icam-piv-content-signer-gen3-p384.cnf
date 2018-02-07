@@ -1,22 +1,30 @@
 [ default]
 dir = .
 new_certs_dir = $dir
-database = ${dir}/database/piv-gen3-index.txt 
 unique_subject = no
 name_opt = utf8
-x509_extensions = v3_ocsp
+x509_extensions = ee_ext
 default_days = 2190 
 default_md = sha256
-serial = database/piv-gen3-serial
 policy = policy_match
 email_in_dn = no
 
 [ ca ]
-default_ca = ca_rsa2048
+default_ca = ca_secp384r1
 
 [ ca_rsa2048 ]
 private_key = ${dir}/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.private.pem 
 certificate = ${dir}/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt 
+database = ${dir}/database/piv-gen3-index.txt 
+serial = ${dir}/database/piv-gen3-serial
+crl_extensions = crl_ext
+
+[ ca_secp384r1 ]
+private_key = ${dir}/pem/ICAM_Test_Card_PIV_P-384_Signing_CA_gold_gen3.private.pem
+certificate = ${dir}/pem/ICAM_Test_Card_PIV_P-384_Signing_CA_gold_gen3.crt
+database = ${dir}/database/piv-gen3-p384-index.txt 
+serial = database/piv-gen3-p384-serial
+crl_extensions = crl_ext
 
 [ policy_match ]
 C = match
@@ -24,6 +32,9 @@ O = optional
 OU = optional
 CN = optional
 emailAddress = optional
+
+[ crl_ext ]
+authorityKeyIdentifier=keyid:always,issuer:always
 
 [ req ]
 prompt = yes
@@ -49,12 +60,11 @@ emailAddress_default = icam.test.cards@gsa.gov
 basicConstraints = CA:FALSE
 subjectKeyIdentifier = hash
 
-[ v3_ocsp ]
-basicConstraints = CA:FALSE
+[ ee_ext ]
 authorityKeyIdentifier = keyid:issuer
 subjectKeyIdentifier = hash
-extendedKeyUsage=critical,OCSPSigning
+extendedKeyUsage = critical,2.16.840.1.101.3.6.7
 keyUsage = critical,digitalSignature
-authorityInfoAccess = caIssuers;URI:http://http.apl-test.cite.fpki-lab.gov/aia/certsIssuedToICAMTestCardSigningCA.p7c
-crlDistributionPoints = URI:http://http.apl-test.cite.fpki-lab.gov/crls/ICAMTestCardGen3SigningCA.crl
-certificatePolicies=ia5org,2.16.840.1.101.3.2.1.48.11,2.16.840.1.101.3.2.1.48.13,2.16.840.1.101.3.2.1.48.9,2.16.840.1.101.3.2.1.48.86
+authorityInfoAccess = caIssuers;URI:http://http.apl-test.cite.fpki-lab.gov/aia/certsIssuedToICAMTestCardP384PIVSigningCA.p7c, OCSP;URI:http://ocspGen3P384.apl-test.cite.fpki-lab.gov
+crlDistributionPoints = URI:http://http.apl-test.cite.fpki-lab.gov/crls/ICAMTestCardP384PIVSigningCA.crl
+certificatePolicies = ia5org,2.16.840.1.101.3.2.1.48.86

@@ -1,13 +1,11 @@
 [ default]
 dir = .
 new_certs_dir = $dir
-database = ${dir}/database/pivi-gen3-index.txt 
 unique_subject = no
 name_opt = utf8
 x509_extensions = ee_ext
 default_days = 2190 
 default_md = sha256
-serial = database/pivi-gen3-serial
 policy = policy_match
 email_in_dn = no
 
@@ -17,10 +15,9 @@ default_ca = ca_rsa2048
 [ ca_rsa2048 ]
 private_key = ${dir}/pem/ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.private.pem
 certificate = ${dir}/pem/ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.crt
-
-[ ca_secp384r1 ]
-private_key = ${dir}/pem/ICAM_Test_Card_PIV-I_P-384_Signing_CA_gold_gen3.private.pem
-certificate = ${dir}/pem/ICAM_Test_Card_PIV-I_P-384_Signing_CA_gold_gen3.crt
+database = ${dir}/database/pivi-gen3-index.txt 
+serial = ${dir}/database/pivi-gen3-serial
+crl_extensions = crl_ext
 
 [ policy_match ]
 C = match
@@ -28,6 +25,9 @@ O = optional
 OU = optional
 CN = optional
 emailAddress = optional
+
+[ crl_ext ]
+authorityKeyIdentifier=keyid:always,issuer:always
 
 [ req ]
 prompt = yes
