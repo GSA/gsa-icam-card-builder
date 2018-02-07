@@ -157,7 +157,7 @@ grep -i ocspGen3p384.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$
 if [ $GC -gt 0 ]; then
   cp -p /etc/hosts /etc/hosts.$$
   grep -v lab.gov /etc/hosts >/tmp/hosts
-  echo "$IPADDR $HOSTNAME" >/tmp/hosts
+  echo "$IPADDR $HOSTNAME" >>/tmp/hosts
   echo "$IPADDR http.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
   echo "$IPADDR ocsp.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
   echo "$IPADDR ocspGen3.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
@@ -359,7 +359,12 @@ cat << %% >ocspGen3p384.apl-test.cite.fpki-lab.gov.conf
 
 cd ../sites-enabled
 
-for F in $(ls /etc/httpd/sites-available/*.conf); do if [ ! -L $F ]; then ln -s $F .; fi; done
+for F in $(ls /etc/httpd/sites-available/*.conf)
+do
+  if [ ! -L $(basename $F) ]; then
+    ln -s $F .
+  fi
+done
 
 # Edit main httpd.conf file
 
@@ -372,13 +377,13 @@ for F in $(ls /etc/httpd/sites-available/*.conf); do if [ ! -L $F ]; then ln -s 
 egrep "^#ServerName|^# ServerName" /etc/httpd/conf/httpd.conf >/dev/null 2>&1
 if [ $? -eq 0 ]; then
   /bin/cp -p /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.$$
-  cat /etc/httpd/conf/httpd.conf | sed 's/#ServerName.*$/ServerName '$(hostname)':80/g' >/tmp/httpd.conf
+  cat /etc/httpd/conf/httpd.conf | sed 's/#ServerName.*$|# ServerName.*/ServerName '$(hostname)':80/g' >/tmp/httpd.conf
 fi
 grep "IncludeOptional sites-enabled/*.conf" /tmp/httpd.conf >/dev/null 2>&1
 if [ $? -eq 1 ]; then
   echo "IncludeOptional sites-enabled/*.conf" >>/tmp/httpd.conf
-  /bin/mv /tmp/httpd.conf /etc/httpd/conf/httpd.conf
 fi
+/bin/mv /tmp/httpd.conf /etc/httpd/conf/httpd.conf
 
 # Start up at boot
 
