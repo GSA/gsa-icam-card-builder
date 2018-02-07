@@ -353,7 +353,7 @@ else
 	do
 		cp -p data/$F .
 		cp -p data/pem/$(basename $F .p12).crt .
-		if [ -z "$CERTLIST" ]; then CERTLIST=$(basename $F .p12); else CERTLIST="${CERTLIST} $(basename $F .p12).crt"; fi
+		if [ -z "$CERTLIST" ]; then CERTLIST=$(basename $F .p12).crt; else CERTLIST="${CERTLIST} $(basename $F .p12).crt"; fi
 	done
 fi
 
@@ -452,6 +452,7 @@ rm -f $PIVIGEN1_LOCAL ${PIVIGEN1_LOCAL}.attr
 rm -f $PIVIGEN3_LOCAL ${PIVIGEN3_LOCAL}.attr
 rm -f $PIVGEN3P384_LOCAL ${PIVGEN3P384_LOCAL}.attr
 rm -f data/pem/*.private.pem
+rm -f *.p12 *.crt
 
 # AIA, SIA, CRLs
 
