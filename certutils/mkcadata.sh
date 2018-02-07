@@ -307,7 +307,7 @@ reindex() {
 
 			if [ $(expr "$X" : ".*PIV-I.*$") -ge 5 ]; then T=pivi; else T=piv; fi
 
-			if [ $(expr "$X" : ".*RSA.*$") -ge 3 -a $(expr "$X" : ".*CVC.*$") -ge 3 ]; then G=gen3
+			if [ $(expr "$X" : ".*RSA.*$") -ge 3 -a $(expr "$X" : ".*ECC.*$") -ge 3 ]; then G=gen3
 			elif [ $(expr "$X" : ".*ECC.*$") -ge 3 -a $(expr "$X" : ".*P-256.*$") -ge 5 ]; then G=gen3-p384
 			elif [ $(expr "$X" : ".*ECC.*$") -ge 3 -a $(expr "$X" : ".*P-384.*$") -ge 5 ]; then G=gen3-p384
 			elif [ $(expr "$X" : ".*P-384.*$") -ge 5 ]; then G=gen3-p384
@@ -322,6 +322,7 @@ reindex() {
 			fi
 			echo "${PAD}${CTR}: ${C}..."
 			process "$T-$G" $STATUS $Y $X
+			cp -p $F ..
 		done
 
 		echo "Extracting certs from signing CA .p12 files..."
@@ -347,6 +348,13 @@ reindex() {
 if [ $# -eq 1 -a r$1 == r"-r" ]; then
 	rm -f $PIVGEN1_LOCAL $PIVGEN3_LOCAL $PIVIGEN3_LOCAL $PIVGEN3P384_LOCAL
 	reindex
+else
+	for F in $OCSPP12S $SIGNCAP12S
+	do
+		cp -p data/$F .
+		cp -p data/pem/$(basename $F .p12).crt .
+		if [ -z "$CERTLIST" ]; then CERTLIST=$(basename $F .p12); else CERTLIST="${CERTLIST} $(basename $F .p12).crt"; fi
+	done
 fi
 
 # Back it up
@@ -424,6 +432,7 @@ do
 done
 
 tar cv --owner=root --group=root -f responder-certs.tar \
+	$OCSPP12S \
 	$CERTLIST \
 	$(basename $PIVGEN1_LOCAL) \
 	$(basename $PIVGEN3_LOCAL) \
@@ -436,7 +445,7 @@ tar cv --owner=root --group=root -f responder-certs.tar \
 	$(basename ${PIVIGEN3_LOCAL}.attr) \
 	$(basename ${PIVGEN3P384_LOCAL}.attr)
 
-rm -f $OCSPCERTS $SIGNCERTS $CERTLIST
+rm -f $OCSPP12S $SIGNP12S $CERTLIST
 rm -f $PIVGEN1_LOCAL ${PIVGEN1_LOCAL}.attr
 rm -f $PIVGEN3_LOCAL ${PIVGEN3_LOCAL}.attr
 rm -f $PIVIGEN1_LOCAL ${PIVIGEN1_LOCAL}.attr

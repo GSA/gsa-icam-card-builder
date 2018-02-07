@@ -1,4 +1,8 @@
 #!/bin/bash
+export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
+exec 19>/tmp/install-responder.log
+BASH_XTRACEFD=19
+set -x
 #
 # vim: set ts=2 nowrap
 # Copy this file to the directory on the VM where you've copied the
@@ -55,7 +59,8 @@ for F in \\
   ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Not_Present_gen3.p12 \\
   ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Present_gen3.p12 \\
   ICAM_Test_Card_PIV_OCSP_Invalid_Sig_Signer_gen3.p12 \\
-  ICAM_Test_Card_PIV-I_OCSP_Valid_Signer_gen3.p12
+  ICAM_Test_Card_PIV-I_OCSP_Valid_Signer_gen3.p12 \\
+  ICAM_Test_Card_PIV_OCSP_Valid_Signer_P384_gen3.p12
 do
     COUNT=\$(expr \$COUNT + 1)
     case \$COUNT in
@@ -66,6 +71,7 @@ do
     5) N=ocspRevoked ;;
     6) N=ocspInvalidSig ;;
     7) N=ocsp-pivi ;;
+    8) N=ocspGen3p384 ;;
     esac
 
     # Get the signer private and public keys
@@ -95,6 +101,7 @@ chmod 600 *.key
 mv ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2.crt PIV_Signing_CA_gen1-2.crt
 mv ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt PIV_Signing_CA_gen3.crt
 mv ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.crt PIV-I_Signing_CA_gen3.crt
+mv ICAM_Test_Card_PIV_P-384_Signing_CA_gold_gen3.crt PIV_Signing_CA_gen3_p384.crt
 
 systemctl stop ocspd.service
 systemctl disable ocspd.service
@@ -138,18 +145,28 @@ grep $HOSTNAME /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
 if [ $CRLHOST -eq 1 ]; then
   grep http.apl-test.cite.fpki-lab.gov /etc/host >/dev/null 2>&1; GC=$(expr $? + $GC)
 fi
-grep ocsp.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
-grep ocspGen3.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
-grep ocspExpired.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
-grep ocspInvalidSig.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1 >/dev/null 2>&1; GC=$(expr $? + $GC)
-grep ocspRevoked.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
-grep ocspNocheckNotPresent.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
-grep ocsp-pivi.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
+grep -i ocsp.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
+grep -i ocspGen3.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
+grep -i ocspExpired.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
+grep -i ocspInvalidSig.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1 >/dev/null 2>&1; GC=$(expr $? + $GC)
+grep -i ocspRevoked.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
+grep -i ocspNocheckNotPresent.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
+grep -i ocsp-pivi.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
+grep -i ocspGen3p384.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
 
 if [ $GC -gt 0 ]; then
   cp -p /etc/hosts /etc/hosts.$$
   grep -v lab.gov /etc/hosts >/tmp/hosts
-  echo "$IPADDR $HOSTNAME http.apl-test.cite.fpki-lab.gov ocsp.apl-test.cite.fpki-lab.gov ocspGen3.apl-test.cite.fpki-lab.gov ocspExpired.apl-test.cite.fpki-lab.gov ocspInvalidSig.apl-test.cite.fpki-lab.gov ocspRevoked.apl-test.cite.fpki-lab.gov ocspNocheckNotPresent.apl-test.cite.fpki-lab.gov ocsp-pivi.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
+  echo "$IPADDR $HOSTNAME" >/tmp/hosts
+  echo "$IPADDR http.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
+  echo "$IPADDR ocsp.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
+  echo "$IPADDR ocspGen3.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
+  echo "$IPADDR ocspExpired.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
+  echo "$IPADDR ocspInvalidSig.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
+  echo "$IPADDR ocspRevoked.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
+  echo "$IPADDR ocspNocheckNotPresent.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
+  echo "$IPADDR ocsp-pivi.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
+  echo "$IPADDR ocspGen3p384.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
   /bin/mv /tmp/hosts /etc/hosts
 fi
 
@@ -173,6 +190,7 @@ firewall-cmd --permanent --zone=trusted --add-port=2563/tcp
 firewall-cmd --permanent --zone=trusted --add-port=2564/tcp
 firewall-cmd --permanent --zone=trusted --add-port=2565/tcp
 firewall-cmd --permanent --zone=trusted --add-port=2566/tcp
+firewall-cmd --permanent --zone=trusted --add-port=2567/tcp
 firewall-cmd --reload
 
 # Apache2:
@@ -187,7 +205,8 @@ for D in \
   ocspRevoked.apl-test.cite.fpki-lab.gov/logs \
   ocspNocheckNotPresent.apl-test.cite.fpki-lab.gov/logs \
   ocspInvalidSig.apl-test.cite.fpki-lab.gov/logs \
-  ocsp-pivi.apl-test.cite.fpki-lab.gov/logs
+  ocsp-pivi.apl-test.cite.fpki-lab.gov/logs \
+  ocspGen3p384.apl-test.cite.fpki-lab.gov/logs
 do
     mkdir -p $D
     chmod 755 $D
@@ -221,12 +240,13 @@ semanage port -a -t http_port_t -p tcp 2563
 semanage port -a -t http_port_t -p tcp 2564
 semanage port -a -t http_port_t -p tcp 2565
 semanage port -a -t http_port_t -p tcp 2566
+semanage port -a -t http_port_t -p tcp 2567
 
 # Scripts to install Apache virtual hosts
 
 cd /etc/httpd
-mkdir sites-available
-mkdir sites-enabled
+mkdir -p sites-available
+mkdir -p sites-enabled
 
 cd sites-available
 
@@ -325,9 +345,21 @@ cat << %% >ocsp-pivi.apl-test.cite.fpki-lab.gov.conf
 </VirtualHost>
 %%
 
+cat << %% >ocspGen3p384.apl-test.cite.fpki-lab.gov.conf
+<VirtualHost ocspGen3p384.apl-test.cite.fpki-lab.gov:80>
+  ServerName ocspGen3p384.apl-test.cite.fpki-lab.gov
+  DocumentRoot /dev/null
+  RewriteEngine on
+  RewriteCond %{CONTENT_TYPE} !^application/ocsp-request$
+  RewriteRule ^/(.*) http://localhost:2567/ [P]
+  ErrorLog /var/www/ocspGen3p384.apl-test.cite.fpki-lab.gov/logs/error.log
+  CustomLog /var/www/ocspGen3p384.apl-test.cite.fpki-lab.gov/logs/requests.log combined
+</VirtualHost>
+%%
+
 cd ../sites-enabled
 
-for F in $(ls /etc/httpd/sites-available/*.conf); do ln -s $F .; done
+for F in $(ls /etc/httpd/sites-available/*.conf); do if [ ! -L $F ]; then ln -s $F .; fi; done
 
 # Edit main httpd.conf file
 
@@ -522,6 +554,26 @@ do
 done
 )&
 echo \$! >/var/run/ocsp/ocsp-pivi.pid
+
+# ocspGen3p384.apl-test.cite.fpki-lab.gov -> http://localhost:2567
+(\\
+while true
+do
+  openssl ocsp \\
+  -index \$CADIR/piv-gen3-p384-index.txt \\
+  -port 2567 \\
+  -rsigner \$CADIR/ocspGen3p384.crt \\
+  -rkey \$CADIR/ocspGen3p384.key \\
+  -CA \$CADIR/PIV_Signing_CA_gen3_p384.crt \\
+  -text \\
+  -out /var/log/ocspGen3p384-log.txt >>/var/log/ocspGen3p384-output 2>&1 &
+  PID=\$!
+  trap 'kill \$!; exit' 1 2 1 2 15
+  wait
+  sleep 60
+done
+) &
+echo \$! >/var/run/ocsp/ocspGen3.pid
 
 sleep infinity
 %%

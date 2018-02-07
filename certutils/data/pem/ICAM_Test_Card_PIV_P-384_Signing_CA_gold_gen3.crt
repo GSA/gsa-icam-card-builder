@@ -1,3 +1,8 @@
+Bag Attributes
+    localKeyID: 70 33 22 48 9E A8 B7 A3 63 CD C1 2E 33 CF 70 F5 4A 15 AC DA 
+    friendlyName: ICAM Test Card PIV P-384 Signing CA
+subject=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV P-384 Signing CA
+issuer=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Root CA
 -----BEGIN CERTIFICATE-----
 MIIEkzCCAvugAwIBAgIITuy6CCpqZ4YwDQYJKoZIhvcNAQEMBQAwYjELMAkGA1UE
 BhMCVVMxGDAWBgNVBAoTD1UuUy4gR292ZXJubWVudDEYMBYGA1UECxMPSUNBTSBU
