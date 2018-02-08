@@ -400,7 +400,8 @@ if [ $WIN32 -eq 1 ]; then
 		-name "$NAME" \
 		-passout pass: \
 		-in pem/$(basename $EE_P12 .p12).pem \
-		-descert \
+		-keypbe PBE-SHA1-3DES \
+		-certpbe PBE-SHA1-3DES \
 		-out $EE_P12
 else
 	openssl pkcs12 \

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/bcmail-jdk15on-158.jar"/>
 	<classpathentry kind="lib" path="lib/bcpkix-jdk15on-158.jar"/>
 	<classpathentry kind="lib" path="lib/bcprov-jdk15on-158.jar"/>
 	<classpathentry kind="lib" path="lib/bctls-jdk15on-158.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-api-2.8.2.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-core-2.8.2.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
