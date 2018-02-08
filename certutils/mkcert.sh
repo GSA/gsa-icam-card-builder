@@ -394,14 +394,13 @@ cat \
 
 chmod 644 pem/$(basename $EE_P12 .p12).pem
 
-if [ $WIN32 = 1 ]; then
+if [ $WIN32 -eq 1 ]; then
 	openssl pkcs12 \
 		-export \
 		-name "$NAME" \
 		-passout pass: \
 		-in pem/$(basename $EE_P12 .p12).pem \
-		-keypbe PBE-SHA1-3DES \
-		-certpbe PBE-SHA1-3DES \
+		-descert \
 		-out $EE_P12
 else
 	openssl pkcs12 \
