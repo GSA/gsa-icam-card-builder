@@ -458,6 +458,9 @@ rm -f *.p12 *.crt
 
 cp -pr ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/{aia,sia,crls} .
 
+chmod 755 aia crls sia
+chmod 644 aia/* crls/* sia/*
+
 # Backup AIA, CRLs, and SIA
 tar cv --owner=root --group=root -f aiacrlsia.tar aia crls sia
 rm -rf aia sia crls
