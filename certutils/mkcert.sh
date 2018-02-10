@@ -407,9 +407,10 @@ else
 	openssl pkcs12 \
 		-export \
 		-name "$NAME" \
+		-descert \
 		-passout pass: \
 		-in pem/$(basename $EE_P12 .p12).pem \
-		-macalg sha256 \
+		-macalg sha256
 		-out $EE_P12
 fi
 
