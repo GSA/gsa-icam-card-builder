@@ -6,6 +6,8 @@ export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
 exec 10>/tmp/ocsptest.log
 BASH_XTRACEFD=10
 
+set -x
+
 ocsp() {
 
 	CA_CERT="$1"
@@ -21,6 +23,7 @@ ocsp() {
 prepreq() {
 	EE_CERT="${1}"
 	URI=$(openssl x509 -in "$EE_CERT" -ocsp_uri -noout)
+	URI=$(echo $URI | sed $'s/\r//')
 	case $URI in
 	http://ocsp.apl-test.cite.fpki-lab.gov)
 		CA_CERT=../ICAM_CA_and_Signer/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2.crt
