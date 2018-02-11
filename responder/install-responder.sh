@@ -270,6 +270,9 @@ cat << %% >ocsp.apl-test.cite.fpki-lab.gov.conf
   RewriteRule ^/(.*) http://localhost:2560/ [P]
   ErrorLog /var/www/ocsp.apl-test.cite.fpki-lab.gov/logs/error.log
   CustomLog /var/www/ocsp.apl-test.cite.fpki-lab.gov/logs/requests.log combined
+  <Location "/">
+    AllowMethods POST
+  </Location>
 </VirtualHost>
 %%
 
@@ -282,6 +285,9 @@ cat << %% >ocspGen3.apl-test.cite.fpki-lab.gov.conf
   RewriteRule ^/(.*) http://localhost:2561/ [P]
   ErrorLog /var/www/ocspGen3.apl-test.cite.fpki-lab.gov/logs/error.log
   CustomLog /var/www/ocspGen3.apl-test.cite.fpki-lab.gov/logs/requests.log combined
+  <Location "/">
+    AllowMethods POST
+  </Location>
 </VirtualHost>
 %%
 
@@ -294,6 +300,9 @@ cat << %% >ocspExpired.apl-test.cite.fpki-lab.gov.conf
   RewriteRule ^/(.*) http://localhost:2562/ [P]
   ErrorLog /var/www/ocspExpired.apl-test.cite.fpki-lab.gov/logs/error.log
   CustomLog /var/www/ocspExpired.apl-test.cite.fpki-lab.gov/logs/requests.log combined
+  <Location "/">
+    AllowMethods POST
+  </Location>
 </VirtualHost>
 %%
 
@@ -306,6 +315,9 @@ cat << %% >ocspInvalidSig.apl-test.cite.fpki-lab.gov.conf
   RewriteRule ^/(.*) http://localhost:2563/ [P]
   ErrorLog /var/www/ocspInvalidSig.apl-test.cite.fpki-lab.gov/logs/error.log
   CustomLog /var/www/ocspInvalidSig.apl-test.cite.fpki-lab.gov/logs/requests.log combined
+  <Location "/">
+    AllowMethods POST
+  </Location>
 </VirtualHost>
 %%
 
@@ -318,6 +330,9 @@ cat << %% >ocspRevoked.apl-test.cite.fpki-lab.gov.conf
   RewriteRule ^/(.*) http://localhost:2564/ [P]
   ErrorLog /var/www/ocspRevoked.apl-test.cite.fpki-lab.gov/logs/error.log
   CustomLog /var/www/ocspRevoked.apl-test.cite.fpki-lab.gov/logs/requests.log combined
+  <Location "/">
+    AllowMethods POST
+  </Location>
 </VirtualHost>
 %%
 
@@ -330,6 +345,9 @@ cat << %% >ocspNocheckNotPresent.apl-test.cite.fpki-lab.gov.conf
   RewriteRule ^/(.*) http://localhost:2565/ [P]
   ErrorLog /var/www/ocspNocheckNotPresent.apl-test.cite.fpki-lab.gov/logs/error.log
   CustomLog /var/www/ocspNocheckNotPresent.apl-test.cite.fpki-lab.gov/logs/requests.log combined
+  <Location "/">
+    AllowMethods POST
+  </Location>
 </VirtualHost>
 %%
 
@@ -342,6 +360,9 @@ cat << %% >ocsp-pivi.apl-test.cite.fpki-lab.gov.conf
   RewriteRule ^/(.*) http://localhost:2566/ [P]
   ErrorLog /var/www/ocsp-pivi.apl-test.cite.fpki-lab.gov/logs/error.log
   CustomLog /var/www/ocsp-pivi.apl-test.cite.fpki-lab.gov/logs/requests.log combined
+  <Location "/">
+    AllowMethods POST
+  </Location>
 </VirtualHost>
 %%
 
@@ -354,6 +375,9 @@ cat << %% >ocspGen3p384.apl-test.cite.fpki-lab.gov.conf
   RewriteRule ^/(.*) http://localhost:2567/ [P]
   ErrorLog /var/www/ocspGen3p384.apl-test.cite.fpki-lab.gov/logs/error.log
   CustomLog /var/www/ocspGen3p384.apl-test.cite.fpki-lab.gov/logs/requests.log combined
+  <Location "/">
+    AllowMethods POST
+  </Location>
 </VirtualHost>
 %%
 
