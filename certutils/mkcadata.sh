@@ -348,14 +348,14 @@ reindex() {
 if [ $# -eq 1 -a r$1 == r"-r" ]; then
 	rm -f $PIVGEN1_LOCAL $PIVGEN3_LOCAL $PIVIGEN3_LOCAL $PIVGEN3P384_LOCAL
 	reindex
-else
-	for F in $OCSPP12S $SIGNCAP12S
-	do
-		cp -p data/$F .
-		cp -p data/pem/$(basename $F .p12).crt .
-		if [ -z "$CERTLIST" ]; then CERTLIST=$(basename $F .p12).crt; else CERTLIST="${CERTLIST} $(basename $F .p12).crt"; fi
-	done
 fi
+
+for F in $OCSPP12S $SIGNCAP12S
+do
+	cp -p data/$F .
+	cp -p data/pem/$(basename $F .p12).crt .
+	if [ -z "$CERTLIST" ]; then CERTLIST=$(basename $F .p12).crt; else CERTLIST="${CERTLIST} $(basename $F .p12).crt"; fi
+done
 
 # Back it up
 
