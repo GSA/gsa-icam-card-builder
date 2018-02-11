@@ -1,7 +1,7 @@
 #!/bin/bash
 export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
-exec 19>/tmp/$(basename $0 .sh).log
-BASH_XTRACEFD=19
+exec 10>/tmp/$(basename $0 .sh).log
+BASH_XTRACEFD=10
 set -x
 #
 # Usage: mkcert.sh 

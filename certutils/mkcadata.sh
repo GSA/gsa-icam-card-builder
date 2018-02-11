@@ -9,8 +9,8 @@
 #
 
 export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
-exec 19>/tmp/mkcadata.log
-BASH_XTRACEFD=19
+exec 10>/tmp/mkcadata.log
+BASH_XTRACEFD=10
 set -x
 export GEN1CRL=1
 export GEN3CRL=1
@@ -119,7 +119,7 @@ p12tocert() {
 		openssl pkcs12 \
 			-in "$1" \
 			-passin pass: \
-			-nokeys 2>&19 | \
+			-nokeys 2>&10 | \
 		perl -n -e 'if (!(/^Subject/i | /^Issuer/i | /^Bag/i | /^ /)) { print $_; }' >$2 2>/dev/null
 	fi
 }
@@ -137,7 +137,7 @@ p12tokey() {
 			-nocerts \
 			-nodes \
 			-passin pass: \
-			-passout pass: 2>&19 | \
+			-passout pass: 2>&10 | \
 		perl -n -e 'if (!(/^Bag/i | /^ / | /^Key/)) { print $_; }' >$2 2>/dev/null
 	fi
 }
@@ -162,7 +162,7 @@ reindex() {
 				G=$(basename "$F" .p12).crt
 				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
 				X=$(openssl x509 -serial -subject -in "$G" -noout) 
-				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
+				Y=$(openssl x509 -in "$G" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
 				STATUS=V
 				process piv-gen1-2 $STATUS $Y $X
 
@@ -170,7 +170,7 @@ reindex() {
 				G=$(basename "$F" .p12).crt
 				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
 				X=$(openssl x509 -serial -subject -in "$G" -noout) 
-				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
+				Y=$(openssl x509 -in "$G" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
 				STATUS=V
 				process piv-gen1-2 $STATUS $Y $X
 				process piv-gen1-2 $STATUS $Y $X
@@ -186,7 +186,7 @@ reindex() {
 				G=$(basename "$F" .p12).crt
 				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
 				X=$(openssl x509 -serial -subject -in "$G" -noout) 
-				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
+				Y=$(openssl x509 -in "$G" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
 				STATUS=V
 				process piv-gen1-2 $STATUS $Y $X
 
@@ -194,7 +194,7 @@ reindex() {
 				G=$(basename "$F" .p12).crt
 				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
 				X=$(openssl x509 -serial -subject -in "$G" -noout) 
-				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
+				Y=$(openssl x509 -in "$G" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
 				STATUS=V
 				process piv-gen1-2 $STATUS $Y $X
 			popd >/dev/null 2>&1
@@ -209,7 +209,7 @@ reindex() {
 				G=$(basename "$F" .p12).crt
 				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
 				X=$(openssl x509 -serial -subject -in "$G" -noout) 
-				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
+				Y=$(openssl x509 -in "$G" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
 				STATUS=V
 				process piv-gen3 $STATUS $Y $X
 
@@ -217,7 +217,7 @@ reindex() {
 				G=$(basename "$F" .p12).crt
 				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
 				X=$(openssl x509 -serial -subject -in '4 - ICAM_PIV_Dig_Sig_SP_800-73-4.crt' -noout)
-				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
+				Y=$(openssl x509 -in "$G" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
 				STATUS=V
 				process piv-gen3 $STATUS $Y $X
 
@@ -225,7 +225,7 @@ reindex() {
 				G=$(basename "$F" .p12).crt
 				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
 				X=$(openssl x509 -serial -subject -in "$G" -noout)
-				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
+				Y=$(openssl x509 -in "$G" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
 				STATUS=V
 				process piv-gen3 $STATUS $Y $X
 
@@ -233,7 +233,7 @@ reindex() {
 				G=$(basename "$F" .p12).crt
 				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
 				X=$(openssl x509 -serial -subject -in "$G" -noout)
-				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
+				Y=$(openssl x509 -in "$G" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
 				STATUS=V
 				process piv-gen3 $STATUS $Y $X
 			popd >/dev/null 2>&1
@@ -248,7 +248,7 @@ reindex() {
 				G=$(basename "$F" .p12).crt
 				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
 				X=$(openssl x509 -serial -subject -in "$G" -noout) 
-				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
+				Y=$(openssl x509 -in "$G" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
 				STATUS=V
 				process pivi-gen3 V $Y $X
 
@@ -256,7 +256,7 @@ reindex() {
 				G=$(basename "$F" .p12).crt
 				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
 				X=$(openssl x509 -serial -subject -in "$G" -noout)
-				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
+				Y=$(openssl x509 -in "$G" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
 				STATUS=V
 				process pivi-gen3 V $Y $X
 
@@ -264,7 +264,7 @@ reindex() {
 				G=$(basename "$F" .p12).crt
 				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
 				X=$(openssl x509 -serial -subject -in "$G" -noout)
-				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
+				Y=$(openssl x509 -in "$G" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
 				STATUS=V
 				process pivi-gen3 V $Y $X
 
@@ -272,7 +272,7 @@ reindex() {
 				G=$(basename "$F" .p12).crt
 				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
 				X=$(openssl x509 -serial -subject -in "$G" -noout)
-				Y=$(openssl x509 -in "$G" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
+				Y=$(openssl x509 -in "$G" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
 				STATUS=V
 				process pivi-gen3 V $Y $X
 			popd >/dev/null 2>&1
@@ -297,7 +297,7 @@ reindex() {
 			if [ ! -f "$K" ]; then p12tokey "$C" "$K"; fi
 
 			X=$(openssl x509 -serial -subject -in "$F" -noout) 
-			Y=$(openssl x509 -in "$F" -outform der 2>&19 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
+			Y=$(openssl x509 -in "$F" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
 
 			if [ -z "$CERTLIST" ]; then CERTLIST=$(basename $F); else CERTLIST="${CERTLIST} $(basename $F)"; fi
 
