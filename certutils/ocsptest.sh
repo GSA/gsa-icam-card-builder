@@ -8,6 +8,12 @@ BASH_XTRACEFD=10
 
 set -x
 
+HEADERS=$(openssl ocsp --help 2>&1 | grep "\-header")
+if [ r"$HEADERS" == "r" ]; then
+	echo "This version of OpenSSL cannot support HTTP headers. Exiting."
+	exit 1
+fi
+
 ocsp() {
 
 	CA_CERT="$1"
@@ -55,6 +61,15 @@ pushd ../cards/ICAM_Card_Objects >/dev/null 2>&1
 		pushd $D >/dev/null 2>&1
 			echo "Testing certs in $D..."
 			find . -type f -name '*.crt' -print0 | 
+			while IFS= read -r -d '' file; do
+				F=$(printf '%s\n' "$file")
+				prepreq "$F"
+			done
+			echo "*********************************************************"
+		popd >/dev/null 2>&1
+		pushd ICAM_CA_and_Signer >/dev/null 2>&1
+			echo "Testing OCSP response signercerts in ICAM_CA_and_Signer..."
+			find . -type f -name '*OCSP*.crt' -print0 | 
 			while IFS= read -r -d '' file; do
 				F=$(printf '%s\n' "$file")
 				prepreq "$F"
