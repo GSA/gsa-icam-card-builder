@@ -88,6 +88,17 @@ Note that `aiacrlsia.tar` and `responder-certs.tar` are copied to the
 [responder](https://github.com/GSA/gsa-icam-card-builder/tree/master/responder)
 directory.
 
+#### ocsptest.sh
+
+The `ocsptest.sh` script script traverses all of the card directories and matches
+certificates' AIA URI fields with a known responder. Because the response signing
+cert is signed by the same signing CA as the EE cert, the signing CA cert completes
+the three pieces of information needed to perform an OCSP query. A query is made
+which results in a "good", "revoked", or "unknown" status.
+
+The `openssl ocsp` command is used.  Note that `openssl` versions prior to 1.1 
+do not support the necessary `-header` option needed to make the query.
+
 ### OpenSSL Configuration Files
 Each certificate on each card has its own OpenSSL configuration file, providing
 an ability to create customized certificates for each certificate and card type
