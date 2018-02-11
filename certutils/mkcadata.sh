@@ -51,7 +51,7 @@ CONTP12S="ICAM_Test_Card_PIV_Content_Signer_-_gold_gen1-2.p12 \
 	ICAM_Test_Card_PIV_Revoked_Content_Signer_gen1-2.p12 \
 	ICAM_Test_Card_PIV-I_Content_Signer_-_gold_gen1-2.p12 \
 	ICAM_Test_Card_PIV-I_Content_Signer_-_gold_gen3.p12 \
-	ICAM_Test_Card_PIV_RSA_Issued_ECC_Intermediate_CVC_Signer.p12 \
+	ICAM_Test_Card_PIV_RSA_Issued_Intermediate_CVC_Signer.p12 \
 	ICAM_Test_Card_PIV_ECC_Issued_P-256_SM_Certificate_Signer_2.p12 \
 	ICAM_Test_Card_PIV_ECC_Issued_P-384_SM_Certificate_Signer_3.p12"
 
@@ -357,7 +357,7 @@ do
 	if [ -z "$CERTLIST" ]; then CERTLIST=$(basename $F .p12).crt; else CERTLIST="${CERTLIST} $(basename $F .p12).crt"; fi
 done
 
-# Back it up
+# Back up CA databases
 
 /bin/mv $PIVGEN1_DEST $PIVGEN1_DEST.old 2>/dev/null
 /bin/mv $PIVGEN3_DEST $PIVGEN3_DEST.old 2>/dev/null
@@ -365,7 +365,7 @@ done
 /bin/mv $PIVIGEN3_DEST $PIVIGEN3_DEST.old 2>/dev/null
 /bin/mv $PIVGEN3P384_DEST $PIVGEN3P384_DEST.old 2>/dev/null
 
-# Move into place
+# Move our "rebuilt" version into place
 
 cp -p $PIVGEN1_LOCAL $PIVGEN1_DEST
 cp -p $PIVGEN3_LOCAL $PIVGEN3_DEST
@@ -424,6 +424,14 @@ CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardSignin
 revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN1CRL
 if [ $? -gt 0 ]; then exit 1; fi
 sortbyser $PIVGEN1_LOCAL
+
+# End of CA work, now move back to local directory to archive it
+
+cp -p $PIVGEN1_DEST $PIVGEN1_LOCAL
+cp -p $PIVGEN3_DEST $PIVGEN3_LOCAL
+cp -p $PIVIGEN1_DEST $PIVIGEN1_LOCAL
+cp -p $PIVIGEN3_DEST $PIVIGEN3_LOCAL
+cp -p $PIVGEN3P384_LOCAL $PIVGEN3P384_LOCAL
 
 for F in $PIVGEN1_DEST $PIVGEN3_DEST $PIVIGEN1_DEST $PIVIGEN3_DEST $PIVGEN3P384_DEST
 do
