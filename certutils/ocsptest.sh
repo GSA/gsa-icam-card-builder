@@ -67,14 +67,5 @@ pushd ../cards/ICAM_Card_Objects >/dev/null 2>&1
 			done
 			echo "*********************************************************"
 		popd >/dev/null 2>&1
-		pushd ICAM_CA_and_Signer >/dev/null 2>&1
-			echo "Testing OCSP response signercerts in ICAM_CA_and_Signer..."
-			find . -type f -name '*OCSP*.crt' -print0 | 
-			while IFS= read -r -d '' file; do
-				F=$(printf '%s\n' "$file")
-				prepreq "$F"
-			done
-			echo "*********************************************************"
-		popd >/dev/null 2>&1
 	done
 popd >/dev/null 2>&1
