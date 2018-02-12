@@ -2,7 +2,7 @@
 There are multiple utilities in this directory.  The purpose, usage instructions and
 other information is provided in the following sections. 
 
-These utilities are to be run in a Linux, MAC OS X, or Cygwin environment only.
+These utilities are to be run in a RHEL/CentOS Linux, MAC OS X, or Cygwin environment only.
 There is currently no DOS Command Window or Windows Power Shell equivalent.
 
 ### Purpose
@@ -18,17 +18,18 @@ When a certificate is generated, the public and private key are stored in a PKCS
 file which allows the appropriate key to be injected into the card and the certificate
 to be written to the corresponding container.  If on-card key generation is used,
 then these utilities are not needed.  Key injection is a way to expedite test card
-population.  Itshould *never* be used to create production cards.
+population.  It should *never* be used to create production cards.
 
 ### Batch Mode Generation
 A batch-mode utility, `makeall.sh` creates the four certificates for all ICAM
-test cards that use the SP 800-73-4 (FIPS 201-2) data model.  It creates the
-PKCS12 `.p12` files and copies them into the appropriate "cards/ICAM_Card_Objects"
+test cards that use the SP 800-73-4 (FIPS 201-2) data model, starting with Card 25. 
+It creates the PKCS12 `.p12` files and copies them into the appropriate "cards/ICAM_Card_Objects"
 directory.  It also creates a standardized file name for software that may be
 hard-coded to look for specific `.p12` file names.
 
 Certificates that are supposed to be revoked as part of a test case are first 
-created, and then revoked using OpenSSL's `openssl ca` command.
+created, and then revoked using OpenSSL's `openssl ca` command.  See the `mkcadata.sh`
+further down this page.
 
 ### Single Certificate Generation
 The `certutils` directory contains a bash script, `mkcert.sh` that uses command
@@ -48,10 +49,74 @@ which already exists in the `data` directory.  Omit the `.p12` extension on the
 `sh mkcert.sh` command line.
 
 `mkcert.sh` can also create content signer certs by specifying specifying any
-`-t` parameter that begins with `piv-content-signer` or `pivi-content-signer`. 
-It will attempt to match your `-t` parameter with the configuration file, so you can
+`-t` or `--type` parameter that begins with `piv-content-signer` or `pivi-content-signer`. 
+It will attempt to match your `--type` parameter with the configuration file type, so you can
 support multiple content signer certs as in `piv-content-signer-gen1` or 
-`pivi-content-signer-gen3`.
+`pivi-content-signer-gen3`.  Configuration files are standard OpenSSL `.cnf` files. Even
+though most of the `.cnf` files are designed for EE certs, they usually include a `ca`
+section to help steer `mkcert.sh` to signing with the right key.  Environment variables
+can be passed in to the `ENV::<var>` substutition mechanism so that a specific `ca` section
+can be selected by `mkcert.sh`.  The desired signing CA can be passed to `mkcert.sh` using
+the `-s` parameter.
+
+Most PIV card certs have their own dedicated configuration files and contain the card number
+just before the `.cnf` extension.  The `-c` parameter allows the caller to select the card
+that the certificate will be created for.
+
+Usage
+```
+Usage: mkcert.sh -s SubjectCN -i IssuerCN -n cardnumber
+  -t piv-auth|piv-card-auth|pivi-auth|pivi-card-auth|piv-dig-sig|pivi-dig-sig|
+      piv-key-mgmt|pivi-key-mgmt|piv-key-hist1..20|pivi-key-hist1..20
+      piv-content-signer*|pivi-content-signer*|piv-ocsp*|pivi-ocsp*
+OPTIONS:
+  [-b]
+  [-c rsa2048|secp384r1]
+  [-e prime256v1|secp384r1]
+  [-r 1024|2048|3072|4096]
+  [-p prefix]
+  [-w]
+
+  Where:
+
+   -w generates certificates with slightly weaker keys due to a deficiency in Win32.
+   This is only necessary when using Win32-based software to inject keys on to the
+   smartcard.
+
+   -s subjectDN represents the Common Name in the certificate you wish to  create.
+   The resulting .p12 will consist of underscores substituted for spaces.
+
+   -i issuerDN represents the Common Name of the issuer.  The name you provide
+   is cleaned up, substituting spaces and ampersands.  The resulting .p12 file must
+   exist.  Only the public and private  keys are needed.
+
+   -t type denotes the type of card (piv oi pivi) and type of cert.  Types can be
+    piv-auth, piv-card-auth, pivi-auth, pivi-card-auth, piv-dig-sig
+    pivi-dig-sig, piv-key-mgmt, pivi-key-mgmt, piv-key-hist1..20, pivi-key-hist1..20,
+    piv-content-signer*, pivi-content-signer*, piv-ocsp*, or pivi-ocsp*.
+
+   -b puts this script and the various OpenSSL commands into batch mode, requiring
+   no input from the user.
+   -c cakey the CA key length/type used to sign the request.  Default is "rsa2048".
+
+   -e ECCalgorithm specifies the name of the ECC algorithm. Does not apply to 
+   RSA-based certs.
+
+   -n cardnumber is the card number which is used to locate the appropriate OpenSSL
+
+   configuration file which should always end in "c<cardnumber>.cnf".  If you plan 
+   to create your own configuration files, follow this naming convention: 
+
+     prefix + "-" + type + "-c" + cardnumber + ".cnf". 
+     e.g. mytest-piv-auth-c32.cnf
+
+   -p prefix the prefix to the coniguration file name.  Default is "icam".
+
+   -r RSAbitlength specifies the length of the RSA key in bits. Does not apply to 
+   ECC-based certs.
+
+   -x ExpirationDateTime (in UCT format)
+```
 
 By studying the command structure, you can tailor additional certificates by creating
 your own  OpenSSL configuration files and executing your customized `mkcert.sh` 
@@ -64,10 +129,12 @@ For the FIPS 201-2 cards in this project, a convenience utility has been develop
 #### mkall.sh
 
 The `mkall.sh` script creates certificates for all of the FIPS 201-2 cards using
-the existing OpenSSL configuration files.  It runs in mkcert.sh in batch mode, so
-there there is no interaction.  Watch the terminal output for possible errors that
+the existing OpenSSL configuration files.  It runs in `mkcert.sh` in batch mode, so
+there there is no interaction and maybe more importantly, no need to know what parameters
+you need to invoke `mkcert.sh`.  Just watch the console output for possible errors that
 can occur if the configuration file contains errors found by OpenSSL or your card
-folders do not match the names of the folders in the script.
+folders do not match the names of the folders in the script.  It's best to redirect the
+output to a file that you can inspect when it's done.
 
 Note that different personalization tools may use different forms of
 public/private key pairs.  Most PIV middleware is designed to tell the smart card
@@ -79,14 +146,27 @@ maintain.
 
 The `mkcadata.sh` script traverses all of the card directories as well as the
 content and OCSP signing directories to re-index the CA database and collect all
-artifacts needed for the OCSP responder and AIA/SIA/CRL server.  The OCSP response
-artifacts are stored in `aiacrlsia.tar` and the AIA, SIA, and CRL files are
+artifacts needed for the OCSP responder and AIA/SIA/CRL server.  
+
+The OCSP response artifacts are stored in `aiacrlsia.tar` and the AIA, SIA, and CRL files are
 stored in `responder-certs.tar`.  This allows the deployment can be split so OCSP
 can be deployed separately from AIA, SIA, and CRL service.
 
 Note that `aiacrlsia.tar` and `responder-certs.tar` are copied to the
 [responder](https://github.com/GSA/gsa-icam-card-builder/tree/master/responder)
 directory.
+
+When invoked with the `-r` option, it rebuilds all of the database files for each CA.
+This  overrides the incrementatal OpenSSL CA database interaction that happens new certs 
+are generated.  Instead, it operates on a premise that the certs in the cards directories 
+are authoritative and that you know what you want on your cards.  CA database files with
+serial numbers and certificate status are coded in `mkcadata.sh`.  There are sections of
+code for each type of EE cert followed by a  section of code that revokes certain certs
+that we want to be revoked for test purposes.
+
+Certs are revoked in by the `revoke.sh` scriptlet.  Inside of `revoke.sh`, the `openssl ca -revoke`
+command revokes the certs.  The appropriate CRL is updated so that the CA database and
+CRLs stay in sync.
 
 #### ocsptest.sh
 
