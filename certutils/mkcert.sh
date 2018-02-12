@@ -110,6 +110,7 @@ ECCALG=prime256v1
 RSAALG=2048
 PREFIX=icam
 CAKEY=default
+TYPE=piv-auth
 ENDDATE=
 CANAME=
 APPLE=$(expr $MACHTYPE : "^.*apple")
@@ -176,7 +177,7 @@ while true ; do
 				*) usage 1 ;;
 			esac ;;
 		--) shift ; break ;;
-		"") echo "Empty"; break ;;
+		"") break ;;
 		*) echo "Internal error: $1" ; exit 1 ;;
 	esac
 done
