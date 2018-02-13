@@ -91,14 +91,14 @@ pushd ../cards/ICAM_Card_Objects >/dev/null 2>&1
 			done
 			echo "*********************************************************"
 		popd >/dev/null 2>&1
-		pushd ICAM_CA_and_Signer >/dev/null 2>&1
-			echo "Testing certs in ICAM_CA_and_Signer..."
-			find . -type f -name '*.crt' -a -name '*Content_Signer*' -print0 | 
-			while IFS= read -r -d '' file; do
-				F=$(printf '%s\n' "$file")
-				prepreq "$F"
-			done
-			echo "*********************************************************"
-		popd >/dev/null 2>&1
 	done
+	pushd ../ICAM_CA_and_Signer >/dev/null 2>&1
+		echo "Testing certs in ICAM_CA_and_Signer..."
+		find . -type f -name '*.crt' -a -name '*Content_Signer*' -print0 | 
+		while IFS= read -r -d '' file; do
+			F=$(printf '%s\n' "$file")
+			prepreq "$F"
+		done
+		echo "*********************************************************"
+	popd >/dev/null 2>&1
 popd >/dev/null 2>&1
