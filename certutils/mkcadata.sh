@@ -425,13 +425,23 @@ revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN1CRL
 if [ $? -gt 0 ]; then exit 1; fi
 sortbyser $PIVGEN1_LOCAL
 
+## Gen1-2 Revoked Content Signer
+echo "Gen1-2 Revoked Content Signer..."
+SUBJ=ICAM_Test_Card_PIV_Revoked_Content_Signer_gen1-2
+ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2
+CONFIG=${CWD}/icam-piv-revoked-ee-gen1-2.cnf
+CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardSigningCA.crl
+revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN1CRL
+if [ $? -gt 0 ]; then exit 1; fi
+sortbyser $PIVGEN1_LOCAL
+
 # End of CA work, now move back to local directory to archive it
 
 cp -p $PIVGEN1_DEST $PIVGEN1_LOCAL
 cp -p $PIVGEN3_DEST $PIVGEN3_LOCAL
 cp -p $PIVIGEN1_DEST $PIVIGEN1_LOCAL
 cp -p $PIVIGEN3_DEST $PIVIGEN3_LOCAL
-cp -p $PIVGEN3P384_LOCAL $PIVGEN3P384_LOCAL
+cp -p $PIVGEN3P384_DEST $PIVGEN3P384_LOCAL
 
 for F in $PIVGEN1_DEST $PIVGEN3_DEST $PIVIGEN1_DEST $PIVIGEN3_DEST $PIVGEN3P384_DEST
 do
