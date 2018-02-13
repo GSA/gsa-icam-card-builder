@@ -21,7 +21,7 @@ revoke() {
 		# Get EE serial number
 		SERIAL=$(openssl x509 -in $SRCDIR/$SUBJ.crt -serial -noout | sed 's/^.*=//g')
 		# Get EE status
-		RESULT1=$(openssl ca -config $CONFIG -status $SERIAL 2>&1 | grep "=Revoked")
+		RESULT1=$(openssl ca -config $CONFIG -status $SERIAL 2>&1 | sed $'s/\r//' | grep "=Revoked")
 		CODE=$?
 		if [ $CODE -eq 0 -a $REVOKE -eq 0 ]; then popd >/dev/null 2>&1; return 0; fi
 		# Get CA cert
@@ -33,7 +33,6 @@ revoke() {
 		# Revoke
 		ALREADY=$(openssl ca -config $CONFIG -keyfile $SRCDIR/$ISSUER.private.pem -cert $SRCDIR/$ISSUER.crt -revoke $SRCDIR/$SUBJ.crt -crl_reason cessationOfOperation 2>&1)
 		RESULT2=$?
-		ALREADY=$ALREADY
 		if [ $RESULT2 -ne 0 -a $(expr "$ALREADY" : ".*Already.*$") -lt 7 ]; then
 			popd >/dev/null 2>&1; return 3
 		fi
