@@ -3,9 +3,8 @@
 This directory contains subdirectories for each ICAM Test Card.  ICAM Test Cards have been published in 3 phases which we'll call "generations" or simply "Gen".
 The generations are:
 
-* Gen 1: Cards 1-24, 25-28 (FIPS 201-1/SP 800-73-3, FRTC 1.2.0 and 1.3.0-2)
-* Gen 2: Card 38, 41-45 (FIPS 201-1/SP 800-73-3 FRTC,  1.3.3)
-* Gen 3: Cards 37, 39, 46-47, 49-53 (FIPS 201-2/SP 800-73-4,  FRTC 1.3.3)
+* Gen 1-2: Cards 1-24, (FIPS 201-1/SP 800-73-3, FRTC 1.2.0 and 1.3.0-2)
+* Gen 3: Cards 25-28, 37, 38, 39, 41-47, 49-55 (FIPS 201-2/SP 800-73-4,  FRTC 1.3.3)
 
 The complete list of ICAM test cards for FRTC 1.3.3 is listed in the table below.
 
@@ -64,5 +63,7 @@ The complete list of ICAM test cards for FRTC 1.3.3 is listed in the table below
 | 51 | Golden PIV FIPS 201-2 card profile with exception that Cardholder Fingerprints CBEFF has expired | Invalid Date |
 | 52 | Golden PIV card profile with exception that Cardholder Fingerprints CBEFF will expire before CHUID expiration date | Invalid Date |
 | 53 | Valid: Golden PIV card profile with slightly larger than recommended Card Authentication Certificate (2160 bytes) | SP 800-73-4 Standards Conformance |
+| 54 | Valid: Golden Non-federally-issued PIV-I with 99999999999999 in first portion of FASC-N | SP 800-73-4, PIV-I Standards Conformance |
+| 55 | Invalid: Missing Security Object | Tampered Data |
 
 
