@@ -80,8 +80,7 @@ prepreq() {
 }
 
 pushd ../cards/ICAM_Card_Objects >/dev/null 2>&1
-	#for D in $(ls -d 0* 1* 2* 3* 4* 5*)
-	for D in 01*
+	for D in $(ls -d 0* 1* 2* 3* 4* 5*)
 	do
 		pushd $D >/dev/null 2>&1
 			echo "Testing certs in $D..."
