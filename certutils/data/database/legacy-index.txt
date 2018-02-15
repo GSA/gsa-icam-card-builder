@@ -1,0 +1,6 @@
+V	321201235959Z		5853CCE25218AEC0	unknown	/C=US/O=CertiPath LLC/OU=CertiPath ICAM ProofCards/serialNumber=be127ea0-d180-124d-e044-000f202b235a
+V	321201235959Z		5853CCE25218AEC2	unknown	/C=US/O=CertiPath LLC/OU=CertiPath ICAM ProofCards/CN=ProofCard PIV Authentication
+V	321201235959Z		5853CCE25218AEC3	unknown	/C=US/O=CertiPath LLC/OU=CertiPath ICAM ProofCards/serialNumber=D13810D828AB6C10C339E5A1685A08C92ADE0A6184E739C3E7
+V	321201235959Z		5853CCE25218AEC4	unknown	/C=US/O=CertiPath LLC/OU=CertiPath ICAM ProofCards/CN=ProofCard PIV Content Signer
+V	321201235959Z		5853CCE25218AEC5	unknown	/C=US/O=CertiPath LLC/OU=CertiPath ICAM ProofCards/CN=ProofCard PIV-I Content Signer
+V	321201235959Z		D18FC8F76557A6D4	unknown	/C=US/O=CertiPath LLC/OU=CertiPath ICAM ProofCards/CN=ProofCard PIV Authentication

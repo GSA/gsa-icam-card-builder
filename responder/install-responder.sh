@@ -46,6 +46,10 @@ cp responder-certs.tar /etc/pki/CA
 cd /etc/pki/CA
 tar xv --no-same-owner --no-same-permissions -f responder-certs.tar
 
+# Add the legacy certs to the Gen1-2 signing CA
+
+cat legacy-index.txt >>piv-gen1-2-index.txt
+
 # Then, run this script to create OCSP response signer keys and certs.  
 # Split .p12 files from ICAM_CA_and_Signer files to be used in
 # on the responder VM.
