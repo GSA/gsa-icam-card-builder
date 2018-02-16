@@ -430,6 +430,9 @@ public class ContentSignerTool {
 			else
 				piValues.put(piAgencyCardSerialNumberTag, piAgencyCardSerialNumber.getBytes());
 
+			if (piValues.containsKey(errorDetectionCodeTag))
+				piValues.remove(errorDetectionCodeTag);
+			
 			contentBytes = Utils.valuesToBytes(piValues, "Printed Information", errorDetectionCodeTag);
 			desiredContainerId = printedInformationContainerId;
 			containerBufferBytes = writePiContainer(contentFile, contentBytes);
