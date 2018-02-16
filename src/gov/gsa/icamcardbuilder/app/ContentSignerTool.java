@@ -379,6 +379,10 @@ public class ContentSignerTool {
 
 				if (chuidValues.containsKey(issuerAsymmetricSignatureTag))
 					chuidValues.remove(issuerAsymmetricSignatureTag);
+				
+				if (chuidValues.containsKey(errorDetectionCodeTag))
+					chuidValues.remove(errorDetectionCodeTag);
+								
 			} catch (InvalidDataFormatException e) {
 				return;
 			}
