@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Tests all of the EE certs
+# Replaces spaces with underscores in file names
 
 export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
 exec 10>/tmp/ocsptest.log
