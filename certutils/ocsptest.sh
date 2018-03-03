@@ -8,37 +8,14 @@ BASH_XTRACEFD=10
 
 set -x
 
-typeHEADERS=1
-CYGWIN=$(expr $MACHTYPE : "^.*cygwin")
-if [ $CYGWIN -gt 6 ]; then 
-	COUNTFLG="n"
-else
-	COUNTFLG="c"
-fi
-
-HEADERS=$(openssl ocsp --help 2>&1 | grep "\-header")
-ST=$(expr "$URL" : "http://\(.*\)")
-
-if [ r"$HEADERS" == "r" ]; then
-	echo "This version of OpenSSL may not support HTTP headers. Exiting."
-	typeHEADERS=0
-fi
+trap 'echo "Cancelled by keyboard interrupt."; exit 0' 2 3
 
 ocsp() {
-
 	CA_CERT="$1"
 	EE_CERT="$2"
 	URL="$3"
-
 	HOST=$(expr "$URL" : "http://\(.*\)")
-	if [ $typeHEADERS = 0 ]
-		then
-			HEADER1="HOST $HOST"
-		else
-			HEADER1="URL=$HOST"
-		fi
-
-	RESP=$(openssl ocsp -issuer "$CA_CERT" -nonce -cert "$EE_CERT" -url "$URL" -header $HEADER1 -no_cert_verify -timeout 5 2>&1)
+	RESP=$(openssl ocsp -issuer "$CA_CERT" -nonce -cert "$EE_CERT" -url "$URL" -header ${HEADERIND}${HOST} -no_cert_verify -timeout 5 2>&1)
 	echo $RESP
 }
 
@@ -46,11 +23,20 @@ prepreq() {
 	EE_CERT="${1}"
 	URI=$(openssl x509 -in "$EE_CERT" -ocsp_uri -noout)
 	URI=$(echo $URI | sed $'s/\r//')
-
 	HOST=$(expr "$URI" : "http://\(.*\)")
 				
-	if ping -$COUNTFLG 1 $HOST &>/dev/null
-	then
+	REACHABLE=0
+	if [ $PINGOPT -eq 1 ]; then
+		if [ ping -$COUNTFLG 1 $HOST &>/dev/null ]; then
+			REACHABLE=1
+		else
+			echo "Host/URL -->	$HOST <-- is unreachable"
+		fi
+	else
+		REACHABLE=1
+	fi
+
+	if [ $PINGOPT -eq 0 -o $REACHABLE -eq 1 ]; then
 		case $URI in
 			http://ocsp.apl-test.cite.fpki-lab.gov)
 				CA_CERT=../ICAM_CA_and_Signer/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2.crt
@@ -72,12 +58,49 @@ prepreq() {
 				echo "Cannot get issuer for $EE_CERT"
 				;;
 		esac
-
  		ocsp "$CA_CERT" "$EE_CERT" "$URI"
-	 else
-		echo "Host/URL -->	$HOST <-- is unreachable"
  	fi
 }
+
+PINGOPT=0
+TEMP=$(getopt -o p --long ping -n 'test.sh' -- "$@")
+if [ $? -eq 1 ]; then
+	echo "Usage: $0 [-p|--ping]" 
+	exit 1
+fi
+
+eval set -- "$TEMP"
+
+while true ; do
+    case "$1" in
+        -p|--ping) PINGOPT=1 ; shift ;;
+        --) shift ; break ;;
+        *) echo "Internal error." ; exit 2 ;;
+    esac
+done
+
+# Handle Cygwin's version of ping
+
+CYGWIN=$(expr $MACHTYPE : "^.*cygwin")
+if [ $CYGWIN -gt 6 ]; then 
+	COUNTFLG="n"
+else
+	COUNTFLG="c"
+fi
+
+# Handle OpenSSL's change to the -header option
+
+VER=$(openssl version | sed 's/OpenSSL //g; s/ .*$//g')
+
+case $VER in
+	1.0.[2-9]*)
+	HEADERIND="Host " ;;
+	1.[1-9].[0-9]*)
+	HEADERIND="URL=" ;;
+	*)
+	echo "This version of OpenSSL does not support HTTP headers. Exiting."; exit 3
+	;;
+esac
 
 pushd ../cards/ICAM_Card_Objects >/dev/null 2>&1
 	for D in $(ls -d 0* 1* 2* 3* 4* 5*)
