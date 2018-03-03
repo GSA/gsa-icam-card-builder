@@ -15,15 +15,15 @@ trap 'echo -e "\x0a**** Caught keyboard signaal *****"; exit 2' 2 3 15
 timer() {
   SECS=120
   while [ $SECS -gt 0 ]; do
-    if [ $SECS -ge 100 ]; then
-      echo -n "$SECS seconds."; echo -n $'\b\b\b\b\b\b\b\b\b\b\b\b'
-    elif [ $SECS -ge 10 ]; then
-      echo -n "$SECS seconds."; echo -n $'\b\b\b\b\b\b\b\b\b\b\b'
-    else
-      echo -n "$SECS seconds."; echo -n $'\b\b\b\b\b\b\b\b\b\b'
-    fi
-    sleep 1
-    SECS=$(expr $SECS - 1)
+		if [ $SECS -ge 100 ]; then
+		  echo -n "$SECS seconds."; echo -n $'\b\b\b\b\b\b\b\b\b\b\b\b'
+		elif [ $SECS -ge 10 ]; then
+		  echo -n "$SECS seconds."; echo -n $'\b\b\b\b\b\b\b\b\b\b\b'
+		else
+		  echo -n "$SECS seconds."; echo -n $'\b\b\b\b\b\b\b\b\b\b'
+		fi
+		sleep 1
+		SECS=$(expr $SECS - 1)
   done
 }
 
@@ -66,36 +66,36 @@ for F in \\
   ICAM_Test_Card_PIV-I_OCSP_Valid_Signer_gen3.p12 \\
   ICAM_Test_Card_PIV_OCSP_Valid_Signer_P384_gen3.p12
 do
-    COUNT=\$(expr \$COUNT + 1)
-    case \$COUNT in
-    1) N=ocsp ;;
-    2) N=ocspGen3 ;;
-    3) N=ocspExpired ;;
-    4) N=ocspNocheckNotPresent ;;
-    5) N=ocspRevoked ;;
-    6) N=ocspInvalidSig ;;
-    7) N=ocsp-pivi ;;
-    8) N=ocspGen3p384 ;;
-    esac
+		COUNT=\$(expr \$COUNT + 1)
+		case \$COUNT in
+		1) N=ocsp ;;
+		2) N=ocspGen3 ;;
+		3) N=ocspExpired ;;
+		4) N=ocspNocheckNotPresent ;;
+		5) N=ocspRevoked ;;
+		6) N=ocspInvalidSig ;;
+		7) N=ocsp-pivi ;;
+		8) N=ocspGen3p384 ;;
+		esac
 
-    # Get the signer private and public keys
+		# Get the signer private and public keys
 
-    openssl pkcs12 \\
-    -in \$F \\
-    -nocerts \\
-    -nodes \\
-    -passin pass: \\
-    -passout pass: \\
-    -out \$(basename \$N .p12).key
+		openssl pkcs12 \\
+		-in \$F \\
+		-nocerts \\
+		-nodes \\
+		-passin pass: \\
+		-passout pass: \\
+		-out \$(basename \$N .p12).key
 
-    openssl pkcs12 \\
-    -in \$F \\
-    -clcerts \\
-    -passin pass: \\
-    -nokeys \\
-    -out \$(basename \$N .p12).crt
+		openssl pkcs12 \\
+		-in \$F \\
+		-clcerts \\
+		-passin pass: \\
+		-nokeys \\
+		-out \$(basename \$N .p12).crt
  
-    /bin/rm \$F
+		/bin/rm \$F
 done
 %%
 
@@ -113,11 +113,11 @@ systemctl stop httpd.service
 
 if [ $DATAONLY -eq 1 -a $CRLHOST -eq 1 ]; then
   if [ -d /var/www/http.apl-test.cite.fpki-lab.gov ]; then
-    pushd /var/www/http.apl-test.cite.fpki-lab.gov >/dev/null 2>&1
-    if [ -f $CWD/aiacrlsia.tar ]; then
-      tar xv --no-same-owner --no-same-permissions -f $CWD/aiacrlsia.tar
-    fi
-    popd >/dev/null 2>&1
+		pushd /var/www/http.apl-test.cite.fpki-lab.gov >/dev/null 2>&1
+		if [ -f $CWD/aiacrlsia.tar ]; then
+		  tar xv --no-same-owner --no-same-permissions -f $CWD/aiacrlsia.tar
+		fi
+		popd >/dev/null 2>&1
   fi
   
   echo -n "Data has been updated. The serivces will restart in "; timer
@@ -203,37 +203,40 @@ yum install httpd -y
 
 cd /var/www/ || (echo "Failed to access /var/www"; exit 1)
 for D in \
-  ocsp.apl-test.cite.fpki-lab.gov/logs \
-  ocspGen3.apl-test.cite.fpki-lab.gov/logs \
-  ocspExpired.apl-test.cite.fpki-lab.gov/logs \
-  ocspRevoked.apl-test.cite.fpki-lab.gov/logs \
-  ocspNocheckNotPresent.apl-test.cite.fpki-lab.gov/logs \
-  ocspInvalidSig.apl-test.cite.fpki-lab.gov/logs \
-  ocsp-pivi.apl-test.cite.fpki-lab.gov/logs \
-  ocspGen3p384.apl-test.cite.fpki-lab.gov/logs
+	ocsp.apl-test.cite.fpki-lab.gov/logs \
+	ocspGen3.apl-test.cite.fpki-lab.gov/logs \
+	ocspExpired.apl-test.cite.fpki-lab.gov/logs \
+	ocspRevoked.apl-test.cite.fpki-lab.gov/logs \
+	ocspNocheckNotPresent.apl-test.cite.fpki-lab.gov/logs \
+	ocspInvalidSig.apl-test.cite.fpki-lab.gov/logs \
+	ocsp-pivi.apl-test.cite.fpki-lab.gov/logs \
+	ocspGen3p384.apl-test.cite.fpki-lab.gov/logs
 do
-    mkdir -p $D
-    chmod 755 $D
-    chmod 755 $(dirname $D)
-    semanage fcontext -a -t httpd_sys_rw_content_t $D
-    restorecon -v $D
+	mkdir -p $D
+	chmod 755 $D
+	chmod 755 $(dirname $D)
+	semanage fcontext -a -t httpd_sys_rw_content_t $D
+	restorecon -v $D
 done
 setsebool -P httpd_unified 1
 
 if [ $CRLHOST -eq 1 ]; then
-  mkdir -p http.apl-test.cite.fpki-lab.gov
-  mkdir -p http.apl-test.cite.fpki-lab.gov/aia
-  mkdir -p http.apl-test.cite.fpki-lab.gov/sia
-  mkdir -p http.apl-test.cite.fpki-lab.gov/crls
-  mkdir -p http.apl-test.cite.fpki-lab.gov/logs
-  pushd http.apl-test.cite.fpki-lab.gov >/dev/null 2>&1
-    if [ -f $CWD/aiacrlsia.tar ]; then
-      tar xv --no-same-owner --no-same-permissions -f $CWD/aiacrlsia.tar
-    fi
+	mkdir -p http.apl-test.cite.fpki-lab.gov
+	mkdir -p http.apl-test.cite.fpki-lab.gov/aia
+	mkdir -p http.apl-test.cite.fpki-lab.gov/sia
+	mkdir -p http.apl-test.cite.fpki-lab.gov/crls
+	mkdir -p http.apl-test.cite.fpki-lab.gov/roots
+	mkdir -p http.apl-test.cite.fpki-lab.gov/logs
+	pushd http.apl-test.cite.fpki-lab.gov >/dev/null 2>&1
+		if [ -f $CWD/aiacrlsia.tar ]; then
+		  tar xv --no-same-owner --no-same-permissions -f $CWD/aiacrlsia.tar
+			for D in aia crls sia roots; do
+				chmod 644 $D/*
+				chmod 755 $D
+			done
+		fi
   popd >/dev/null 2>&1
 fi
-
-chmod -R 755 .
 
 # SELinux:
 
@@ -389,27 +392,27 @@ cd ../sites-enabled
 
 for F in $(ls /etc/httpd/sites-available/*.conf)
 do
-  if [ ! -L $(basename $F) ]; then
-    ln -s $F .
-  fi
+	if [ ! -L $(basename $F) ]; then
+		ln -s $F .
+	fi
 done
 
 # Edit main httpd.conf file
 
 # Edit /etc/httpd/conf/httpd.conf
 # Change #ServerName to:
-#     http.apl-test.cite.fpki-lab.gov
+#		 http.apl-test.cite.fpki-lab.gov
 # Add to end: 
-#     IncludeOptional sites-enabled/*.conf
+#		 IncludeOptional sites-enabled/*.conf
 
 egrep "^#ServerName|^# ServerName" /etc/httpd/conf/httpd.conf >/dev/null 2>&1
 if [ $? -eq 0 ]; then
-  /bin/cp -p /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.$$
-  cat /etc/httpd/conf/httpd.conf | sed 's/#ServerName.*$|# ServerName.*/ServerName '$(hostname)':80/g' >/tmp/httpd.conf
+	/bin/cp -p /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.$$
+	cat /etc/httpd/conf/httpd.conf | sed 's/#ServerName.*$|# ServerName.*/ServerName '$(hostname)':80/g' >/tmp/httpd.conf
 fi
 grep "IncludeOptional sites-enabled/*.conf" /tmp/httpd.conf >/dev/null 2>&1
 if [ $? -eq 1 ]; then
-  echo "IncludeOptional sites-enabled/*.conf" >>/tmp/httpd.conf
+	echo "IncludeOptional sites-enabled/*.conf" >>/tmp/httpd.conf
 fi
 /bin/mv /tmp/httpd.conf /etc/httpd/conf/httpd.conf
 
@@ -431,7 +434,7 @@ chmod 755 /usr/local/bin
 
 cat << %% >/usr/local/bin/ocspd
 #!/bin/bash
-#vim: set ts=2 nowwrap nohlsearh
+#vim: set ts=2 nowrap nohlsearh
 
 # This is minimalist script to start/stop OCSP responder listeners for
 # each of the types of response signatures we want to respond with.
