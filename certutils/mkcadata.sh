@@ -478,16 +478,16 @@ rm -f $LEGACY_LOCAL
 rm -f data/pem/*.private.pem
 rm -f *.p12 *.crt
 
-# AIA, SIA, CRLs
+# AIA, SIA, CRLs roots
 
-cp -pr ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/{aia,sia,crls} .
+cp -pr ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/{aia,sia,crls,roots} .
 
-chmod 755 aia crls sia
-chmod 644 aia/* crls/* sia/*
+chmod 755 aia crls sia roots
+chmod 644 aia/* crls/* sia/* roots/*
 
 # Backup AIA, CRLs, and SIA
-tar cv --owner=root --group=root -f aiacrlsia.tar aia crls sia
-rm -rf aia sia crls
+tar cv --owner=root --group=root -f aiacrlsia.tar aia crls sia roots
+rm -rf aia sia crls roots
 
 mv responder-certs.tar ../responder
 mv aiacrlsia.tar ../responder
