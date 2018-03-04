@@ -2,11 +2,23 @@
 
 # Tests all of the EE certs
 
-export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
-exec 10>/tmp/ocsptest.log
-BASH_XTRACEFD=10
+# Handle Mac OS X
 
-set -x
+OSX=0
+MACOSX=$(expr $MACHTYPE : "^.*darwin")
+if [ $MACOSX -gt 6 ]; then 
+	OSX=1
+fi
+
+export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
+
+if [ $OSX -eq 0 ]; then
+	exec 10>/tmp/ocsptest.log
+	BASH_XTRACEFD=10
+	set -x
+else
+	BASH_XTRACEFD=10 bash -xlic "" 10>/tmp/ocsptest.log
+fi
 
 trap 'echo "Cancelled by keyboard interrupt."; exit 0' 2 3
 
@@ -15,7 +27,7 @@ ocsp() {
 	EE_CERT="$2"
 	URL="$3"
 	HOST=$(expr "$URL" : "http://\(.*\)")
-	RESP=$(openssl ocsp -issuer "$CA_CERT" -nonce -cert "$EE_CERT" -url "$URL" -header ${HEADERIND}${HOST} -no_cert_verify -timeout 5 2>&1)
+	RESP=$(openssl ocsp -issuer "$CA_CERT" -nonce -cert "$EE_CERT" -url "$URL" -header ${HEADERIND}${HOST} -CAfile $CAFILE -CApath . -timeout 5 2>&1)
 	echo $RESP
 }
 
@@ -79,6 +91,17 @@ while true ; do
     esac
 done
 
+# Create master CAfile here
+
+OPWD=$(pwd)
+
+pushd ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer
+	cat *Root_CA*.crt *Signing_CA*.crt >$OPWD/CAfile.pem
+	export CAFILE=$OPWD/CAfile.pem
+popd
+
+cat ../ICAM_CA_and_Signer
+
 # Handle Cygwin's version of ping
 
 CYGWIN=$(expr $MACHTYPE : "^.*cygwin")
@@ -125,3 +148,5 @@ pushd ../cards/ICAM_Card_Objects >/dev/null 2>&1
 		echo "*********************************************************"
 	popd >/dev/null 2>&1
 popd >/dev/null 2>&1
+
+rm -f $CAFILE
