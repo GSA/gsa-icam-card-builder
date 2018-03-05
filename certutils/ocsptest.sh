@@ -59,7 +59,7 @@ prepreq() {
 debug_output()
 {
 	export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
-	VERSION=$(/bin/bash --version | grep version | sed 's/^.*version //g' | sed 's/^\(...\).*$/\1/g')
+	VERSION=$(/bin/bash --version | grep ", version" | sed 's/^.*version //g; s/^\(...\).*$/\1/g')
 	MAJ=$(expr $VERSION : "^\(.\).*$")
 	MIN=$(expr $VERSION : "^..\(.\).*$")
 	if [ $MAJ -ge 4 -a $MIN -ge 1 ]; then
