@@ -2,24 +2,6 @@
 
 # Tests all of the EE certs
 
-# Handle Mac OS X
-
-OSX=0
-MACOSX=$(expr $MACHTYPE : "^.*darwin")
-if [ $MACOSX -gt 6 ]; then 
-	OSX=1
-fi
-
-export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
-
-if [ $OSX -eq 0 ]; then
-	exec 10>/tmp/ocsptest.log
-	BASH_XTRACEFD=10
-	set -x
-else
-	BASH_XTRACEFD=10 bash -xlic "" 10>/tmp/ocsptest.log
-fi
-
 trap 'echo "Cancelled by keyboard interrupt."; exit 0' 2 3
 
 ocsp() {
@@ -73,6 +55,24 @@ prepreq() {
  		ocsp "$CA_CERT" "$EE_CERT" "$URI"
  	fi
 }
+
+debug_output()
+{
+	export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
+	VERSION=$(/bin/bash --version | grep version | sed 's/^.*version //g' | sed 's/^\(...\).*$/\1/g')
+	MAJ=$(expr $VERSION : "^\(.\).*$")
+	MIN=$(expr $VERSION : "^..\(.\).*$")
+	if [ $MAJ -ge 4 -a $MIN -ge 1 ]; then
+		exec 10>>"$1"
+		BASH_XTRACEFD=10
+		set -x
+	else
+		exec 2>>"$1"
+		set -x
+	fi
+}
+
+debug_output /tmp/$(basename $0 .sh).log
 
 PINGOPT=0
 TEMP=$(getopt -o p --long ping -n 'test.sh' -- "$@")

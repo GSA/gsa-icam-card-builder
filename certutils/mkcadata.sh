@@ -8,66 +8,7 @@
 # It then creates tar files with the artfacts needed to run a responder
 #
 
-export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
-exec 10>/tmp/mkcadata.log
-BASH_XTRACEFD=10
-set -x
-export GEN1CRL=1
-export GEN3CRL=1
-
 . ./revoke.sh
-
-CWD=$(pwd)
-PIVGEN1_DEST=$CWD/data/database/piv-gen1-2-index.txt
-PIVGEN3_DEST=$CWD/data/database/piv-gen3-index.txt
-PIVIGEN1_DEST=$CWD/data/database/pivi-gen1-2-index.txt
-PIVIGEN3_DEST=$CWD/data/database/pivi-gen3-index.txt
-PIVGEN3P384_DEST=$CWD/data/database/piv-gen3-p384-index.txt
-LEGACY_DEST=$CWD/data/database/legacy-index.txt
-
-PIVGEN1_LOCAL=$CWD/piv-gen1-2-index.txt
-PIVGEN3_LOCAL=$CWD/piv-gen3-index.txt
-PIVIGEN1_LOCAL=$CWD/pivi-gen1-2-index.txt
-PIVIGEN3_LOCAL=$CWD/pivi-gen3-index.txt
-PIVGEN3P384_LOCAL=$CWD/piv-gen3-p384-index.txt
-LEGACY_LOCAL=$CWD/legacy-index.txt
-
-cp $PIVGEN1_DEST $PIVGEN1_LOCAL
-cp $PIVGEN3_DEST $PIVGEN3_LOCAL
-cp $PIVIGEN1_DEST $PIVIGEN1_LOCAL
-cp $PIVIGEN3_DEST $PIVIGEN3_LOCAL
-cp $PIVGEN3P384_DEST $PIVGEN3P384_LOCAL
-cp $LEGACY_DEST $LEGACY_LOCAL
-
-cp -p ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/*.crt data/pem
-cp -p ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/*.p12 data
-rm -f /tmp/hashes.txt
-
-SIGNCAP12S="ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2.p12 \
-	ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.p12 \
-	ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.p12 \
-	ICAM_Test_Card_PIV_P-384_Signing_CA_gold_gen3.p12"
-
-CONTP12S="ICAM_Test_Card_PIV_Content_Signer_-_gold_gen1-2.p12 \
-	ICAM_Test_Card_PIV_Content_Signer_-_gold_gen3.p12 \
-	ICAM_Test_Card_PIV_Content_Signer_Expiring_-_gold_gen3.p12 \
-	ICAM_Test_Card_PIV_Revoked_Content_Signer_gen1-2.p12 \
-	ICAM_Test_Card_PIV-I_Content_Signer_-_gold_gen1-2.p12 \
-	ICAM_Test_Card_PIV-I_Content_Signer_-_gold_gen3.p12 \
-	ICAM_Test_Card_PIV_RSA_Issued_Intermediate_CVC_Signer.p12 \
-	ICAM_Test_Card_PIV_ECC_Issued_P-256_SM_Certificate_Signer_2.p12 \
-	ICAM_Test_Card_PIV_ECC_Issued_P-384_SM_Certificate_Signer_3.p12"
-
-OCSPP12S="ICAM_Test_Card_PIV_OCSP_Expired_Signer_gen3.p12 \
-	ICAM_Test_Card_PIV_OCSP_Invalid_Sig_Signer_gen3.p12 \
-	ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Not_Present_gen3.p12 \
-	ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Present_gen3.p12 \
-	ICAM_Test_Card_PIV_OCSP_Valid_Signer_gen1-2.p12 \
-	ICAM_Test_Card_PIV_OCSP_Valid_Signer_gen3.p12 \
-	ICAM_Test_Card_PIV-I_OCSP_Valid_Signer_gen3.p12 \
-	ICAM_Test_Card_PIV_OCSP_Valid_Signer_P384_gen3.p12"
-
-CERTLIST=""
 
 sortbyser() {
 	SRC=$1
@@ -347,6 +288,79 @@ reindex() {
 		done
 	popd >/dev/null 2>&1
 }
+
+debug_output()
+{
+	export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
+	VERSION=$(/bin/bash --version | grep version | sed 's/^.*version //g' | sed 's/^\(...\).*$/\1/g')
+	MAJ=$(expr $VERSION : "^\(.\).*$")
+	MIN=$(expr $VERSION : "^..\(.\).*$")
+	if [ $MAJ -ge 4 -a $MIN -ge 1 ]; then
+		exec 10>>"$1"
+		BASH_XTRACEFD=10
+		set -x
+	else
+		exec 2>>"$1"
+		set -x
+	fi
+}
+
+debug_output /tmp/$(basename $0 .sh).log
+
+export GEN1CRL=1
+export GEN3CRL=1
+
+CWD=$(pwd)
+PIVGEN1_DEST=$CWD/data/database/piv-gen1-2-index.txt
+PIVGEN3_DEST=$CWD/data/database/piv-gen3-index.txt
+PIVIGEN1_DEST=$CWD/data/database/pivi-gen1-2-index.txt
+PIVIGEN3_DEST=$CWD/data/database/pivi-gen3-index.txt
+PIVGEN3P384_DEST=$CWD/data/database/piv-gen3-p384-index.txt
+LEGACY_DEST=$CWD/data/database/legacy-index.txt
+
+PIVGEN1_LOCAL=$CWD/piv-gen1-2-index.txt
+PIVGEN3_LOCAL=$CWD/piv-gen3-index.txt
+PIVIGEN1_LOCAL=$CWD/pivi-gen1-2-index.txt
+PIVIGEN3_LOCAL=$CWD/pivi-gen3-index.txt
+PIVGEN3P384_LOCAL=$CWD/piv-gen3-p384-index.txt
+LEGACY_LOCAL=$CWD/legacy-index.txt
+
+cp $PIVGEN1_DEST $PIVGEN1_LOCAL
+cp $PIVGEN3_DEST $PIVGEN3_LOCAL
+cp $PIVIGEN1_DEST $PIVIGEN1_LOCAL
+cp $PIVIGEN3_DEST $PIVIGEN3_LOCAL
+cp $PIVGEN3P384_DEST $PIVGEN3P384_LOCAL
+cp $LEGACY_DEST $LEGACY_LOCAL
+
+cp -p ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/*.crt data/pem
+cp -p ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/*.p12 data
+rm -f /tmp/hashes.txt
+
+SIGNCAP12S="ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2.p12 \
+	ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.p12 \
+	ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.p12 \
+	ICAM_Test_Card_PIV_P-384_Signing_CA_gold_gen3.p12"
+
+CONTP12S="ICAM_Test_Card_PIV_Content_Signer_-_gold_gen1-2.p12 \
+	ICAM_Test_Card_PIV_Content_Signer_-_gold_gen3.p12 \
+	ICAM_Test_Card_PIV_Content_Signer_Expiring_-_gold_gen3.p12 \
+	ICAM_Test_Card_PIV_Revoked_Content_Signer_gen1-2.p12 \
+	ICAM_Test_Card_PIV-I_Content_Signer_-_gold_gen1-2.p12 \
+	ICAM_Test_Card_PIV-I_Content_Signer_-_gold_gen3.p12 \
+	ICAM_Test_Card_PIV_RSA_Issued_Intermediate_CVC_Signer.p12 \
+	ICAM_Test_Card_PIV_ECC_Issued_P-256_SM_Certificate_Signer_2.p12 \
+	ICAM_Test_Card_PIV_ECC_Issued_P-384_SM_Certificate_Signer_3.p12"
+
+OCSPP12S="ICAM_Test_Card_PIV_OCSP_Expired_Signer_gen3.p12 \
+	ICAM_Test_Card_PIV_OCSP_Invalid_Sig_Signer_gen3.p12 \
+	ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Not_Present_gen3.p12 \
+	ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Present_gen3.p12 \
+	ICAM_Test_Card_PIV_OCSP_Valid_Signer_gen1-2.p12 \
+	ICAM_Test_Card_PIV_OCSP_Valid_Signer_gen3.p12 \
+	ICAM_Test_Card_PIV-I_OCSP_Valid_Signer_gen3.p12 \
+	ICAM_Test_Card_PIV_OCSP_Valid_Signer_P384_gen3.p12"
+
+CERTLIST=""
 
 if [ $# -eq 1 -a r$1 == r"-r" ]; then
 	rm -f $PIVGEN1_LOCAL $PIVGEN3_LOCAL $PIVIGEN3_LOCAL $PIVGEN3P384_LOCAL

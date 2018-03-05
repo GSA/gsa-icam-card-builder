@@ -1,8 +1,4 @@
-#!/bin/bash
-export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
-exec 10>/tmp/$(basename $0 .sh).log
-BASH_XTRACEFD=10
-set -x
+#!/usr/local/bin/bash
 #
 # Usage: mkcert.sh 
 #   -s|--subject subjectDN 
@@ -103,6 +99,24 @@ function tolower() {
 	arg = ${1}
 	echo $arg | tr "[:upper:]" : "[:lower:]"
 }
+
+debug_output()
+{
+	export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
+	VERSION=$(/bin/bash --version | grep version | sed 's/^.*version //g' | sed 's/^\(...\).*$/\1/g')
+	MAJ=$(expr $VERSION : "^\(.\).*$")
+	MIN=$(expr $VERSION : "^..\(.\).*$")
+	if [ $MAJ -ge 4 -a $MIN -ge 1 ]; then
+		exec 10>>"$1"
+		BASH_XTRACEFD=10
+		set -x
+	else
+		exec 2>>"$1"
+		set -x
+	fi
+}
+
+debug_output /tmp/$(basename $0 .sh).log
 
 BATCH=0
 WIN32=0
@@ -240,7 +254,7 @@ mkdir -p data/pem || error mkdir $?
 mkdir -p data/database || error mkdir $?
 mkdir -p data/csr || error mkdir $?
 
-pushd data
+pushd data >/dev/null 2>&1
 
 if [ z$TYPE == "zpiv-auth" -o z$TYPE == "zpivi-auth" ]; then
 	CN=$(grep CN_default "$CNF" | sed 's/^.*=\s*//g')
@@ -291,8 +305,6 @@ if [ $BATCH -eq 0 ]; then
 			ISSUE=1
 		fi
 	done
-else
-	echo "Issuing $TYPE cert to $SUBJ."
 fi
 
 export CN="$CN"
@@ -306,6 +318,7 @@ NAME=$(basename $EE_P12 .p12 | sed 's/[&_]/ /g')
 echo
 echo "**************************** $NAME ******************************"
 echo
+echo "Issuing $TYPE cert to $SUBJ."
 
 # Get the signer private and public keys
 
@@ -427,4 +440,4 @@ rm -f pem/$(basename $EE_P12 .p12).private.pem
 rm -f $SERIAL.pem
 rm -rf csr
 
-popd
+popd >/dev/null 2>&1

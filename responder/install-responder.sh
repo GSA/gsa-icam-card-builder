@@ -1,8 +1,4 @@
 #!/bin/bash
-export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
-exec 19>/tmp/install-responder.log
-BASH_XTRACEFD=19
-set -x
 #
 # vim: set ts=2 nowrap
 # Copy this file to the directory on the VM where you've copied the
@@ -26,6 +22,24 @@ timer() {
 		SECS=$(expr $SECS - 1)
   done
 }
+
+debug_output()
+{
+	export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
+	VERSION=$(/bin/bash --version | grep version | sed 's/^.*version //g' | sed 's/^\(...\).*$/\1/g')
+	MAJ=$(expr $VERSION : "^\(.\).*$")
+	MIN=$(expr $VERSION : "^..\(.\).*$")
+	if [ $MAJ -ge 4 -a $MIN -ge 1 ]; then
+		exec 10>>"$1"
+		BASH_XTRACEFD=10
+		set -x
+	else
+		exec 2>>"$1"
+		set -x
+	fi
+}
+
+debug_output /tmp/$(basename $0 .sh).log
 
 if [ $# -eq 1 -a x$1 == x"-d" ]; then 
   echo "Certificates and revocation data update."
