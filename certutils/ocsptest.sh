@@ -100,8 +100,6 @@ pushd ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer
 	export CAFILE=$OPWD/CAfile.pem
 popd
 
-cat ../ICAM_CA_and_Signer
-
 # Handle Cygwin's version of ping
 
 CYGWIN=$(expr $MACHTYPE : "^.*cygwin")
