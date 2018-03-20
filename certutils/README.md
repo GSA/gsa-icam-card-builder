@@ -187,7 +187,7 @@ plan to load on to the smart card.
 
 ### NIST Test Certificate Policy OIDS
 The certificate policies OIDS for FIPS 201-2 PIV cards that this project uses are 
-below.  They use the NIST test OIDs that aredesignated to mimic production OIDs.
+below.  They use the NIST test OIDs that are designated to mimic production OIDs.
 Validation systems should configure their initial policy sets as follows:
 
 #### PIV Card Certificate Policy Test OIDs
