@@ -240,7 +240,7 @@ on Federally-issued PIV cards.
 2.16.840.1.101.3.2.1.3.7 (id-fpki-common-hardware)
 2.16.840.1.101.3.2.1.3.16 (id-fpki-common-High)
 
-### PIV-I Card Certificate Policy OIDs
+#### PIV-I Card Certificate Policy OIDs
 Certificate policies for PIV-I cards are below.  With PIV-I cards, the 
 certificate policies on the certificates must correctly map to an 
 initial policy on the relying party validation system.  The PIV-I 
