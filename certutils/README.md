@@ -190,6 +190,7 @@ The certificate policies OIDS for FIPS 201-2 PIV cards that this project uses ar
 below.  They use the NIST test OIDs that aredesignated to mimic production OIDs.
 Validation systems should configure their initial policy sets as follows:
 
+#### PIV Card Certificate Policy Test OIDs
 |Certificate Name|EE Certificate Policy OID|
 |----------------|-------------------------|
 |PIV Authentication|2.16.840.1.101.3.2.1.48.11|
@@ -200,7 +201,7 @@ Validation systems should configure their initial policy sets as follows:
 |Content Signing|2.16.840.1.101.3.2.1.48.86|
 |Content Signing EKU KPID|2.16.840.1.101.3.6.7|
 
-### PIV-I Card Certificate Policy OIDs
+#### PIV-I Card Certificate Policy Test OIDs
 The certificate policies for PIV-I cards that this project uses are below.  With 
 PIV-I cards, the certificate policies on the certificates must correctly map
 to an initial policy on the validation system.  The PIV-I Signing CA cert contains
@@ -219,10 +220,11 @@ initial policy set.*
 
 The normative reference for these policies can be found at [FPKI CITE](https://www.idmanagement.gov/wp-content/uploads/sites/1171/uploads/FPKI_CITE_v1_0_4.pdf).
 
-### Federal PIV Card Certificate Policy OIDs
+### Production PIV and PIV-I Card Certificate Policy OIDs
 The certificate policy OIDs used by the Federal Government are found
 on Federally-issued PIV cards.
 
+#### PIV Card Certificate Policy OIDs
 |Certificate Name|EE Certificate Policy OID|
 |----------------|-------------------------|
 |PIV Authentication|2.16.840.1.101.3.2.1.3.13|
@@ -239,8 +241,7 @@ on Federally-issued PIV cards.
 2.16.840.1.101.3.2.1.3.16 (id-fpki-common-High)
 
 ### PIV-I Card Certificate Policy OIDs
-
-Certificate policies for PIV-I cards below.  With PIV-I cards, the 
+Certificate policies for PIV-I cards are below.  With PIV-I cards, the 
 certificate policies on the certificates must correctly map to an 
 initial policy on the relying party validation system.  The PIV-I 
 Signing CA cert and bridge certificates contain mappings from
