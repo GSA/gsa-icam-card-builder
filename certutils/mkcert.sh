@@ -424,7 +424,7 @@ else
 		-descert \
 		-passout pass: \
 		-in pem/$(basename $EE_P12 .p12).pem \
-		-macalg sha256
+		-macalg sha256 \
 		-out $EE_P12
 fi
 

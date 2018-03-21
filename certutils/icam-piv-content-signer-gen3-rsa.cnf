@@ -18,6 +18,7 @@ certificate = ${dir}/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt
 database = ${dir}/database/piv-gen3-index.txt 
 serial = ${dir}/database/piv-gen3-serial
 crl_extensions = crl_ext
+string_mask = nombstr
 
 [ policy_match ]
 C = match
@@ -31,6 +32,7 @@ authorityKeyIdentifier=keyid:always,issuer:always
 
 [ req ]
 prompt = yes
+string_mask = nombstr
 distinguished_name = req_distinguished_name
 attributes = req_attributes
 req_extensions = v3_req

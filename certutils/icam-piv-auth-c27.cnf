@@ -16,6 +16,7 @@ serial = ${dir}/database/piv-gen3-serial
 policy = policy_match
 email_in_dn = no
 crl_extensions = crl_ext
+string_mask = nombstr
 
 [ policy_match ]
 C = match
@@ -29,6 +30,7 @@ authorityKeyIdentifier=keyid:always,issuer:always
 
 [ req ]
 prompt = yes
+string_mask = nombstr
 distinguished_name = req_distinguished_name
 attributes = req_attributes
 req_extensions = v3_req
