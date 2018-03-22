@@ -145,7 +145,7 @@ reindex() {
 		done
 
 		echo "Creating index for Gen3 PIV certs..."
-		for D in 25 26 27 28 37 38 41 42 43 44 45 46 47 49 50 51 52 53 55 56
+		for D in 25 26 27 28 37 38 41 42 43 44 45 46 47 48 49 50 51 52 53 55 56
 		do
 			pushd ${D}_* >/dev/null 2>&1
 				pwd
