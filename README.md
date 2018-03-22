@@ -52,6 +52,7 @@ test cards, which are referred to as *Gen 3*:
 | 44 | Invalid Signature in OCSP Response Signer Certificate |
 | 46 | Golden FIPS 201-2 PIV (replaced Card 1) |
 | 47 | Golden FIPS 201-2 PIV SAN Order |
+| 48 | Golden FIPS 201-2 T=1 PPS Non-zero PPS LEN Value |
 | 49 | FIPS 201-2 Facial Image CBEFF Expired |
 | 50 | FIPS 201-2 Facial Image CBEFF Expires before CHUID |
 | 51 | FIPS 201-2 Fingerprint CBEFF Expired |
