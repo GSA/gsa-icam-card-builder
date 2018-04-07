@@ -75,7 +75,7 @@ debug_output()
 debug_output /tmp/$(basename $0 .sh).log
 
 PINGOPT=0
-TEMP=$(getopt -o p --long ping -n 'test.sh' -- "$@")
+TEMP=$(getopt -o p --long ping -n 'ocsptest.sh' -- "$@")
 if [ $? -eq 1 ]; then
 	echo "Usage: $0 [-p|--ping]" 
 	exit 1
