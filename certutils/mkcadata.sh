@@ -348,8 +348,8 @@ CONTP12S="ICAM_Test_Card_PIV_Content_Signer_-_gold_gen1-2.p12 \
 	ICAM_Test_Card_PIV-I_Content_Signer_-_gold_gen1-2.p12 \
 	ICAM_Test_Card_PIV-I_Content_Signer_-_gold_gen3.p12 \
 	ICAM_Test_Card_PIV_RSA_Issued_Intermediate_CVC_Signer.p12 \
-	ICAM_Test_Card_PIV_ECC_Issued_P-256_SM_Certificate_Signer.p12 \
-	ICAM_Test_Card_PIV_ECC_Issued_P-384_SM_Certificate_Signer.p12"
+	ICAM_Test_Card_PIV_ECC_Issued_P-256_SM_Certificate_Signer_2.p12 \
+	ICAM_Test_Card_PIV_ECC_Issued_P-384_SM_Certificate_Signer_3.p12"
 
 OCSPP12S="ICAM_Test_Card_PIV_OCSP_Expired_Signer_gen3.p12 \
 	ICAM_Test_Card_PIV_OCSP_Invalid_Sig_Signer_gen3.p12 \
