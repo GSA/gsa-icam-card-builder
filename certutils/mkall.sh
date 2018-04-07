@@ -43,19 +43,20 @@ DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
 cp -p data/$SUBJ.p12 "$DEST"
 cp -p data/pem/$SUBJ.crt "$DEST"
 
+# TODO: Uncomment the next two certs when we can encode our own Secure Messaging cards
 ## Gen3 Secure Messaging Key Establishment using ECC P-256 (ECC P-384 CA)
-SUBJ=ICAM_Test_Card_PIV_ECC_Issued_P-256_SM_Certificate_Signer_2
-sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_P-384_Signing_CA_gold_gen3 -t piv-content-signer-gen3-p384 -e prime256v1 --cakey secp384r1 || exit $?
-DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
-cp -p data/$SUBJ.p12 "$DEST"
-cp -p data/pem/$SUBJ.crt "$DEST"
+#SUBJ=ICAM_Test_Card_PIV_ECC_Issued_P-256_SM_Certificate_Signer_2
+#sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_P-384_Signing_CA_gold_gen3 -t piv-content-signer-gen3-p384 -e prime256v1 --cakey secp384r1 || exit $?
+#DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
+#cp -p data/$SUBJ.p12 "$DEST"
+#cp -p data/pem/$SUBJ.crt "$DEST"
 
 ## Gen3 Secure Messaging Key Establishment using ECC P-384 (ECC P-384 CA)
-SUBJ=ICAM_Test_Card_PIV_ECC_Issued_P-384_SM_Certificate_Signer_3
-sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_P-384_Signing_CA_gold_gen3 -t piv-content-signer-gen3-p384 -e secp384r1 --cakey secp384r1 || exit $?
-DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
-cp -p data/$SUBJ.p12 "$DEST"
-cp -p data/pem/$SUBJ.crt "$DEST"
+#SUBJ=ICAM_Test_Card_PIV_ECC_Issued_P-384_SM_Certificate_Signer_3
+#sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_P-384_Signing_CA_gold_gen3 -t piv-content-signer-gen3-p384 -e secp384r1 --cakey secp384r1 || exit $?
+#DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
+#cp -p data/$SUBJ.p12 "$DEST"
+#cp -p data/pem/$SUBJ.crt "$DEST"
 
 ## OCSP Gen3 valid signer using RSA 2048 (RSA 2048 CA)
 SUBJ=ICAM_Test_Card_PIV_OCSP_Valid_Signer_gen3 
