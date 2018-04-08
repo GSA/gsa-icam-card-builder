@@ -227,7 +227,7 @@ reindex() {
 	pushd data >/dev/null 2>&1
 		pwd
 		CTR=0
-		for C in $OCSPP12S $CONTP12S
+		for C in $SSLP12S $OCSPP12S $CONTP12S
 		do
 			CTR=$(expr $CTR + 1); if [ $CTR -lt 10 ]; then PAD="0"; else PAD=""; fi
 
@@ -336,6 +336,8 @@ cp -p ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/*.crt data/pem
 cp -p ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/*.p12 data
 rm -f /tmp/hashes.txt
 
+SSLP12S="ICAM_Test_Card_SSL_and_TLS.p12"
+
 SIGNCAP12S="ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2.p12 \
 	ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.p12 \
 	ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.p12 \
@@ -367,7 +369,7 @@ if [ $# -eq 1 -a r$1 == r"-r" ]; then
 	reindex
 fi
 
-for F in $OCSPP12S $SIGNCAP12S
+for F in $SSLP12S $OCSPP12S $SIGNCAP12S
 do
 	cp -p data/$F .
 	cp -p data/pem/$(basename $F .p12).crt .
@@ -468,6 +470,7 @@ do
 done
 
 tar cv --owner=root --group=root -f responder-certs.tar \
+	$SSLP12S \
 	$OCSPP12S \
 	$CERTLIST \
 	$(basename $PIVGEN1_LOCAL) \
@@ -482,7 +485,7 @@ tar cv --owner=root --group=root -f responder-certs.tar \
 	$(basename ${PIVIGEN3_LOCAL}.attr) \
 	$(basename ${PIVGEN3P384_LOCAL}.attr)
 
-rm -f $OCSPP12S $SIGNP12S $CERTLIST
+rm -f $SSLP12S $OCSPP12S $SIGNP12S $CERTLIST
 rm -f $PIVGEN1_LOCAL ${PIVGEN1_LOCAL}.attr
 rm -f $PIVGEN3_LOCAL ${PIVGEN3_LOCAL}.attr
 rm -f $PIVIGEN1_LOCAL ${PIVIGEN1_LOCAL}.attr
