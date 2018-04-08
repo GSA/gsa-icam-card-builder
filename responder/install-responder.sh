@@ -265,9 +265,12 @@ semanage port -a -t http_port_t -p tcp 2565
 semanage port -a -t http_port_t -p tcp 2566
 semanage port -a -t http_port_t -p tcp 2567
 
+# Remove the default web page
+
 # Scripts to install Apache virtual hosts
 
 cd /etc/httpd
+rm -f conf.d/welcome.conf
 mkdir -p sites-available
 mkdir -p sites-enabled
 
