@@ -293,7 +293,7 @@ if [ $CRLHOST -eq 1 ]; then
   SSLEngine On
   SSLCertificateFile /etc/pki/CA/ICAM_Test_Card_SSL_TLS.crt
   SSLCertificateKeyFile /etc/pki/CA/ICAM_Test_Card_SSL_TLS.key
-  SSLProtocol all -SSLv2
+  SSLProtocol -all +TLSv1.2
   SSLCipherSuite HIGH:!MEDIUM:!aNULL:!MD5:!SEED:!IDEA
   LogLevel debug ssl:trace5 rewrite:trace5
   ErrorLog /var/www/http.apl-test.cite.fpki-lab.gov/logs/ssl_error_log
