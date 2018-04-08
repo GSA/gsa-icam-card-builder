@@ -211,9 +211,9 @@ firewall-cmd --permanent --zone=trusted --add-port=2566/tcp
 firewall-cmd --permanent --zone=trusted --add-port=2567/tcp
 firewall-cmd --reload
 
-# Apache2:
+# Apache2, mod_ssl, openssl
 
-yum install httpd -y
+yum install httpd mod_ssl openssl -y
 
 cd /var/www/ || (echo "Failed to access /var/www"; exit 1)
 for D in \
@@ -275,9 +275,28 @@ if [ $CRLHOST -eq 1 ]; then
   cat << %% >http.apl-test.cite.fpki-lab.gov.conf
 <VirtualHost http.apl-test.cite.fpki-lab.gov:80>
   ServerName http.apl-test.cite.fpki-lab.gov
+  Redirect / https://http.apl-test.cite.fpki-lab.gov/
+</VirtualHost>
+
+<VirtualHost http.apl-test.cite.fpki-lab.gov:443>
+  ServerName http.apl-test.cite.fpki-lab.gov
   DocumentRoot /var/www/http.apl-test.cite.fpki-lab.gov
-  ErrorLog /var/www/http.apl-test.cite.fpki-lab.gov/logs/error.log
+  <Directory "/var/www/http.apl-test.cite.fpki-lab.gov">
+    Options +Indexes
+    IndexIgnore logs
+    AllowOverride all
+    SSLOptions +StdEnvVars
+  </Directory>
+  IndexOptions FancyIndexing HTMLTable VersionSort NameWidth=210 DescriptionWidth=0
+  SSLEngine On
+  SSLCertificateFile /etc/pki/CA/ICAM_Test_Card_SSL_TLS.crt
+  SSLCertificateKeyFile /etc/pki/CA/ICAM_Test_Card_SSL_TLS.key
+  SSLProtocol all -SSLv2
+  SSLCipherSuite HIGH:!MEDIUM:!aNULL:!MD5:!SEED:!IDEA
+  LogLevel debug ssl:trace5 rewrite:trace5
+  ErrorLog /var/www/http.apl-test.cite.fpki-lab.gov/logs/ssl_error_log
   CustomLog /var/www/http.apl-test.cite.fpki-lab.gov/logs/requests.log combined
+  TransferLog /var/www/http.apl-test.cite.fpki-lab.gov/logs/ssl_access_log
 </VirtualHost>
 %%
 fi
