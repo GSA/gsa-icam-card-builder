@@ -163,6 +163,7 @@ grep $IPADDR /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
 grep $HOSTNAME /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
 
 if [ $CRLHOST -eq 1 ]; then
+  grep crl.apl-test.cite.fpki-lab.gov /etc/host >/dev/null 2>&1; GC=$(expr $? + $GC)
   grep http.apl-test.cite.fpki-lab.gov /etc/host >/dev/null 2>&1; GC=$(expr $? + $GC)
 fi
 grep -i ocsp.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
@@ -178,6 +179,7 @@ if [ $GC -gt 0 ]; then
   cp -p /etc/hosts /etc/hosts.$$
   grep -v lab.gov /etc/hosts >/tmp/hosts
   echo "$IPADDR $HOSTNAME" >>/tmp/hosts
+  echo "$IPADDR crl.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
   echo "$IPADDR http.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
   echo "$IPADDR ocsp.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
   echo "$IPADDR ocspGen3.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
@@ -237,6 +239,9 @@ done
 setsebool -P httpd_unified 1
 
 if [ $CRLHOST -eq 1 ]; then
+	mkdir -p crl.apl-test.cite.fpki-lab.gov
+	mkdir -p crl.apl-test.cite.fpki-lab.gov/crls
+	mkdir -p crl.apl-test.cite.fpki-lab.gov/logs
 	mkdir -p http.apl-test.cite.fpki-lab.gov
 	mkdir -p http.apl-test.cite.fpki-lab.gov/aia
 	mkdir -p http.apl-test.cite.fpki-lab.gov/sia
@@ -277,6 +282,20 @@ mkdir -p sites-enabled
 cd sites-available
 
 if [ $CRLHOST -eq 1 ]; then
+
+  cat << %% >crl.apl-test.cite.fpki-lab.gov.conf
+<VirtualHost crl.apl-test.cite.fpki-lab.gov:80>
+  ServerName crl.apl-test.cite.fpki-lab.gov
+  DocumentRoot /var/www/crl.apl-test.cite.fpki-lab.gov
+  ErrorLog /var/www/crl.apl-test.cite.fpki-lab.gov/logs/error.log
+  CustomLog /var/www/crl.apl-test.cite.fpki-lab.gov/logs/requests.log combined
+  <Directory "/var/www/crl.apl-test.cite.fpki-lab.gov">
+    Options -Indexes
+    AllowOverride none
+  </Directory>
+</VirtualHost>
+%%
+
   cat << %% >http.apl-test.cite.fpki-lab.gov.conf
 <VirtualHost http.apl-test.cite.fpki-lab.gov:80>
   ServerName http.apl-test.cite.fpki-lab.gov
