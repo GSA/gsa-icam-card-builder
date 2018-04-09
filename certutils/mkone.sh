@@ -5,6 +5,8 @@
 . ./rename.sh
 . ./revoke.sh
 
+cp -p ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/*.p12 data
+
 ## Card 39
 #sh mkcert.sh -w -b -s ICAM_Test_Card_PIV-I_Auth_Fed_SP_800-73-4 -i ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3 -n 39 -t pivi-auth
 #sh mkcert.sh -w -b -s ICAM_Test_Card_PIV-I_Dig_Sig_Fed_SP_800-73-4 -i ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3 -n 39 -t pivi-dig-sig
@@ -132,11 +134,18 @@
 #renameIn "$DEST" 1 1
 
 ## Card 48
-sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Auth_SP_800-73-4_Non-Zero_PPS_LEN -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 48 -t piv-auth
-sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Dig_Sig_SP_800-73-4_Non-Zero_PPS_LEN -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 48 -t piv-dig-sig
-sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Key_Mgmt_SP_800-73-4_Non-Zero_PPS_LEN -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 48 -t piv-key-mgmt
-sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Card_Auth_SP_800-73-4_Non-Zero_PPS_LEN -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 48 -t piv-card-auth
-DEST="../cards/ICAM_Card_Objects/48_T=1_with_Non-Zero_PPS_LEN_Value"
-cp -p data/ICAM_Test_Card_PIV_*PPS_LEN.p12 "$DEST"
-cp -p data/pem/ICAM_Test_Card_PIV_*PPS_LEN.crt "$DEST"
-renameIn "$DEST" 1 1
+#sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Auth_SP_800-73-4_Non-Zero_PPS_LEN -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 48 -t piv-auth
+#sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Dig_Sig_SP_800-73-4_Non-Zero_PPS_LEN -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 48 -t piv-dig-sig
+#sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Key_Mgmt_SP_800-73-4_Non-Zero_PPS_LEN -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 48 -t piv-key-mgmt
+#sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Card_Auth_SP_800-73-4_Non-Zero_PPS_LEN -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 48 -t piv-card-auth
+#DEST="../cards/ICAM_Card_Objects/48_T=1_with_Non-Zero_PPS_LEN_Value"
+#cp -p data/ICAM_Test_Card_PIV_*PPS_LEN.p12 "$DEST"
+#cp -p data/pem/ICAM_Test_Card_PIV_*PPS_LEN.crt "$DEST"
+#renameIn "$DEST" 1 1
+
+## Gen3 Secure Messaging Key Establishment using ECC P-256 with intermediate CVC (RSA 2048 CA)
+SUBJ=ICAM_Test_Card_PIV_RSA_Issued_Intermediate_CVC_Signer
+sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3 -t piv-content-signer-rsa-2048 -e prime256v1 --cakey rsa2048 || exit $?
+DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
+cp -p data/$SUBJ.p12 "$DEST"
+cp -p data/pem/$SUBJ.crt "$DEST"

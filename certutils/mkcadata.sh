@@ -38,6 +38,8 @@ process() {
 		DEST=$PIVGEN1_LOCAL ;;
 	piv-gen3) 
 		DEST=$PIVGEN3_LOCAL ;;
+	piv-rsa-2048) 
+		DEST=$PIVRSA2048_LOCAL ;;
 	piv-gen3-p384) 
 		DEST=$PIVGEN3_LOCAL ;;
 	pivi-gen1-2) 
@@ -94,6 +96,7 @@ reindex() {
 	>$PIVGEN3_LOCAL
 	>$PIVIGEN1_LOCAL
 	>$PIVIGEN3_LOCAL
+	>$PIVRSA2048_LOCAL
 	>$PIVGEN3P384_LOCAL
 
 	pushd ../cards/ICAM_Card_Objects >/dev/null 2>&1
@@ -315,6 +318,7 @@ PIVGEN1_DEST=$CWD/data/database/piv-gen1-2-index.txt
 PIVGEN3_DEST=$CWD/data/database/piv-gen3-index.txt
 PIVIGEN1_DEST=$CWD/data/database/pivi-gen1-2-index.txt
 PIVIGEN3_DEST=$CWD/data/database/pivi-gen3-index.txt
+PIVRSA2048_DEST=$CWD/data/database/piv-rsa-2048-index.txt
 PIVGEN3P384_DEST=$CWD/data/database/piv-gen3-p384-index.txt
 LEGACY_DEST=$CWD/data/database/legacy-index.txt
 
@@ -322,6 +326,7 @@ PIVGEN1_LOCAL=$CWD/piv-gen1-2-index.txt
 PIVGEN3_LOCAL=$CWD/piv-gen3-index.txt
 PIVIGEN1_LOCAL=$CWD/pivi-gen1-2-index.txt
 PIVIGEN3_LOCAL=$CWD/pivi-gen3-index.txt
+PIVRSA2048_LOCAL=$CWD/piv-rsa-2048-index.txt
 PIVGEN3P384_LOCAL=$CWD/piv-gen3-p384-index.txt
 LEGACY_LOCAL=$CWD/legacy-index.txt
 
@@ -329,6 +334,7 @@ cp $PIVGEN1_DEST $PIVGEN1_LOCAL
 cp $PIVGEN3_DEST $PIVGEN3_LOCAL
 cp $PIVIGEN1_DEST $PIVIGEN1_LOCAL
 cp $PIVIGEN3_DEST $PIVIGEN3_LOCAL
+cp $PIVRSA2048_DEST $PIVRSA2048_LOCAL
 cp $PIVGEN3P384_DEST $PIVGEN3P384_LOCAL
 cp $LEGACY_DEST $LEGACY_LOCAL
 
@@ -341,6 +347,7 @@ SSLP12S="ICAM_Test_Card_SSL_and_TLS.p12"
 SIGNCAP12S="ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2.p12 \
 	ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.p12 \
 	ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.p12 \
+	ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3.p12 \
 	ICAM_Test_Card_PIV_P-384_Signing_CA_gold_gen3.p12"
 
 CONTP12S="ICAM_Test_Card_PIV_Content_Signer_-_gold_gen1-2.p12 \
@@ -382,6 +389,7 @@ done
 /bin/mv $PIVGEN3_DEST $PIVGEN3_DEST.old 2>/dev/null
 /bin/mv $PIVIGEN1_DEST $PIVIGEN1_DEST.old 2>/dev/null
 /bin/mv $PIVIGEN3_DEST $PIVIGEN3_DEST.old 2>/dev/null
+/bin/mv $PIVRSA2048_DEST $PIVRSA2048_DEST.old 2>/dev/null
 /bin/mv $PIVGEN3P384_DEST $PIVGEN3P384_DEST.old 2>/dev/null
 
 # Move our "rebuilt" version into place
@@ -390,6 +398,8 @@ cp -p $PIVGEN1_LOCAL $PIVGEN1_DEST
 cp -p $PIVGEN3_LOCAL $PIVGEN3_DEST
 cp -p $PIVIGEN1_LOCAL $PIVIGEN1_DEST
 cp -p $PIVIGEN3_LOCAL $PIVIGEN3_DEST
+cp -p $PIVIGEN3_LOCAL $PIVIGEN3_DEST
+cp -p $PIVRSA2048_LOCAL $PIVRSA2048_DEST
 cp -p $PIVGEN3P384_LOCAL $PIVGEN3P384_DEST
 
 echo "Revoking known revoked certs..."
@@ -460,10 +470,11 @@ cp -p $PIVGEN1_DEST $PIVGEN1_LOCAL
 cp -p $PIVGEN3_DEST $PIVGEN3_LOCAL
 cp -p $PIVIGEN1_DEST $PIVIGEN1_LOCAL
 cp -p $PIVIGEN3_DEST $PIVIGEN3_LOCAL
+cp -p $PIVRSA2048_DEST $PIVRSA2048_LOCAL
 cp -p $PIVGEN3P384_DEST $PIVGEN3P384_LOCAL
 cp -p $LEGACY_DEST $LEGACY_LOCAL
 
-for F in $PIVGEN1_DEST $PIVGEN3_DEST $PIVIGEN1_DEST $PIVIGEN3_DEST $PIVGEN3P384_DEST
+for F in $PIVGEN1_DEST $PIVGEN3_DEST $PIVIGEN1_DEST $PIVIGEN3_DEST $PIVRSA2048_DEST $PIVGEN3P384_DEST
 do
 	echo "unique_subject = no" >${F}.attr
 	cp -p ${F}.attr .
@@ -477,6 +488,7 @@ tar cv --owner=root --group=root -f responder-certs.tar \
 	$(basename $PIVGEN3_LOCAL) \
 	$(basename $PIVIGEN1_LOCAL) \
 	$(basename $PIVIGEN3_LOCAL) \
+	$(basename $PIVRSA2048_LOCAL) \
 	$(basename $PIVGEN3P384_LOCAL) \
 	$(basename $LEGACY_LOCAL) \
 	$(basename ${PIVGEN1_LOCAL}.attr) \
@@ -490,6 +502,7 @@ rm -f $PIVGEN1_LOCAL ${PIVGEN1_LOCAL}.attr
 rm -f $PIVGEN3_LOCAL ${PIVGEN3_LOCAL}.attr
 rm -f $PIVIGEN1_LOCAL ${PIVIGEN1_LOCAL}.attr
 rm -f $PIVIGEN3_LOCAL ${PIVIGEN3_LOCAL}.attr
+rm -f $PIVRSA2048_LOCAL ${PIVRSA2048_LOCAL}.attr
 rm -f $PIVGEN3P384_LOCAL ${PIVGEN3P384_LOCAL}.attr
 rm -f $LEGACY_LOCAL
 rm -f data/pem/*.private.pem
