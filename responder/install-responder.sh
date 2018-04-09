@@ -80,6 +80,7 @@ for F in \\
   ICAM_Test_Card_PIV-I_OCSP_Valid_Signer_gen3.p12 \\
   ICAM_Test_Card_PIV_OCSP_Valid_Signer_P384_gen3.p12 \\
   ICAM_Test_Card_SSL_and_TLS.p12
+
 do
 		COUNT=\$(expr \$COUNT + 1)
 		case \$COUNT in
@@ -91,7 +92,7 @@ do
 		6) N=ocspInvalidSig ;;
 		7) N=ocsp-pivi ;;
 		8) N=ocspGen3p384 ;;
-		*) ;;
+		9) N=ICAM_Test_Card_SSL_and_TLS ;;
 		esac
 
 		# Get the signer private and public keys
@@ -257,6 +258,7 @@ if [ $CRLHOST -eq 1 ]; then
 			done
 		fi
   popd >/dev/null 2>&1
+	cp -p http.apl-test.cite.fpki-lab.gov/crls/ICAMTestCardRootCA.crl crl.apl-test.cite.fpki-lab.gov/crls
 fi
 
 # SELinux:
@@ -313,8 +315,8 @@ if [ $CRLHOST -eq 1 ]; then
   </Directory>
   IndexOptions FancyIndexing HTMLTable VersionSort NameWidth=210 DescriptionWidth=0
   SSLEngine On
-  SSLCertificateFile /etc/pki/CA/ICAM_Test_Card_SSL_TLS.crt
-  SSLCertificateKeyFile /etc/pki/CA/ICAM_Test_Card_SSL_TLS.key
+  SSLCertificateFile /etc/pki/CA/ICAM_Test_Card_SSL_and_TLS.crt
+  SSLCertificateKeyFile /etc/pki/CA/ICAM_Test_Card_SSL_and_TLS.key
   SSLProtocol -all +TLSv1.2
   SSLCipherSuite HIGH:!MEDIUM:!aNULL:!MD5:!SEED:!IDEA
   LogLevel debug ssl:trace5 rewrite:trace5
