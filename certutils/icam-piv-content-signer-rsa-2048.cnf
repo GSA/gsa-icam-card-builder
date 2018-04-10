@@ -61,5 +61,5 @@ subjectKeyIdentifier = hash
 extendedKeyUsage = critical,2.16.840.1.101.3.6.7
 keyUsage = critical,digitalSignature
 authorityInfoAccess = caIssuers;URI:http://http.apl-test.cite.fpki-lab.gov/aia/certsIssuedToICAMTestCardRSA2048SigningCA.p7c
-crlDistributionPoints = URI:http://http.apl-test.cite.fpki-lab.gov/crls/ICAMTestCardRSA2048SigningCA.crl
+crlDistributionPoints = URI:http://http.apl-test.cite.fpki-lab.gov/crls/ICAMTestCardRSA2048PIVSigningCA.crl
 certificatePolicies = ia5org,2.16.840.1.101.3.2.1.48.86

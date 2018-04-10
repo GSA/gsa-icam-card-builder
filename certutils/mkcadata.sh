@@ -108,6 +108,7 @@ reindex() {
 				F="3 - PIV_Auth.p12"
 				G=$(basename "$F" .p12).crt
 				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
+
 				X=$(openssl x509 -serial -subject -in "$G" -noout) 
 				Y=$(openssl x509 -in "$G" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
 				STATUS=V
@@ -116,6 +117,7 @@ reindex() {
 				F="4 - PIV_Card_Auth.p12"
 				G=$(basename "$F" .p12).crt
 				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
+
 				X=$(openssl x509 -serial -subject -in "$G" -noout) 
 				Y=$(openssl x509 -in "$G" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
 				STATUS=V
@@ -243,31 +245,44 @@ reindex() {
 			K="pem/$(basename $C .p12).private.pem"
 			if [ ! -f "$K" ]; then p12tokey "$C" "$K"; fi
 
-			X=$(openssl x509 -serial -subject -in "$F" -noout) 
+			I=$(openssl x509 -in $F -issuer -noout 2>&10 | grep -y signing | grep -v expired |sed 's/^.*CN=//g; s/ICAM_Test_Card_//g; s/ /_/g'|sort -u)
 			Y=$(openssl x509 -in "$F" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
+			X=$(openssl x509 -serial -subject -in "$F" -noout) 
+
+			#PIV_P-384_Signing_CA    - T is always piv, G is always gen3-p384
+			#PIV_RSA_2048_Signing_CA - T is alsway piv, G is always rsa-2048
+			#PIV-I_Signing_CA        - T is always pivi, G is always gen3
+
+			echo "${PAD}${CTR}: ${C}..."
+			if [ $(expr "$F" : ".*SSL.*$") -ge 3 ]; then
+				continue
+			fi
+
+			# Figure out *-index.txt names
+
+			case $I in
+			*PIV_P-384_Signing_CA)
+				T=piv; G=gen3-p384 ;;
+			*PIV_RSA_2048_Signing_CA)
+				T=piv; G=rsa-2048 ;;
+			*PIV_I_Signing_CA)
+				T=pivi; G=gen3 ;;
+			*) # Start date > 2016 is Gen3
+				T=piv
+				B=$(openssl x509 -in $F -startdate -noout 2>&10 | awk '{ print $4 }' | sed 's/[:\r]//g')
+				if [ "$B" -gt 2016 ]; then G=gen3; else G=gen1-2; fi
+				# Lump Gen1 PIV-I with PIV (should have been caught by date check)
+				if [ "${T}-${G}" == "pivi-gen1-2" ]; then
+					T=piv
+				fi ;;
+			esac
+
+			STATUS=V
 
 			if [ -z "$CERTLIST" ]; then CERTLIST=$(basename $F); else CERTLIST="${CERTLIST} $(basename $F)"; fi
 
 			cp $F ..
 
-			STATUS=V
-
-			if [ $(expr "$X" : ".*PIV-I.*$") -ge 5 ]; then T=pivi; else T=piv; fi
-
-			if [ $(expr "$X" : ".*RSA.*$") -ge 3 -a $(expr "$X" : ".*ECC.*$") -ge 3 ]; then G=gen3
-			elif [ $(expr "$X" : ".*ECC.*$") -ge 3 -a $(expr "$X" : ".*P-256.*$") -ge 5 ]; then G=gen3-p384
-			elif [ $(expr "$X" : ".*ECC.*$") -ge 3 -a $(expr "$X" : ".*P-384.*$") -ge 5 ]; then G=gen3-p384
-			elif [ $(expr "$X" : ".*P-384.*$") -ge 5 ]; then G=gen3-p384
-			elif [ $(expr "$X" : ".*gen3.*$") -ge 4 ]; then G=gen3
-			else G=gen1-2
-			fi
-
-			# Lump Gen1 PIV-I with PIV
-
-			if [ "${T}-${G}" == "pivi-gen1-2" ]; then
-				T="piv"
-			fi
-			echo "${PAD}${CTR}: ${C}..."
 			process "$T-$G" $STATUS $Y $X
 			cp -p $F ..
 		done
@@ -435,6 +450,8 @@ sortbyser $PIVGEN1_LOCAL
 
 ## Gen1-2 Card 24 Revoked PIV Auth 
 echo "Gen1-2 Card 24 Revoked PIV Auth..."
+cp -p ../cards/ICAM_Card_Objects/24_Revoked_Certificates/3\ -\ PIV_Auth.crt data/pem/ICAM_Test_Card_24_PIV_Auth.crt
+cp -p ../cards/ICAM_Card_Objects/24_Revoked_Certificates/3\ -\ PIV_Auth.p12 data/ICAM_Test_Card_24_PIV_Auth.p12
 SUBJ=ICAM_Test_Card_24_PIV_Auth
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2
 CONFIG=${CWD}/icam-piv-revoked-ee-gen1-2.cnf
@@ -446,6 +463,8 @@ sortbyser $PIVGEN1_LOCAL
 
 ## Gen1-2 Card 24 Revoked PIV Card Auth 
 echo "Gen1-2 Card 24 Revoked PIV Card Auth..."
+cp -p ../cards/ICAM_Card_Objects/24_Revoked_Certificates/4\ -\ PIV_Card_Auth.crt data/pem/ICAM_Test_Card_24_PIV_Card_Auth.crt
+cp -p ../cards/ICAM_Card_Objects/24_Revoked_Certificates/4\ -\ PIV_Card_Auth.p12 data/ICAM_Test_Card_24_PIV_Card_Auth.p12
 SUBJ=ICAM_Test_Card_24_PIV_Card_Auth
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2
 CONFIG=${CWD}/icam-piv-revoked-ee-gen1-2.cnf
