@@ -198,8 +198,10 @@ Validation systems should configure their initial policy sets as follows:
 |Card Authentication EKU KPID|2.16.840.1.101.3.6.8|
 |Digital Signature|2.16.840.1.101.3.2.1.48.9|
 |Key Management|2.16.840.1.101.3.2.1.48.9|
-|Content Signing|2.16.840.1.101.3.2.1.48.86|
+|Content Signing|2.16.840.1.101.3.2.1.48.86*|
 |Content Signing EKU KPID|2.16.840.1.101.3.6.7|
+
+* ICAM Test Cards 1-24 erroneously use 2.16.840.1.101.3.2.1.48.9 as the content signing certificate OID. This was corrected beginning with Card 25.
 
 #### PIV-I Card Certificate Policy Test OIDs
 The certificate policies for PIV-I cards that this project uses are below.  With 
