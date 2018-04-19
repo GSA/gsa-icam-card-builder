@@ -8,6 +8,14 @@
 
 trap 'echo -e "\x0a**** Caught keyboard signaal *****"; exit 2' 2 3 15
 
+# Change top-level HTTPD directory to apache2 if on Ubuntu
+HTTPD=httpd
+CONF=/etc/$HTTPD/conf/$HTTPD.conf
+
+uname -a | grep -y Ubuntu >/dev/null 2>&1
+RESULT=$?
+if [ $RESULT -eq 0 ]; then HTTPD=apache2; CONF=/etc/$HTTPD/sites-available/000-default.conf; fi
+
 timer() {
   SECS=120
   while [ $SECS -gt 0 ]; do
@@ -30,11 +38,11 @@ debug_output()
 	MAJ=$(expr $VERSION : "^\(.\).*$")
 	MIN=$(expr $VERSION : "^..\(.\).*$")
 	if [ $MAJ -ge 4 -a $MIN -ge 1 ]; then
-		exec 10>>"$1"
+		exec 10>|"$1"
 		BASH_XTRACEFD=10
 		set -x
 	else
-		exec 2>>"$1"
+		exec 2>|"$1"
 		set -x
 	fi
 }
@@ -126,7 +134,7 @@ mv ICAM_Test_Card_PIV_P-384_Signing_CA_gold_gen3.crt PIV_Signing_CA_gen3_p384.cr
 
 systemctl stop ocspd.service
 systemctl disable ocspd.service
-systemctl stop httpd.service
+systemctl stop $HTTPD.service
 
 if [ $DATAONLY -eq 1 -a $CRLHOST -eq 1 ]; then
   if [ -d /var/www/http.apl-test.cite.fpki-lab.gov ]; then
@@ -139,13 +147,13 @@ if [ $DATAONLY -eq 1 -a $CRLHOST -eq 1 ]; then
   
   echo -n "Data has been updated. The serivces will restart in "; timer
   echo
-  nohup systemctl start httpd.service >/dev/null 2>&1
+  nohup systemctl start $HTTPD.service >/dev/null 2>&1
   nohup systemctl start ocspd.service >/dev/null 2>&1
   echo
   echo "The services have been restarted."
   echo "----------------------------------------------------------------------------------"
   sleep 2
-  systemctl status httpd.service
+  systemctl status $HTTPD.service
   systemctl status ocspd.service
   echo "----------------------------------------------------------------------------------"
   exit 0
@@ -157,6 +165,7 @@ fi
 # recognized by Apache2.
 
 IPADDR=$(ifconfig -a | grep "inet " | head -n1 | awk '{ print $2 }')
+IPADDR=$(ip addr show | grep "inet " | grep -v 127.0.0 | sed 's/^.*inet //g; s!/.*$!!')
 HOSTNAME=$(hostname)
 
 GC=0
@@ -234,8 +243,8 @@ do
 	mkdir -p $D
 	chmod 755 $D
 	chmod 755 $(dirname $D)
-	semanage fcontext -a -t httpd_sys_rw_content_t $D
-	restorecon -v $D
+#	semanage fcontext -a -t httpd_sys_rw_content_t $D
+#	restorecon -v $D
 done
 setsebool -P httpd_unified 1
 
@@ -263,20 +272,20 @@ fi
 
 # SELinux:
 
-semanage port -a -t http_port_t -p tcp 2560
-semanage port -a -t http_port_t -p tcp 2561
-semanage port -a -t http_port_t -p tcp 2562
-semanage port -a -t http_port_t -p tcp 2563
-semanage port -a -t http_port_t -p tcp 2564
-semanage port -a -t http_port_t -p tcp 2565
-semanage port -a -t http_port_t -p tcp 2566
-semanage port -a -t http_port_t -p tcp 2567
+#semanage port -a -t http_port_t -p tcp 2560
+#semanage port -a -t http_port_t -p tcp 2561
+#semanage port -a -t http_port_t -p tcp 2562
+#semanage port -a -t http_port_t -p tcp 2563
+#semanage port -a -t http_port_t -p tcp 2564
+#semanage port -a -t http_port_t -p tcp 2565
+#semanage port -a -t http_port_t -p tcp 2566
+#semanage port -a -t http_port_t -p tcp 2567
 
 # Remove the default web page
 
 # Scripts to install Apache virtual hosts
 
-cd /etc/httpd
+cd /etc/$HTTPD
 rm -f conf.d/welcome.conf
 mkdir -p sites-available
 mkdir -p sites-enabled
@@ -284,7 +293,6 @@ mkdir -p sites-enabled
 cd sites-available
 
 if [ $CRLHOST -eq 1 ]; then
-
   cat << %% >crl.apl-test.cite.fpki-lab.gov.conf
 <VirtualHost crl.apl-test.cite.fpki-lab.gov:80>
   ServerName crl.apl-test.cite.fpki-lab.gov
@@ -317,7 +325,7 @@ if [ $CRLHOST -eq 1 ]; then
   SSLEngine On
   SSLCertificateFile /etc/pki/CA/ICAM_Test_Card_SSL_and_TLS.crt
   SSLCertificateKeyFile /etc/pki/CA/ICAM_Test_Card_SSL_and_TLS.key
-  SSLProtocol -all +TLSv1.2
+  SSLProtocol -all +TLSv1.1 +TLSv1.2
   SSLCipherSuite HIGH:!MEDIUM:!aNULL:!MD5:!SEED:!IDEA
   LogLevel debug ssl:trace5 rewrite:trace5
   ErrorLog /var/www/http.apl-test.cite.fpki-lab.gov/logs/ssl_error_log
@@ -449,40 +457,43 @@ cat << %% >ocspGen3p384.apl-test.cite.fpki-lab.gov.conf
 
 cd ../sites-enabled
 
-for F in $(ls /etc/httpd/sites-available/*.conf)
+for F in $(ls /etc/$HTTPD/sites-available/*.conf)
 do
 	if [ ! -L $(basename $F) ]; then
 		ln -s $F .
 	fi
 done
 
-# Edit main httpd.conf file
+# Edit main $HTTPD.conf file
 
-# Edit /etc/httpd/conf/httpd.conf
+# Edit $CONF
 # Change #ServerName to:
 #		 http.apl-test.cite.fpki-lab.gov
 # Add to end: 
 #		 IncludeOptional sites-enabled/*.conf
 
-egrep "^#ServerName|^# ServerName" /etc/httpd/conf/httpd.conf >/dev/null 2>&1
+egrep "^.*#ServerName|^.*# ServerName|^ServerName" $CONF >/dev/null 2>&1
 if [ $? -eq 0 ]; then
-	/bin/cp -p /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.$$
-	cat /etc/httpd/conf/httpd.conf | sed 's/#ServerName.*$|# ServerName.*/ServerName '$(hostname)':80/g' >/tmp/httpd.conf
+	/bin/cp -p $CONF $CONF.$$
+	cat $CONF | sed 's/^.*#ServerName.*$/ServerName '$HOSTNAME':80/g' >/tmp/$(basename $CONF)
 fi
-grep "IncludeOptional sites-enabled/*.conf" /tmp/httpd.conf >/dev/null 2>&1
-if [ $? -eq 1 ]; then
-	echo "IncludeOptional sites-enabled/*.conf" >>/tmp/httpd.conf
+
+if [ "z$HTTPD" == "zhttpd" ]; then # CentOS only
+	grep "IncludeOptional sites-enabled/*.conf" /tmp/$(basename $CONF) >/dev/null 2>&1
+	if [ $? -eq 1 ]; then
+		echo "IncludeOptional sites-enabled/*.conf" >>/tmp/$(basename $CONF)
+	fi
 fi
-/bin/mv /tmp/httpd.conf /etc/httpd/conf/httpd.conf
+/bin/mv /tmp/$(basename $CONF) $CONF
 
 # Start up at boot
 
-systemctl enable httpd.service
+systemctl enable $HTTPD.service
 
 # Apache should start up.
 
-systemctl start httpd.service
-systemctl status httpd.service
+systemctl start $HTTPD.service
+systemctl status $HTTPD.service
 
 # OSCP
 
@@ -668,7 +679,7 @@ do
   sleep 60
 done
 ) &
-echo \$! >/var/run/ocsp/ocspGen3.pid
+echo \$! >/var/run/ocsp/ocspGen3p384.pid
 
 sleep infinity
 %%
