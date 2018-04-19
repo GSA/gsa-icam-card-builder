@@ -74,6 +74,8 @@ debug_output()
 
 debug_output /tmp/$(basename $0 .sh).log
 
+OPWD=$(pwd)
+PATH=$OPWD/../tlvparsing/usr/local/bin:$PATH
 PINGOPT=0
 TEMP=$(getopt -o p --long ping -n 'test.sh' -- "$@")
 if [ $? -eq 1 ]; then
@@ -92,8 +94,6 @@ while true ; do
 done
 
 # Create master CAfile here
-
-OPWD=$(pwd)
 
 pushd ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer
 	cat *Root_CA*.crt *Signing_CA*.crt >$OPWD/CAfile.pem
@@ -124,6 +124,25 @@ case $VER in
 esac
 
 pushd ../cards/ICAM_Card_Objects >/dev/null 2>&1
+	echo -n "Creating CHUID certs..."
+	for D in $(ls -d 0* 1* 2* 3* 4* 5*)
+	do
+		pushd $D >/dev/null 2>&1
+			if [ -f "6 - CHUID Object" ]; then
+				F="6 - CHUID Object"
+			elif [ -f "8 - CHUID Object" ]; then
+				F="8 - CHUID Object"
+			fi
+
+			cp "$F" chuid.bin
+			binchuid.pl chuid.bin >&10 2>&1
+			dd if=chuid.Issuer_Signature.bin bs=1 skip=59 2>/dev/null | openssl x509 -inform der -outform pem -out CHUID.crt
+			rm -f chuid.*
+		popd >/dev/null 2>&1
+	done
+
+	echo "done."
+
 	for D in $(ls -d 0* 1* 2* 3* 4* 5*)
 	do
 		pushd $D >/dev/null 2>&1
