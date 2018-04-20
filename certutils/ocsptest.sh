@@ -128,15 +128,18 @@ pushd ../cards/ICAM_Card_Objects >/dev/null 2>&1
 	for D in $(ls -d 0* 1* 2* 3* 4* 5*)
 	do
 		pushd $D >/dev/null 2>&1
-			if [ -f "6 - CHUID Object" ]; then
-				F="6 - CHUID Object"
-			elif [ -f "8 - CHUID Object" ]; then
-				F="8 - CHUID Object"
-			fi
+			if [ ! -f CHUID.crt ]; then
 
-			cp "$F" chuid.bin
-			binchuid.pl chuid.bin >&10 2>&1
-			dd if=chuid.Issuer_Signature.bin bs=1 skip=59 2>/dev/null | openssl x509 -inform der -outform pem -out CHUID.crt
+				if [ -f "6 - CHUID Object" ]; then
+					F="6 - CHUID Object"
+				elif [ -f "8 - CHUID Object" ]; then
+					F="8 - CHUID Object"
+				fi
+
+				cp "$F" chuid.bin
+				binchuid.pl chuid.bin >&10 2>&1
+				dd if=chuid.Issuer_Signature.bin bs=1 skip=59 2>/dev/null | openssl x509 -inform der -outform pem -out CHUID.crt
+			fi
 			rm -f chuid.*
 		popd >/dev/null 2>&1
 	done
