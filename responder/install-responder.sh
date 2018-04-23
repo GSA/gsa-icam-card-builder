@@ -246,7 +246,7 @@ do
 #	semanage fcontext -a -t httpd_sys_rw_content_t $D
 #	restorecon -v $D
 done
-setsebool -P httpd_unified 1
+#setsebool -P httpd_unified 1
 
 if [ $CRLHOST -eq 1 ]; then
 	mkdir -p crl.apl-test.cite.fpki-lab.gov
@@ -269,6 +269,13 @@ if [ $CRLHOST -eq 1 ]; then
   popd >/dev/null 2>&1
 	cp -p http.apl-test.cite.fpki-lab.gov/crls/ICAMTestCardRootCA.crl crl.apl-test.cite.fpki-lab.gov/crls
 fi
+
+# Prevent indexing
+
+cat << %% >>http.apl-test.cite.fpki-lab.govhttp.apl-test.cite.fpki-lab.gov/robots.txt
+User-agent: *
+Disallow: /
+%%
 
 # SELinux:
 
@@ -476,6 +483,11 @@ egrep "^.*#ServerName|^.*# ServerName|^ServerName" $CONF >/dev/null 2>&1
 if [ $? -eq 0 ]; then
 	/bin/cp -p $CONF $CONF.$$
 	cat $CONF | sed 's/^.*#ServerName.*$/ServerName '$HOSTNAME':80/g' >/tmp/$(basename $CONF)
+fi
+egrep "^.*#DocumentRoot|^.*# DocumentRoot|^DocumentRoot" $CONF >/dev/null 2>&1
+if [ $? -eq 0 ]; then
+	/bin/cp -p $CONF $CONF.$$
+	cat $CONF | sed 's/^.*#DocumentRoot.*$/DocumentRoot /var/www/http.apl-test.cite.fpki-lab.gov:80/g' >/tmp/$(basename $CONF)
 fi
 
 if [ "z$HTTPD" == "zhttpd" ]; then # CentOS only
