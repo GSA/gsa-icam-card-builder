@@ -63,7 +63,7 @@ uname -a | grep -y Ubuntu >/dev/null 2>&1
 RESULT=$?
 if [ $RESULT -eq 0 ]; then OS=ubuntu; HTTPD=apache2; CONF=/etc/$HTTPD/sites-available/000-default.conf; fi
 
-if [ $OS == "ubuntu" ]; then
+if [ x$OS == x"ubuntu" ]; then
 	INSTALLER=apt-get
 	IPTABLES=iptables
 	SYSTEMD_DIR=/lib/systemd/system
@@ -239,7 +239,7 @@ firewall-cmd --reload
 
 $INSTALLER install $HTTPD -y
 
-if [ $OS == "ubuntu" ]; then
+if [ x$OS == x"ubuntu" ]; then
 	a2enmod rewrite allowmethods
 fi
 
@@ -257,13 +257,13 @@ do
 	mkdir -p $D
 	chmod 755 $D
 	chmod 755 $(dirname $D)
-if [ $OS == "centos" ]; then
+if [ x$OS == x"centos" ]; then
 	semanage fcontext -a -t httpd_sys_rw_content_t $D
 	restorecon -v $D
 fi
 done
 
-if [ $OS == "centos" ]; then setsebool -P httpd_unified 1; fi
+if [ x$OS == x"centos" ]; then setsebool -P httpd_unified 1; fi
 
 if [ $CRLHOST -eq 1 ]; then
 	mkdir -p crl.apl-test.cite.fpki-lab.gov
@@ -296,7 +296,7 @@ Disallow: /
 
 # SELinux:
 
-if [ $OS == "centos" ]; then
+if [ x$OS == x"centos" ]; then
 	semanage port -a -t http_port_t -p tcp 2560
 	semanage port -a -t http_port_t -p tcp 2561
 	semanage port -a -t http_port_t -p tcp 2562
@@ -488,6 +488,7 @@ echo "Editing $CONF..."
 #		http.apl-test.cite.fpki-lab.gov
 # Add to end: 
 #		IncludeOptional sites-enabled/*.conf
+# For Ubuntu, edit the main conf file
 
 grep "^.*ServerName.*:80" $CONF >/dev/null 2>&1
 if [ $? -eq 0 ]; then
@@ -510,11 +511,28 @@ if [ $? -eq 0 ]; then
 	fi
 fi
 
-if [ "z$HTTPD" == "zhttpd" ]; then # CentOS only
+if [ z$HTTPD == z"httpd" ]; then # CentOS only
 	grep "^.*IncludeOptional sites-enabled/" $CONF >/dev/null 2>&1
 	if [ $? -eq 1 ]; then
 		echo "IncludeOptional sites-enabled/*.conf" >>$CONF
 	fi
+fi
+
+if [ z$OS == z"ubuntu" ]; then # Ubuntu only
+	cp /etc/apache2/apache2.conf /etc/apache2/apache2.conf.$$
+	grep -v ServerName /etc/apache2/apache2.conf >/tmp/apache2.conf
+	ed /tmp/apache2.conf << %%
+/# Global configuration
+a
+#
+# Added by install-responder.sh
+#
+ServerName http.apl-test.cite.fpki-lab.gov
+#
+.
+w
+q
+%%
 fi
 
 # Start up at boot
