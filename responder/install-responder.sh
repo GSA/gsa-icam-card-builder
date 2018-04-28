@@ -1,20 +1,13 @@
 #!/bin/bash
 #
-# vim: set ts=2 nowrap
+# vim: set ts=2 nowrap nohlsearch
+#
 # Copy this file to the directory on the VM where you've copied the
-# tar file, responder-certs.tar.  Then run it by typing "sh install-responder.sh"
+# tar file, responder-certs.tar.  Then run it by typing "./install-responder.sh"
 
 # Usage: -d option will just install data
 
 trap 'echo -e "\x0a**** Caught keyboard signaal *****"; exit 2' 2 3 15
-
-# Change top-level HTTPD directory to apache2 if on Ubuntu
-HTTPD=httpd
-CONF=/etc/$HTTPD/conf/$HTTPD.conf
-
-uname -a | grep -y Ubuntu >/dev/null 2>&1
-RESULT=$?
-if [ $RESULT -eq 0 ]; then HTTPD=apache2; CONF=/etc/$HTTPD/sites-available/000-default.conf; fi
 
 timer() {
   SECS=120
@@ -47,16 +40,34 @@ debug_output()
 	fi
 }
 
+## Start ##
+
 debug_output /tmp/$(basename $0 .sh).log
 
 if [ $# -eq 1 -a x$1 == x"-d" ]; then 
-  echo "Certificates and revocation data update."
-  DATAONLY=1
+	echo "Certificates and revocation data update."
+	DATAONLY=1
 else
-  DATAONLY=0
+	DATAONLY=0
 fi
 
-##
+# Change top-level HTTPD directory to apache2 if on Ubuntu
+OS=centos
+HTTPD=httpd
+CONF=/etc/$HTTPD/conf/$HTTPD.conf
+INSTALLER=yum
+IPTABLES=iptables-services
+SYSTEMD_DIR=/usr/lib/systemd/system
+
+uname -a | grep -y Ubuntu >/dev/null 2>&1
+RESULT=$?
+if [ $RESULT -eq 0 ]; then OS=ubuntu; HTTPD=apache2; CONF=/etc/$HTTPD/sites-available/000-default.conf; fi
+
+if [ $OS == "ubuntu" ]; then
+	INSTALLER=apt-get
+	IPTABLES=iptables
+	SYSTEMD_DIR=/lib/systemd/system
+fi
 
 CRLHOST=1 # Change to zero if not hosting CRL/AIA/SIA on this VM
 
@@ -100,7 +111,6 @@ do
 		6) N=ocspInvalidSig ;;
 		7) N=ocsp-pivi ;;
 		8) N=ocspGen3p384 ;;
-		9) N=ICAM_Test_Card_SSL_and_TLS ;;
 		esac
 
 		# Get the signer private and public keys
@@ -206,11 +216,11 @@ fi
 
 systemctl status firewalld.service >/dev/null 2>&1
 if [ $? -ne 0 ]; then
-  yum install firewalld -y
+  $INSTALLER install firewalld -y
   systemctl start firewalld.service
 fi
 
-yum install iptables-services -y
+$INSTALLER install $IPTABLES -y
 
 firewall-cmd --permanent --add-port=80/tcp
 firewall-cmd --permanent --add-port=443/tcp
@@ -225,9 +235,13 @@ firewall-cmd --permanent --zone=trusted --add-port=2566/tcp
 firewall-cmd --permanent --zone=trusted --add-port=2567/tcp
 firewall-cmd --reload
 
-# Apache2, mod_ssl, openssl
+# $HTTP, openssl
 
-yum install httpd mod_ssl openssl -y
+$INSTALLER install $HTTPD -y
+
+if [ $OS == "ubuntu" ]; then
+	a2enmod rewrite allowmethods
+fi
 
 cd /var/www/ || (echo "Failed to access /var/www"; exit 1)
 for D in \
@@ -243,10 +257,13 @@ do
 	mkdir -p $D
 	chmod 755 $D
 	chmod 755 $(dirname $D)
-#	semanage fcontext -a -t httpd_sys_rw_content_t $D
-#	restorecon -v $D
+if [ $OS == "centos" ]; then
+	semanage fcontext -a -t httpd_sys_rw_content_t $D
+	restorecon -v $D
+fi
 done
-#setsebool -P httpd_unified 1
+
+if [ $OS == "centos" ]; then setsebool -P httpd_unified 1; fi
 
 if [ $CRLHOST -eq 1 ]; then
 	mkdir -p crl.apl-test.cite.fpki-lab.gov
@@ -272,21 +289,23 @@ fi
 
 # Prevent indexing
 
-cat << %% >>http.apl-test.cite.fpki-lab.govhttp.apl-test.cite.fpki-lab.gov/robots.txt
+cat << %% >>http.apl-test.cite.fpki-lab.gov/robots.txt
 User-agent: *
 Disallow: /
 %%
 
 # SELinux:
 
-#semanage port -a -t http_port_t -p tcp 2560
-#semanage port -a -t http_port_t -p tcp 2561
-#semanage port -a -t http_port_t -p tcp 2562
-#semanage port -a -t http_port_t -p tcp 2563
-#semanage port -a -t http_port_t -p tcp 2564
-#semanage port -a -t http_port_t -p tcp 2565
-#semanage port -a -t http_port_t -p tcp 2566
-#semanage port -a -t http_port_t -p tcp 2567
+if [ $OS == "centos" ]; then
+	semanage port -a -t http_port_t -p tcp 2560
+	semanage port -a -t http_port_t -p tcp 2561
+	semanage port -a -t http_port_t -p tcp 2562
+	semanage port -a -t http_port_t -p tcp 2563
+	semanage port -a -t http_port_t -p tcp 2564
+	semanage port -a -t http_port_t -p tcp 2565
+	semanage port -a -t http_port_t -p tcp 2566
+	semanage port -a -t http_port_t -p tcp 2567
+fi
 
 # Remove the default web page
 
@@ -316,28 +335,17 @@ if [ $CRLHOST -eq 1 ]; then
   cat << %% >http.apl-test.cite.fpki-lab.gov.conf
 <VirtualHost http.apl-test.cite.fpki-lab.gov:80>
   ServerName http.apl-test.cite.fpki-lab.gov
-  Redirect / https://http.apl-test.cite.fpki-lab.gov/
-</VirtualHost>
-
-<VirtualHost http.apl-test.cite.fpki-lab.gov:443>
-  ServerName http.apl-test.cite.fpki-lab.gov
   DocumentRoot /var/www/http.apl-test.cite.fpki-lab.gov
   <Directory "/var/www/http.apl-test.cite.fpki-lab.gov">
     Options +Indexes
     IndexIgnore logs
     AllowOverride all
-    SSLOptions +StdEnvVars
   </Directory>
   IndexOptions FancyIndexing HTMLTable VersionSort NameWidth=210 DescriptionWidth=0
-  SSLEngine On
-  SSLCertificateFile /etc/pki/CA/ICAM_Test_Card_SSL_and_TLS.crt
-  SSLCertificateKeyFile /etc/pki/CA/ICAM_Test_Card_SSL_and_TLS.key
-  SSLProtocol -all +TLSv1.1 +TLSv1.2
-  SSLCipherSuite HIGH:!MEDIUM:!aNULL:!MD5:!SEED:!IDEA
-  LogLevel debug ssl:trace5 rewrite:trace5
-  ErrorLog /var/www/http.apl-test.cite.fpki-lab.gov/logs/ssl_error_log
+  LogLevel debug
+  ErrorLog /var/www/http.apl-test.cite.fpki-lab.gov/logs/error_log
   CustomLog /var/www/http.apl-test.cite.fpki-lab.gov/logs/requests.log combined
-  TransferLog /var/www/http.apl-test.cite.fpki-lab.gov/logs/ssl_access_log
+  TransferLog /var/www/http.apl-test.cite.fpki-lab.gov/logs/access_log
 </VirtualHost>
 %%
 fi
@@ -473,30 +481,41 @@ done
 
 # Edit main $HTTPD.conf file
 
+echo "Editing $CONF..."
+
 # Edit $CONF
 # Change #ServerName to:
-#		 http.apl-test.cite.fpki-lab.gov
+#		http.apl-test.cite.fpki-lab.gov
 # Add to end: 
-#		 IncludeOptional sites-enabled/*.conf
+#		IncludeOptional sites-enabled/*.conf
 
-egrep "^.*#ServerName|^.*# ServerName|^ServerName" $CONF >/dev/null 2>&1
+grep "^.*ServerName.*:80" $CONF >/dev/null 2>&1
 if [ $? -eq 0 ]; then
 	/bin/cp -p $CONF $CONF.$$
-	cat $CONF | sed 's/^.*#ServerName.*$/ServerName '$HOSTNAME':80/g' >/tmp/$(basename $CONF)
+	cat $CONF | sed 's!^.*#ServerName.*:80!ServerName http.apl-test.cite.fpki-lab.gov:80!g' >/tmp/$(basename $CONF)
+	if [ $? -eq 0 ]; then
+		/bin/mv /tmp/$(basename $CONF) $CONF
+	else
+		echo "Failed to update ServerName"
+	fi
 fi
-egrep "^.*#DocumentRoot|^.*# DocumentRoot|^DocumentRoot" $CONF >/dev/null 2>&1
+grep "^.*DocumentRoot.*/" $CONF >/dev/null 2>&1
 if [ $? -eq 0 ]; then
 	/bin/cp -p $CONF $CONF.$$
-	cat $CONF | sed 's/^.*#DocumentRoot.*$/DocumentRoot /var/www/http.apl-test.cite.fpki-lab.gov:80/g' >/tmp/$(basename $CONF)
+	cat $CONF | sed 's!^.*DocumentRoot.*".*$!DocumentRoot /var/www/http.apl-test.cite.fpki-lab.gov!g' >/tmp/$(basename $CONF)
+	if [ $? -eq 0 ]; then
+		/bin/mv /tmp/$(basename $CONF) $CONF
+	else
+		echo "Failed to update DocumentRoot"
+	fi
 fi
 
 if [ "z$HTTPD" == "zhttpd" ]; then # CentOS only
-	grep "IncludeOptional sites-enabled/*.conf" /tmp/$(basename $CONF) >/dev/null 2>&1
+	grep "^.*IncludeOptional sites-enabled/" $CONF >/dev/null 2>&1
 	if [ $? -eq 1 ]; then
-		echo "IncludeOptional sites-enabled/*.conf" >>/tmp/$(basename $CONF)
+		echo "IncludeOptional sites-enabled/*.conf" >>$CONF
 	fi
 fi
-/bin/mv /tmp/$(basename $CONF) $CONF
 
 # Start up at boot
 
@@ -505,7 +524,10 @@ systemctl enable $HTTPD.service
 # Apache should start up.
 
 systemctl start $HTTPD.service
-systemctl status $HTTPD.service
+if [ $? -ne 0 ]; then
+	echo "Failed to start $HTTPD service. Exiting."
+	exit 1
+fi
 
 # OSCP
 
@@ -541,7 +563,7 @@ do
   -text \\
   -out /var/log/ocsp-log.txt >>/var/log/ocsp-output 2>&1 &
   PID=\$!
-  trap 'kill \$!; exit' 1 2 1 2 15
+  trap 'kill \$!; exit' 1 2 3 15
   wait
   sleep 60
 done
@@ -561,7 +583,7 @@ do
   -text \\
   -out /var/log/ocspGen3-log.txt >>/var/log/ocspGen3-output 2>&1 &
   PID=\$!
-  trap 'kill \$!; exit' 1 2 1 2 15
+  trap 'kill \$!; exit' 1 2 3 15
   wait
   sleep 60
 done
@@ -582,7 +604,7 @@ do
   -text \\
   -out /var/log/ocspExpired-log.txt >>/var/log/ocspExpired-output 2>&1 &
   PID=\$!
-  trap 'kill \$!; exit' 1 2 15
+  trap 'kill \$!; exit' 1 2 3 15
   wait
   sleep 60
 done
@@ -603,7 +625,7 @@ do
   -text \\
   -out /var/log/ocspInvalidSig-log.txt >>/var/log/ocspInvalidSig-output 2>&1 &
   PID=\$!
-  trap 'kill \$!; exit' 1 2 15
+  trap 'kill \$!; exit' 1 2 3 15
   wait
   sleep 60
 done
@@ -624,7 +646,7 @@ do
   -text \\
   -out /var/log/ocspRevoked-log.txt >>/var/log/ocspRevoked-output 2>&1 &
   PID=\$!
-  trap 'kill \$!; exit' 1 2 15
+  trap 'kill \$!; exit' 1 2 3 15
   wait
   sleep 60
 done
@@ -645,7 +667,7 @@ do
   -text \\
   -out /var/log/ocspNocheckNotPresent-log.txt >>/var/log/ocspNocheckNotPresent-output 2>&1 &
   PID=\$!
-  trap 'kill \$!; exit' 1 2 15
+  trap 'kill \$!; exit' 1 2 3 15
   wait
   sleep 60
 done
@@ -666,7 +688,7 @@ do
   -text \\
   -out /var/log/ocsp-pivi-log.txt >>/var/log/ocsp-pivi-output 2>&1 &
   PID=\$!
-  trap 'kill \$!; exit' 1 2 15
+  trap 'kill \$!; exit' 1 2 3 15
   wait
   sleep 60
 done
@@ -686,7 +708,7 @@ do
   -text \\
   -out /var/log/ocspGen3p384-log.txt >>/var/log/ocspGen3p384-output 2>&1 &
   PID=\$!
-  trap 'kill \$!; exit' 1 2 1 2 15
+  trap 'kill \$!; exit' 1 2 3 15
   wait
   sleep 60
 done
@@ -698,7 +720,7 @@ sleep infinity
 chmod 755 /usr/local/bin/ocspd
 
 # Set up systemd file
-cd /usr/lib/systemd/system
+cd $SYSTEMD_DIR
 
 cat << %% >ocspd.service
 [Unit]
@@ -719,4 +741,23 @@ WantedBy=multi-user.target
 systemctl daemon-reload
 systemctl enable ocspd.service
 systemctl start ocspd.service
-systemctl status ocspd.service
+if [ $? -ne 0 ]; then
+	echo "Failed to start ocspd service. Exiting."
+	exit 1
+fi
+
+systemctl status $HTTPD >/dev/null 2>&1
+if [ $? -eq 0 ]; then
+	echo "$HTTPD service successfully started"
+else
+	echo "$HTTPD service failed to start"
+fi
+
+systemctl status ocspd >/dev/null 2>&1
+if [ $? -eq 0 ]; then
+	echo "ocspd service successfully started"
+else
+	echo "ocspd service failed to start"
+fi
+
+exit 0
