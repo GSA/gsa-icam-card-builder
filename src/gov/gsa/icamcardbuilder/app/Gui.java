@@ -88,7 +88,7 @@ public class Gui extends JPanel {
 	protected static boolean macOs = false;
 	protected static boolean linuxOs = false;
 
-	// Menu bar and menu controls
+	// Menu bar and menu controls 
 
 	protected JPanel signingPanel;
 	protected JMenu fileMenu;
