@@ -248,7 +248,7 @@ firewall-cmd --reload
 $INSTALLER install $HTTPD -y
 
 if [ x$OS == x"ubuntu" ]; then
-	a2enmod rewrite allowmethods
+	a2enmod rewrite allowmethods proxy proxy_http
 fi
 
 cd /var/www/ || (echo "Failed to access /var/www"; exit 1)
@@ -529,7 +529,7 @@ fi
 if [ z$OS == z"ubuntu" ]; then # Ubuntu only
 	cp $CONF2 $CONF2.$$
 	grep -v ServerName $CONF2 >/tmp/$(basename $CONF2)
-	ed $CONF2 << %%
+	ed /tmp/$(basename $CONF2) << %%
 /# Global configuration
 a
 #
