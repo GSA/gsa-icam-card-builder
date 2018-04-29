@@ -51,17 +51,24 @@ else
 	DATAONLY=0
 fi
 
-# Change top-level HTTPD directory to apache2 if on Ubuntu
 OS=centos
 HTTPD=httpd
-CONF=/etc/$HTTPD/conf/$HTTPD.conf
+CONF1=/etc/$HTTPD/conf/$HTTPD.conf
 INSTALLER=yum
 IPTABLES=iptables-services
 SYSTEMD_DIR=/usr/lib/systemd/system
 
 uname -a | grep -y Ubuntu >/dev/null 2>&1
 RESULT=$?
-if [ $RESULT -eq 0 ]; then OS=ubuntu; HTTPD=apache2; CONF=/etc/$HTTPD/sites-available/000-default.conf; fi
+
+# Change top-level HTTPD directory to apache2 and a few other things if on Ubuntu
+if [ $RESULT -eq 0 ]; then 
+	OS=ubuntu
+	HTTPD=apache2
+	CONF1=/etc/$HTTPD/sites-available/000-default.conf
+	CONF2=/etc/$HTTPD/$HTTPD.conf
+	PKIDIR=/etc/ssl/CA
+fi
 
 if [ x$OS == x"ubuntu" ]; then
 	INSTALLER=apt-get
@@ -71,12 +78,13 @@ fi
 
 CRLHOST=1 # Change to zero if not hosting CRL/AIA/SIA on this VM
 
-# Extract the .p12 and index files into the responder VM's /etc/pki/CA
+# Extract the .p12 and index files into the responder VM's CA directory
 # directory
 
 CWD=$(pwd)
-cp responder-certs.tar /etc/pki/CA
-cd /etc/pki/CA
+mkdir -p $PKIDIR
+cp responder-certs.tar $PKIDIR #/etc/pki/CA or /etc/ssl/CA
+cd $PKIDIR
 tar xv --no-same-owner --no-same-permissions -f responder-certs.tar
 
 # Add the legacy certs to the Gen1-2 signing CA
@@ -289,7 +297,7 @@ fi
 
 # Prevent indexing
 
-cat << %% >>http.apl-test.cite.fpki-lab.gov/robots.txt
+cat << %% >http.apl-test.cite.fpki-lab.gov/robots.txt
 User-agent: *
 Disallow: /
 %%
@@ -481,47 +489,47 @@ done
 
 # Edit main $HTTPD.conf file
 
-echo "Editing $CONF..."
+echo "Editing $CONF1..."
 
-# Edit $CONF
+# Edit $CONF1
 # Change #ServerName to:
 #		http.apl-test.cite.fpki-lab.gov
 # Add to end: 
 #		IncludeOptional sites-enabled/*.conf
 # For Ubuntu, edit the main conf file
 
-grep "^.*ServerName.*:80" $CONF >/dev/null 2>&1
+grep "^.*ServerName.*:80" $CONF1 >/dev/null 2>&1
 if [ $? -eq 0 ]; then
-	/bin/cp -p $CONF $CONF.$$
-	cat $CONF | sed 's!^.*#ServerName.*:80!ServerName http.apl-test.cite.fpki-lab.gov:80!g' >/tmp/$(basename $CONF)
+	/bin/cp -p $CONF1 $CONF1.$$
+	cat $CONF1 | sed 's!^.*#ServerName.*:80!ServerName http.apl-test.cite.fpki-lab.gov:80!g' >/tmp/$(basename $CONF1)
 	if [ $? -eq 0 ]; then
-		/bin/mv /tmp/$(basename $CONF) $CONF
+		/bin/mv /tmp/$(basename $CONF1) $CONF1
 	else
 		echo "Failed to update ServerName"
 	fi
 fi
-grep "^.*DocumentRoot.*/" $CONF >/dev/null 2>&1
+grep "^.*DocumentRoot.*/" $CONF1 >/dev/null 2>&1
 if [ $? -eq 0 ]; then
-	/bin/cp -p $CONF $CONF.$$
-	cat $CONF | sed 's!^.*DocumentRoot.*".*$!DocumentRoot /var/www/http.apl-test.cite.fpki-lab.gov!g' >/tmp/$(basename $CONF)
+	/bin/cp -p $CONF1 $CONF1.$$
+	cat $CONF1 | sed 's!^.*DocumentRoot.*".*$!DocumentRoot /var/www/http.apl-test.cite.fpki-lab.gov!g' >/tmp/$(basename $CONF1)
 	if [ $? -eq 0 ]; then
-		/bin/mv /tmp/$(basename $CONF) $CONF
+		/bin/mv /tmp/$(basename $CONF1) $CONF1
 	else
 		echo "Failed to update DocumentRoot"
 	fi
 fi
 
 if [ z$HTTPD == z"httpd" ]; then # CentOS only
-	grep "^.*IncludeOptional sites-enabled/" $CONF >/dev/null 2>&1
+	grep "^.*IncludeOptional sites-enabled/" $CONF1 >/dev/null 2>&1
 	if [ $? -eq 1 ]; then
-		echo "IncludeOptional sites-enabled/*.conf" >>$CONF
+		echo "IncludeOptional sites-enabled/*.conf" >>$CONF1
 	fi
 fi
 
 if [ z$OS == z"ubuntu" ]; then # Ubuntu only
-	cp /etc/apache2/apache2.conf /etc/apache2/apache2.conf.$$
-	grep -v ServerName /etc/apache2/apache2.conf >/tmp/apache2.conf
-	ed /tmp/apache2.conf << %%
+	cp $CONF2 $CONF2.$$
+	grep -v ServerName $CONF2 >/tmp/$(basename $CONF2)
+	ed $CONF2 << %%
 /# Global configuration
 a
 #
@@ -533,6 +541,9 @@ ServerName http.apl-test.cite.fpki-lab.gov
 w
 q
 %%
+
+if [ $? -eq 0 ]; then cp -p /tmp/$(basename $CONF2) $CONF2; fi
+
 fi
 
 # Start up at boot
@@ -561,7 +572,7 @@ cat << %% >/usr/local/bin/ocspd
 # This is minimalist script to start/stop OCSP responder listeners for
 # each of the types of response signatures we want to respond with.
 
-CADIR=/etc/pki/CA
+CADIR=$PKIDIR
 
 mkdir -p /var/run/ocsp
 rm -f /var/run/ocsp/*
