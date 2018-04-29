@@ -9,59 +9,240 @@ The script `install-responder.sh` can be in invoked in two ways:
 ### Contents of `responder-certs.tar`
 
 ```text
-  3213 Feb  4 00:03 ICAM_Test_Card_PIV_OCSP_Expired_Signer_gen3.p12             
-  3229 Feb  4 00:03 ICAM_Test_Card_PIV_OCSP_Invalid_Sig_Signer_gen3.p12         
-  3322 Feb  4 00:03 ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Not_Present_gen3.p12
-  3320 Feb  4 00:03 ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Present_gen3.p12
-  3205 Feb  4 00:03 ICAM_Test_Card_PIV_OCSP_Valid_Signer_gen1-2.p12             
-  3201 Feb  4 00:03 ICAM_Test_Card_PIV_OCSP_Valid_Signer_gen3.p12               
-  3101 Feb  4 00:03 ICAM_Test_Card_PIV-I_OCSP_Valid_Signer_gen3.p12             
-  2963 Feb  6 13:51 ICAM_Test_Card_PIV_OCSP_Valid_Signer_P384_gen3.p12          
-  1935 Feb  4 00:03 ICAM_Test_Card_PIV_OCSP_Expired_Signer_gen3.crt             
-  2278 Feb  4 00:03 ICAM_Test_Card_PIV_OCSP_Invalid_Sig_Signer_gen3.crt         
-  1964 Feb  4 00:03 ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Not_Present_gen3.crt
-  1984 Feb  4 00:03 ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Present_gen3.crt
-  1927 Feb  4 00:03 ICAM_Test_Card_PIV_OCSP_Valid_Signer_gen1-2.crt             
-  1931 Feb  4 00:03 ICAM_Test_Card_PIV_OCSP_Valid_Signer_gen3.crt               
-  1785 Feb  4 00:03 ICAM_Test_Card_PIV-I_OCSP_Valid_Signer_gen3.crt             
-  1574 Feb  6 13:51 ICAM_Test_Card_PIV_OCSP_Valid_Signer_P384_gen3.crt          
-  2102 Feb  4 00:03 ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2.crt             
-  2098 Feb  4 00:03 ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt               
-  2106 Feb  4 00:03 ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.crt             
-  1647 Feb  4 00:03 ICAM_Test_Card_PIV_P-384_Signing_CA_gold_gen3.crt           
-  1517 Feb 15 13:01 piv-gen1-2-index.txt                                        
- 13036 Feb 15 13:01 piv-gen3-index.txt                                          
-     0 Feb 15 13:01 pivi-gen1-2-index.txt                                       
-  1372 Feb 15 13:01 pivi-gen3-index.txt                                         
-     0 Feb 15 13:01 piv-gen3-p384-index.txt                                     
-   802 Feb 15 12:51 legacy-index.txt                                            
-    20 Feb 15 13:02 piv-gen1-2-index.txt.attr                                   
-    20 Feb 15 13:02 piv-gen3-index.txt.attr                                     
-    20 Feb 15 13:02 pivi-gen1-2-index.txt.attr                                  
-    20 Feb 15 13:02 pivi-gen3-index.txt.attr                                    
-    20 Feb 15 13:02 piv-gen3-p384-index.txt.attr  
+  3213 Feb  4 00:03 2018 ICAM_Test_Card_PIV_OCSP_Expired_Signer_gen3.p12
+  3229 Feb  4 00:03 2018 ICAM_Test_Card_PIV_OCSP_Invalid_Sig_Signer_gen3.p12
+  3322 Feb  4 00:03 2018 ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Not_Present_gen3.p12
+  3320 Feb  4 00:03 2018 ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Present_gen3.p12
+  3205 Feb  4 00:03 2018 ICAM_Test_Card_PIV_OCSP_Valid_Signer_gen1-2.p12
+  3201 Feb  4 00:03 2018 ICAM_Test_Card_PIV_OCSP_Valid_Signer_gen3.p12
+  3101 Feb  4 00:03 2018 ICAM_Test_Card_PIV-I_OCSP_Valid_Signer_gen3.p12
+  2963 Feb  6 13:51 2018 ICAM_Test_Card_PIV_OCSP_Valid_Signer_P384_gen3.p12
+  1935 Feb  4 00:03 2018 ICAM_Test_Card_PIV_OCSP_Expired_Signer_gen3.crt
+  2278 Feb  4 00:03 2018 2018 ICAM_Test_Card_PIV_OCSP_Invalid_Sig_Signer_gen3.crt
+  1964 Feb  4 00:03 2018 ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Not_Present_gen3.crt
+  1984 Feb  4 00:03 2018 ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Present_gen3.crt
+  1927 Feb  4 00:03 2018 ICAM_Test_Card_PIV_OCSP_Valid_Signer_gen1-2.crt
+  1931 Feb  4 00:03 2018 ICAM_Test_Card_PIV_OCSP_Valid_Signer_gen3.crt
+  1785 Feb  4 00:03 2018 ICAM_Test_Card_PIV-I_OCSP_Valid_Signer_gen3.crt
+  1574 Feb  6 13:51 2018 ICAM_Test_Card_PIV_OCSP_Valid_Signer_P384_gen3.crt
+  2102 Feb  4 00:03 2018 ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2.crt
+  2098 Feb  4 00:03 2018 ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt
+  2106 Feb  4 00:03 2018 ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.crt
+  1647 Feb  4 00:03 2018 ICAM_Test_Card_PIV_P-384_Signing_CA_gold_gen3.crt
+  2004 Apr  9 01:04 2018 ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3.crt
+  1517 Feb 15 13:01 2018 piv-gen1-2-index.txt
+ 13036 Feb 15 13:01 2018 piv-gen3-index.txt
+     0 Feb 15 13:01 2018 pivi-gen1-2-index.txt
+  1372 Feb 15 13:01 2018 pivi-gen3-index.txt
+     0 Feb 15 13:01 2018 piv-gen3-p384-index.txt
+   802 Feb 15 12:51 2018 legacy-index.txt
+    20 Feb 15 13:02 2018 piv-gen1-2-index.txt.attr
+    20 Feb 15 13:02 2018 piv-gen3-index.txt.attr
+    20 Feb 15 13:02 2018 pivi-gen1-2-index.txt.attr
+    20 Feb 15 13:02 2018 pivi-gen3-index.txt.attr
+    20 Feb 15 13:02 2018 piv-gen3-p384-index.txt.attr
 ```
 
 ### Contents of `aiacrlsia.tar`
 
-```text                                                      
-  1226 Feb  4 00:03 aia/certsIssuedToICAMTestCardP384PIVSigningCA.p7c           
-  1315 Feb  4 00:03 aia/certsIssuedToICAMTestCardRootCA.p7c                     
-  6397 Feb  4 00:03 aia/certsIssuedToICAMTestCardSigningCA.p7c                  
-  1340 Feb  4 00:03 aia/certsIssuedToPIV-IRootCA.p7c                            
-  1561 Feb  4 00:03 aia/certsIssuedToPIV-ISigningCA.p7c                                                                             
-   807 Feb 15 13:01 crls/ICAMTestCardGen3SigningCA.crl                          
-   440 Feb  7 13:03 crls/ICAMTestCardP384PIVSigningCA.crl                       
-   581 Feb  4 00:03 crls/ICAMTestCardPIV-IRootCA.crl                            
-   456 Feb  4 00:03 crls/ICAMTestCardPIV-ISigningCA.crl                         
-   608 Feb  4 00:03 crls/ICAMTestCardRootCA.crl                                 
-   848 Feb 15 13:02 crls/ICAMTestCardSigningCA.crl                              
-   621 Feb  4 00:03 crls/ICAMTestCardSigningCAExpired.crl                                                                           
-  1565 Feb  4 00:03 sia/certsIssuedByICAMTestCardPIV-IRootCA.p7c                
-  6138 Feb  4 00:03 sia/certsIssuedByICAMTestCardRootCA.p7c
+```text
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAM4096KeySize.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMCAisFalseCritical.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMCAisFalsenotCritical.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMCRLFormat.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMcrlSignFalse.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMExpiredCRL.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMInvalidAKID.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMInvalidCASignature.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMInvalidCRLdistributionPoint.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMInvalidCRLIssuerDN.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMInvalidCRLSignature.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMInvalidCRLSigner.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMInvalidGeneralizedTime.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMInvalidinhibitPolicyMapping.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMInvalidNameChaining.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMInvalidnotAfterDate.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMInvalidnotBeforeDate.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMInvalidPathLength.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMInvalidprime256v1Mapping.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMInvalidprime256v1Signature.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMInvalidrequiredExplicitPolicy.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMInvalidSANDNName.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMInvalidsecp384r1Mapping.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMInvalidsecp384r1Signature.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMInvalidSKID.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMInvalidSubjectDNName.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMkeyCertSignFalse.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMkeyUsageNotCritical.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMMissingBasicConstraints.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMMissingCRL.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMOCSPExpiredCA.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMOCSPInvSigResponderCA.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMOCSPnochecknotpresent.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMOCSPRevokedCA.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMRevokedCA.p7c
+92416 Mar 27 14:16 2018 aia/certsIssuedToICAMTestCardBridgeCA.p7c
+ 1226 Mar 27 14:16 2018 aia/certsIssuedToICAMTestCardP384PIVSigningCA.p7c
+ 1315 Mar 27 14:16 2018 aia/certsIssuedToICAMTestCardRootCA.p7c
+ 1553 Apr  9 17:27 2018 aia/certsIssuedToICAMTestCardRSA2048SigningCA.p7c
+ 6397 Mar 27 14:16 2018 aia/certsIssuedToICAMTestCardSigningCA.p7c
+ 1553 Mar 27 14:16 2018 aia/certsIssuedToICAMTestCardSigningCAExpired.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMValidECCprime256v1.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMValidECCsecp384r1.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMValidGeneralizedTime.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToICAMValidrequiredExplicitPolicy.p7c
+   37 Mar 27 14:16 2018 aia/certsIssuedToInvalidCRLnotBeforeDate.p7c
+ 1340 Mar 27 14:16 2018 aia/certsIssuedToPIV-IRootCA.p7c
+ 1561 Mar 27 14:16 2018 aia/certsIssuedToPIV-ISigningCA.p7c
+  732 Mar 27 14:16 2018 crls/ICAM4096KeySize.crl
+  611 Mar 27 14:16 2018 crls/ICAMCAisFalseCritical.crl
+  616 Mar 27 14:16 2018 crls/ICAMCAisFalsenotCritical.crl
+  616 Mar 27 14:16 2018 crls/ICAMCAisFalsenotCritical_.crl
+  604 Mar 27 14:16 2018 crls/ICAMcrlSignFalse.crl
+  602 Mar 27 14:16 2018 crls/ICAMExpiredCRL.crl
+  603 Mar 27 14:16 2018 crls/ICAMInvalidAKID.crl
+  611 Mar 27 14:16 2018 crls/ICAMInvalidCASignature.crl
+  620 Mar 27 14:16 2018 crls/ICAMInvalidCRLdistributionPoint.crl
+  596 Mar 27 14:16 2018 crls/ICAMInvalidCRLIssuerDN.crl
+  617 Mar 27 14:16 2018 crls/ICAMInvalidCRLnotBeforeDate.crl
+  612 Mar 27 14:16 2018 crls/ICAMInvalidCRLSignature.crl
+  609 Mar 27 14:16 2018 crls/ICAMInvalidCRLSigner.crl
+  615 Mar 27 14:16 2018 crls/ICAMInvalidGeneralizedTime.crl
+  619 Mar 27 14:16 2018 crls/ICAMInvalidinhibitPolicyMapping.crl
+  612 Mar 27 14:16 2018 crls/ICAMInvalidNameChaining.crl
+  612 Mar 27 14:16 2018 crls/ICAMInvalidnotAfterDate.crl
+  613 Mar 27 14:16 2018 crls/ICAMInvalidnotBeforeDate.crl
+  610 Mar 27 14:16 2018 crls/ICAMInvalidPathLength.crl
+  294 Mar 27 14:16 2018 crls/ICAMInvalidprime256v1Mapping.crl
+  296 Mar 27 14:16 2018 crls/ICAMInvalidprime256v1Signature.crl
+  620 Mar 27 14:16 2018 crls/ICAMInvalidrequiredExplicitPolicy.crl
+  620 Mar 27 14:16 2018 crls/ICAMInvalidrequireExplicitPolicy.crl
+  610 Mar 27 14:16 2018 crls/ICAMInvalidSANDNName.crl
+  324 Mar 27 14:16 2018 crls/ICAMInvalidsecp384r1Mapping.crl
+  327 Mar 27 14:16 2018 crls/ICAMInvalidsecp384r1Signature.crl
+  603 Mar 27 14:16 2018 crls/ICAMInvalidSKID.crl
+  614 Mar 27 14:16 2018 crls/ICAMInvalidSubjectDNName.crl
+  608 Mar 27 14:16 2018 crls/ICAMkeyCertSignFalse.crl
+  612 Mar 27 14:16 2018 crls/ICAMkeyUsageNotCritical.crl
+  616 Mar 27 14:16 2018 crls/ICAMMissingBasicConstraints.crl
+  607 Mar 27 14:16 2018 crls/ICAMOCSPExpiredCA.crl
+  620 Mar 27 14:16 2018 crls/ICAMOCSPInvSigResponderCA.crl
+  645 Mar 27 14:16 2018 crls/ICAMOCSPnochecknotpresent.crl
+  646 Mar 27 14:16 2018 crls/ICAMOCSPRevokedCA.crl
+  631 Mar 27 14:16 2018 crls/ICAMRevokedCA.crl
+  610 Mar 27 14:16 2018 crls/ICAMTestCardBridgeCA.crl
+  807 Apr 10 15:27 2018 crls/ICAMTestCardGen3SigningCA.crl
+  301 Apr  9 20:09 2018 crls/ICAMTestCardP256PIVSigningCA.crl
+  440 Mar 27 14:16 2018 crls/ICAMTestCardP384PIVSigningCA.crl
+  581 Mar 27 14:16 2018 crls/ICAMTestCardPIV-IRootCA.crl
+  456 Mar 27 14:16 2018 crls/ICAMTestCardPIV-ISigningCA.crl
+  608 Mar 27 14:16 2018 crls/ICAMTestCardRootCA.crl
+  496 Apr  9 12:54 2018 crls/ICAMTestCardRSA2048PIVSigningCA.crl
+  698 Mar 27 14:16 2018 crls/ICAMTestCardSCA.crl
+  621 Mar 27 14:16 2018 crls/ICAMTestCardSCAExpired.crl
+  848 Apr 10 15:27 2018 crls/ICAMTestCardSigningCA.crl
+  621 Mar 27 14:16 2018 crls/ICAMTestCardSigningCAExpired.crl
+  289 Mar 27 14:16 2018 crls/ICAMValidECCprime256v1.crl
+  318 Mar 27 14:16 2018 crls/ICAMValidECCsecp384r1.crl
+  613 Mar 27 14:16 2018 crls/ICAMValidGeneralizedTime.crl
+  619 Mar 27 14:16 2018 crls/ICAMValidrequiredExplicitPolicy.crl
+  473 Mar 27 14:16 2018 crls/ICAMVendorIssuingCA1.crl
+  601 Mar 27 14:16 2018 crls/ICAMVendorIssuingCA2.crl
+  617 Mar 27 14:16 2018 crls/InvalidCRLnotBeforeDate.crl
+ 1494 Mar 27 14:16 2018 sia/certsIssuedBycertsIssuedByICAMValidECCsecp384r1.p7c
+ 1897 Mar 27 14:16 2018 sia/certsIssuedByICAM4096KeySize.p7c
+ 1785 Mar 27 14:16 2018 sia/certsIssuedByICAMCAisFalseCritical.p7c
+ 1793 Mar 27 14:16 2018 sia/certsIssuedByICAMCAisFalsenotCritical.p7c
+ 1773 Mar 27 14:16 2018 sia/certsIssuedByICAMCRLFormat.p7c
+ 1770 Mar 27 14:16 2018 sia/certsIssuedByICAMcrlSignFalse.p7c
+ 1764 Mar 27 14:16 2018 sia/certsIssuedByICAMExpiredCRL.p7c
+   37 Mar 27 14:16 2018 sia/certsIssuedByICAMIndTestSubCA1.p7c
+   37 Mar 27 14:16 2018 sia/certsIssuedByICAMIndTestSubCA2.p7c
+ 1768 Mar 27 14:16 2018 sia/certsIssuedByICAMInvalidAKID.p7c
+ 1789 Mar 27 14:16 2018 sia/certsIssuedByICAMInvalidCASignature.p7c
+ 1718 Mar 27 14:16 2018 sia/certsIssuedByICAMInvalidCRLdistributionPoint.p7c
+ 1790 Mar 27 14:16 2018 sia/certsIssuedByICAMInvalidCRLIssuerDN.p7c
+ 1798 Mar 27 14:16 2018 sia/certsIssuedByICAMInvalidCRLnotBeforeDate.p7c
+ 1792 Mar 27 14:16 2018 sia/certsIssuedByICAMInvalidCRLSignature.p7c
+ 1783 Mar 27 14:16 2018 sia/certsIssuedByICAMInvalidCRLSigner.p7c
+ 1801 Mar 27 14:16 2018 sia/certsIssuedByICAMInvalidGeneralizedTime.p7c
+ 1816 Mar 27 14:16 2018 sia/certsIssuedByICAMInvalidinhibitPolicyMapping.p7c
+ 1787 Mar 27 14:16 2018 sia/certsIssuedByICAMInvalidNameChaining.p7c
+ 1793 Mar 27 14:16 2018 sia/certsIssuedByICAMInvalidnotAfterDate.p7c
+ 1795 Mar 27 14:16 2018 sia/certsIssuedByICAMInvalidnotBeforeDate.p7c
+ 1790 Mar 27 14:16 2018 sia/certsIssuedByICAMInvalidPathLength.p7c
+ 1452 Mar 27 14:16 2018 sia/certsIssuedByICAMInvalidprime256v1Mapping.p7c
+ 1492 Mar 27 14:16 2018 sia/certsIssuedByICAMInvalidprime256v1Signature.p7c
+ 1729 Mar 27 14:16 2018 sia/certsIssuedByICAMInvalidrequiredExplicitPolicy.p7c
+ 1870 Mar 27 14:16 2018 sia/certsIssuedByICAMInvalidSANDNName.p7c
+ 1480 Mar 27 14:16 2018 sia/certsIssuedByICAMInvalidsecp384r1Mapping.p7c
+ 1518 Mar 27 14:16 2018 sia/certsIssuedByICAMInvalidsecp384r1Signature.p7c
+ 1768 Mar 27 14:16 2018 sia/certsIssuedByICAMInvalidSKID.p7c
+ 1808 Mar 27 14:16 2018 sia/certsIssuedByICAMInvalidSubjectDNName.p7c
+ 1783 Mar 27 14:16 2018 sia/certsIssuedByICAMkeyCertSignFalse.p7c
+ 1790 Mar 27 14:16 2018 sia/certsIssuedByICAMkeyUsageNotCritical.p7c
+ 1788 Mar 27 14:16 2018 sia/certsIssuedByICAMMissingBasicConstraints.p7c
+ 1765 Mar 27 14:16 2018 sia/certsIssuedByICAMMissingCRL.p7c
+ 1831 Mar 27 14:16 2018 sia/certsIssuedByICAMOCSPExpiredCA.p7c
+ 1879 Mar 27 14:16 2018 sia/certsIssuedByICAMOCSPInvSigResponderCA.p7c
+ 1872 Mar 27 14:16 2018 sia/certsIssuedByICAMOCSPnochecknotpresent.p7c
+ 1847 Mar 27 14:16 2018 sia/certsIssuedByICAMOCSPRevokedCA.p7c
+ 1762 Mar 27 14:16 2018 sia/certsIssuedByICAMRevokedCA.p7c
+ 2017 Mar 27 14:16 2018 sia/certsIssuedByICAMTestCardBridgeCA.p7c
+ 1565 Mar 27 14:16 2018 sia/certsIssuedByICAMTestCardPIV-IRootCA.p7c
+ 7159 Apr  9 11:49 2018 sia/certsIssuedByICAMTestCardRootCA.p7c
+ 1467 Mar 27 14:16 2018 sia/certsIssuedByICAMValidECCprime256v1.p7c
+ 1796 Mar 27 14:16 2018 sia/certsIssuedByICAMValidGeneralizedTime.p7c
+ 1846 Mar 27 14:16 2018 sia/certsIssuedByICAMValidrequiredExplicitPolicy.p7c
+ 3306 Mar 27 14:16 2018 roots/ICAMIndTestSubCA1.p12
+ 3996 Mar 27 14:16 2018 roots/ICAMIndTestSubCA2.p12
+ 1513 Mar 27 14:16 2018 roots/ICAM_4096_Key_Size.cer
+ 1277 Mar 27 14:16 2018 roots/ICAM_CA_is_False_Critical.cer
+ 1290 Mar 27 14:16 2018 roots/ICAM_CA_is_False_not_Critical.cer
+ 1258 Mar 27 14:16 2018 roots/ICAM_crlSign_False.cer
+ 1252 Mar 27 14:16 2018 roots/ICAM_Expired_CRL.cer
+ 1255 Mar 27 14:16 2018 roots/ICAM_Invalid_AKID.cer
+ 1278 Mar 27 14:16 2018 roots/ICAM_Invalid_CA_Signature.cer
+ 1305 Mar 27 14:16 2018 roots/ICAM_Invalid_CRL_distributionPoint.cer
+ 1265 Mar 27 14:16 2018 roots/ICAM_Invalid_CRL_Format.cer
+ 1280 Mar 27 14:16 2018 roots/ICAM_Invalid_CRL_Issuer_DN.cer
+ 1295 Mar 27 14:16 2018 roots/ICAM_Invalid_CRL_notBefore_Date.cer
+ 1281 Mar 27 14:16 2018 roots/ICAM_Invalid_CRL_Signature.cer
+ 1272 Mar 27 14:16 2018 roots/ICAM_Invalid_CRL_Signer.cer
+ 1294 Mar 27 14:16 2018 roots/ICAM_Invalid_Generalized_Time.cer
+ 1303 Mar 27 14:16 2018 roots/ICAM_Invalid_inhibitPolicyMapping.cer
+ 1281 Mar 27 14:16 2018 roots/ICAM_Invalid_Name_Chaining.cer
+ 1281 Mar 27 14:16 2018 roots/ICAM_Invalid_notAfter_Date.cer
+ 1284 Mar 27 14:16 2018 roots/ICAM_Invalid_notBefore_Date.cer
+ 1275 Mar 27 14:16 2018 roots/ICAM_Invalid_Path_Length.cer
+  643 Mar 27 14:16 2018 roots/ICAM_Invalid_prime256v1_Mapping.cer
+  648 Mar 27 14:16 2018 roots/ICAM_Invalid_prime256v1_Signature.cer
+ 1307 Mar 27 14:16 2018 roots/ICAM_Invalid_requireExplicitPolicy.cer
+ 1274 Mar 27 14:16 2018 roots/ICAM_Invalid_SAN_DN_Name.cer
+  699 Mar 27 14:16 2018 roots/ICAM_Invalid_secp384r1_Mapping.cer
+  706 Mar 27 14:16 2018 roots/ICAM_Invalid_secp384r1_Signature.cer
+ 1255 Mar 27 14:16 2018 roots/ICAM_Invalid_SKID.cer
+ 1286 Mar 27 14:16 2018 roots/ICAM_Invalid_Subject_DN_Name.cer
+ 1270 Mar 27 14:16 2018 roots/ICAM_keyCertSign_False.cer
+ 1281 Mar 27 14:16 2018 roots/ICAM_keyUsage_Not_Critical.cer
+ 1293 Mar 27 14:16 2018 roots/ICAM_Missing_Basic_Constraints.cer
+ 1252 Mar 27 14:16 2018 roots/ICAM_Missing_CRL.cer
+ 1323 Mar 27 14:16 2018 roots/ICAM_OCSP_Expired_OCSP_Responder_Certificate.cer
+ 1122 Mar 27 14:16 2018 roots/ICAM_OCSP_Inv_Sig_OCSP_Responder_Certificate.cer
+ 1355 Mar 27 14:16 2018 roots/ICAM_OCSP_nocheck_not_present_OCSP_Responder.cer
+ 1331 Mar 27 14:16 2018 roots/ICAM_OCSP_revoked_Responder_Certificate.cer
+ 1249 Mar 27 14:16 2018 roots/ICAM_Revoked_CA.cer
+ 1805 Mar 27 14:16 2018 roots/ICAM_Test_Card_PIV-I_Root_CA_-_gold_gen3.crt
+ 3659 Mar 27 14:16 2018 roots/ICAM_Test_Card_PIV-I_Root_CA_-_gold_gen3.p12
+ 1773 Mar 27 14:16 2018 roots/ICAM_Test_Card_PIV_Root_CA_-_gold_gen1-3.crt
+ 3635 Mar 27 14:16 2018 roots/ICAM_Test_Card_PIV_Root_CA_-_gold_gen1-3.p12
+ 1268 Mar 27 14:16 2018 roots/ICAM_Test_Card_Root_CA.cer
+  623 Mar 27 14:16 2018 roots/ICAM_Valid_ECC_prime256v1.cer
+  695 Mar 27 14:16 2018 roots/ICAM_Valid_ECC_secp384r1.cer
+ 1286 Mar 27 14:16 2018 roots/ICAM_Valid_Generalized_Time.cer
+ 1303 Mar 27 14:16 2018 roots/ICAM_Valid_requiredExplicitPolicy.cer
 ```
 
 `aiacrlsia.tar` is extracted into /var/www/http.apl-test.cite.fpki-lab.gov where it can be hit by relying parties
-needing AIA, SIA, or CRLs.  To avoid importing this file when running `install-responder.sh`, edit the script
-and change CLRHOST=1 to CRLHOST=0.
+needing AIA, SIA, or CRLs.  
 
