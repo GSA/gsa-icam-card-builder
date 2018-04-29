@@ -1,9 +1,10 @@
 # responder
-This directory contains a script to install the Apache web server and OCSP responder subsystems.
+This directory contains a script to install the Apache web server and OCSP responder subsystems.  The responder hass been tested on CentOS 7.4 with Apache 2.4.8 and Ubuntu 16.04 with Apache 2.4.18.  Internet access is required during the installation, as certain prerequisites may be downloaded.
+
 The script `install-responder.sh` can be in invoked in two ways:
 
-1. `sh install-responder.sh -d` - Installs just the artifacts in `responder-certs.tar` and `aiacrlsia.tar`.
-2. `sh install-responder.sh` - Installs the Apache and responder software as well as the artifacts in (1) above.
+1. `cd responder; ./install-responder.sh -d` - Installs just the artifacts in `responder-certs.tar` and `aiacrlsia.tar`.
+2. `cd responder; ./install-responder.sh` - Installs the Apache and responder software as well as the artifacts in (1) above.
 
 ### Contents of `responder-certs.tar`
 
