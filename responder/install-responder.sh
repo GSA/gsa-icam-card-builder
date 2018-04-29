@@ -57,6 +57,7 @@ CONF1=/etc/$HTTPD/conf/$HTTPD.conf
 INSTALLER=yum
 IPTABLES=iptables-services
 SYSTEMD_DIR=/usr/lib/systemd/system
+PKIDIR=/etc/pki/CA
 
 uname -a | grep -y Ubuntu >/dev/null 2>&1
 RESULT=$?
