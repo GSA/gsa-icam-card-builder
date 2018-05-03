@@ -21,8 +21,10 @@ public class DgMap {
 	 * 
 	 * @param fileBytes
 	 *            the bytes in the Security Object container
+	 * @param initSo
+	 *            flag indicating whether to clean out the existing DG map and start over
 	 */
-	protected DgMap(byte[] fileBytes) {
+	protected DgMap(byte[] fileBytes, boolean initSo) {
 		byte[] mapping = getSoMapping(fileBytes);
 		init(mapping);
 	}

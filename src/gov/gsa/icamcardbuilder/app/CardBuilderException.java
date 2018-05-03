@@ -18,6 +18,7 @@ public class CardBuilderException extends Exception {
 		this.message = errorMessage;
 		logger.error(message);
 		Gui.status.append(dateFormat.format(new Date()) + " - " + message + "\n");
+		Gui.progress.setValue(0);
 		Gui.errors = true;
 	}
 }

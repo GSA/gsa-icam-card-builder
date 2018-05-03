@@ -34,8 +34,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import javax.xml.bind.DatatypeConverter;
-
 import org.apache.logging.log4j.LogManager;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -85,13 +83,13 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.Store;
 
 import gov.gsa.icamcardbuilder.app.Utils;
-import sun.security.rsa.SunRsaSign;
+//import sun.security.rsa.SunRsaSign;
 
 public class ContentSignerTool {
 
 	protected static boolean expired = false;
-	private static Provider bc = new BouncyCastleProvider();
-	private static Provider sun = new SunRsaSign();
+	private static Provider bc = Security.getProvider("BC");
+	private static Provider sun = Security.getProvider("SunRsaSign");
 	private byte[] contentFileBytes = null;
 	private byte[] securityObjectFileBytes = null;
 	private boolean updateSecurityObject = true;
@@ -189,24 +187,30 @@ public class ContentSignerTool {
 	 *            object containing various properties extracted from
 	 *            .properties files associated with the object being created and
 	 *            signed
+	 * @param initSo
+	 *            flag indicating to clear out the Security Object hash map and start clean
 	 */
-	protected ContentSignerTool(File contentFile, File securityObjectFile, Hashtable<String, String> properties) {
+	protected ContentSignerTool(File contentFile, File securityObjectFile, Hashtable<String, String> properties, boolean initSo) {
 
 		logger = LogManager.getLogger(ContentSignerTool.class.getName());
-		// TODO: Break security object stuff into separate class
-
-		try {
-			Security.addProvider(new BouncyCastleProvider());
-			Security.addProvider(new SunRsaSign());
-		} catch (Exception e) {
-			String message = "Unable to add provider: " + e.getMessage();
-			logger.info(message);
-			Gui.status.append(dateFormat.format(new Date()) + " - " + message + "\n");
-			return;
+		
+		if (bc == null) {
+			try {
+				Security.addProvider(new BouncyCastleProvider());
+				bc = Security.getProvider("BC");
+			} catch (NullPointerException e) {
+				String message = "Unable to add BouncyCastle provider: " + e.getMessage();
+				logger.info(message);
+				Gui.status.append(dateFormat.format(new Date()) + " - " + message + "\n");
+				Gui.progress.setValue(0);
+				return;
+			}
 		}
 		try {
 			getProperties(properties);
 		} catch (NoSuchPropertyException e1) {
+			System.out.println("NoSuchPropertyException handled\n");
+			Gui.progress.setValue(0);
 			return;
 		}
 
@@ -252,6 +256,8 @@ public class ContentSignerTool {
 					Gui.revocationStatus = "Checked";
 				}
 			} catch (RevocationStatusException e) {
+				System.out.println("RevocationStatusException handled\n");
+				Gui.progress.setValue(0);
 				return;
 			}
 		} catch (Exception e) {
@@ -271,6 +277,8 @@ public class ContentSignerTool {
 			@SuppressWarnings("unused")
 			LinkedHashMap<Integer, byte[]> cccValues;
 			if ((cccValues = getCccContents(contentFileBytes)) == null) {
+				System.out.println("Empty container\n");
+				Gui.progress.setValue(0);
 				return;
 			}
 			containerBufferBytes = contentFileBytes;
@@ -281,8 +289,11 @@ public class ContentSignerTool {
 			LinkedHashMap<Integer, byte[]> doContainer;
 			LinkedHashMap<Integer, byte[]> doChildren;
 			// Map the values to the tags that were found in the container
-			if ((doContainer = getDoContents(contentFileBytes)) == null)
+			if ((doContainer = getDoContents(contentFileBytes)) == null) {
+				System.out.println("Empty container\n");
+				Gui.progress.setValue(0);
 				return;
+			}
 
 			doChildren = getDoContents(doContainer.get(discoveryObjectTag));
 
@@ -300,8 +311,12 @@ public class ContentSignerTool {
 							doChildren.put(doPupTag, Utils.hexStringToByteArray(pinUsagePolicy));
 					}
 				} catch (InvalidDataFormatException e) {
+					System.out.println("InvalidDataFormatException handled\n");
+					Gui.progress.setValue(0);
 					return;
 				} catch (Exception e) {
+					System.out.println("Exception " + e.getMessage() + " handled\n");
+					Gui.progress.setValue(0);
 					return;
 				}
 				contentBytes = Utils.valuesToBytes(doChildren, "Discovery Object PCA & PUP", 0);
@@ -331,7 +346,9 @@ public class ContentSignerTool {
 		case cardholderUuidTag:
 			LinkedHashMap<Integer, byte[]> chuidValues;
 			if ((chuidValues = getDoContents(contentFileBytes)) == null) {
-				return;
+				System.out.println("Empty container\n");
+				Gui.progress.setValue(0);
+				return;			
 			}
 			try {
 				if (chuidValues.containsKey(chuidFascnTag))
@@ -344,6 +361,8 @@ public class ContentSignerTool {
 				else
 					chuidValues.put(chuidGuidTag, Utils.hexStringToByteArray(uuid));
 			} catch (InvalidDataFormatException e) {
+				System.out.println("InvalidDataFormatException handled\n");
+				Gui.progress.setValue(0);
 				return;
 			}
 
@@ -365,6 +384,7 @@ public class ContentSignerTool {
 					logger.error(message);
 					Gui.status.append(dateFormat.format(new Date()) + " - " + message + "\n");
 					Gui.errors = true;
+					Gui.progress.setValue(0);
 					return;
 				}
 				chuidValues.replace(chuidExpirationDateTag, expirationDate.substring(0, 8).getBytes());
@@ -384,6 +404,8 @@ public class ContentSignerTool {
 					chuidValues.remove(errorDetectionCodeTag);
 								
 			} catch (InvalidDataFormatException e) {
+				System.out.println("InvalidDataFormatException handled\n");
+				Gui.progress.setValue(0);
 				return;
 			}
 
@@ -407,8 +429,11 @@ public class ContentSignerTool {
 		case piOrgAffiliation2Tag:
 			// Not a signed object
 			LinkedHashMap<Integer, byte[]> piValues;
-			if ((piValues = getDoContents(contentFileBytes)) == null)
-				return;
+			if ((piValues = getDoContents(contentFileBytes)) == null) {
+				System.out.println("Empty container\n");
+				Gui.progress.setValue(0);
+				return;				
+			}
 
 			if (piValues.containsKey(piNameTag))
 				piValues.replace(piNameTag, piName.getBytes());
@@ -444,6 +469,8 @@ public class ContentSignerTool {
 
 			if (signedFakeBytes == null) {
 				Gui.errors = true;
+				System.out.println("Error creating CMS\n");
+				Gui.progress.setValue(0);
 				return;
 			}
 
@@ -488,6 +515,8 @@ public class ContentSignerTool {
 					contentFileBytes[127] = idType;
 					logger.debug("Image data type = " + String.format("%s", (idType == 0) ? "JPEG" : "JPEG 2000"));
 				} catch (Exception e) {
+					System.out.println("Exception " + e.getMessage() + " handled");
+					Gui.progress.setValue(0);
 					return;
 				}
 				desiredContainerId = facialImageContainerId;
@@ -528,6 +557,7 @@ public class ContentSignerTool {
 				}
 			} catch (DateParserException ex) {
 				System.out.println("DateParserException handled\n");
+				Gui.progress.setValue(0);
 				return;
 			}
 
@@ -536,8 +566,13 @@ public class ContentSignerTool {
 			sdbb.put(contentFileBytes, 40, 23);
 
 			// FASC-N
-			sdbb.put(DatatypeConverter.parseHexBinary(fascn), 0, 25);
-
+			try {
+				sdbb.put(Utils.hexStringToByteArray(fascn), 0, 25);
+			} catch (InvalidDataFormatException ex) { 
+				System.out.println("InvalidDataFormatException handled\n");
+				Gui.progress.setValue(0);
+				return;
+			}
 			// The rest, including the spacer and the BDB.
 			sdbb.put(contentFileBytes, 88, nbytesToSign - 84);
 
@@ -566,6 +601,7 @@ public class ContentSignerTool {
 			Gui.status.append(dateFormat.format(new Date())
 					+ String.format(" - Unrecognized tag in file, tag is: 0x%02X\n.", tag));
 			Gui.errors = true;
+			Gui.progress.setValue(0);
 			return;
 		}
 
@@ -581,7 +617,7 @@ public class ContentSignerTool {
 
 				switch (tag) {
 				case securityObjectDgMapTag: // Security Object DG Mapping
-					DgHashMap dgHashMap = new DgHashMap(securityObjectFileBytes);
+					DgHashMap dgHashMap = new DgHashMap(securityObjectFileBytes, initSo);
 					dgHashMap.addDgHash(desiredContainerId, containerDigestBytes);
 					if (clearDg)
 						dgHashMap.removeDgHash(desiredContainerId);
@@ -648,7 +684,7 @@ public class ContentSignerTool {
 			}
 		}
 
-		Security.removeProvider(bc.getName());
+		//Security.removeProvider(bc.getName());
 	}
 
 	/**
@@ -835,12 +871,17 @@ public class ContentSignerTool {
 						new DERSet(new DERUTCTime(updatedUtcTime.getAdjustedDate()))));
 
 				if (idPivBiometricContentTypeOid.equals(contentType)) {
+					
+					try {
 					// pivFASC-N
 					aev.add(new Attribute(new ASN1ObjectIdentifier(fascnOid), new DERSet(
-							new ASN1Encodable[] { new DEROctetString(DatatypeConverter.parseHexBinary(fascn)) })));
+							new ASN1Encodable[] { new DEROctetString(Utils.hexStringToByteArray(fascn)) })));
 					// entryUUID
 					aev.add(new Attribute(new ASN1ObjectIdentifier(uuidOid), new DERSet(
-							new ASN1Encodable[] { new DEROctetString(DatatypeConverter.parseHexBinary(uuid)) })));
+							new ASN1Encodable[] { new DEROctetString(Utils.hexStringToByteArray(uuid)) })));
+					} catch (InvalidDataFormatException ex) {
+						
+					}
 				}
 
 				// pivSigner-DN

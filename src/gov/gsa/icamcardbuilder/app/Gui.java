@@ -66,7 +66,7 @@ import java.awt.Font;
 public class Gui extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	protected final static String version = "1.8.44";
+	protected final static String version = "1.8.45";
 	protected static String cardsDirectory = null;
 	private static String cardsDirectoryArg = null;
 	protected static boolean debug = true;
@@ -139,6 +139,7 @@ public class Gui extends JPanel {
 	protected static javax.swing.JProgressBar progress;
 
 	protected static JButton signButton;
+	protected static JButton signAndInitSoButton;
 	protected static JButton clearButton;
 	// TODO: protected static javax.swing.JButton verifyButton;
 	protected static JTextArea status;
@@ -161,9 +162,11 @@ public class Gui extends JPanel {
 	protected static String pivCardApplicationAid = "";
 	protected static String pinUsagePolicy = "";
 
+	@SuppressWarnings("deprecation")
 	public Gui(JFrame frame) {
 
 		super(new GridLayout(1, 1));
+		setPreferredSize(new Dimension(680, 800));
 		Dimension frameDimension = Toolkit.getDefaultToolkit().getScreenSize();
 		frame.setLocation((frameDimension.width / 2 - frame.getSize().width / 2) - 400,
 				(frameDimension.height / 2 - frame.getSize().height / 2) - 400);
@@ -175,9 +178,10 @@ public class Gui extends JPanel {
 		Dimension dimension = new Dimension();
 		dimension.height = 720;
 		dimension.width = 680;
-		tabbedPane.setPreferredSize(dimension);
+		tabbedPane.setPreferredSize(new Dimension(700, 1024));
 
 		signingPanel = new JPanel();
+		signingPanel.setPreferredSize(new Dimension(700, 1024));
 		tabbedPane.addTab("Object Signing", null, signingPanel, null);
 		tabbedPane.setEnabledAt(0, true);
 
@@ -280,7 +284,29 @@ public class Gui extends JPanel {
 				status.append(dateFormat.format(new Date()) + " - Applying signature (" + ++signingCount + ").\n");
 				checkRevocation = revocationCheckBoxMenuItem.isSelected();
 				progress.setValue(8);
-				worker = createSigningWorker(status, progress);
+				worker = createSigningWorker(status, progress, false);
+				worker.execute();
+			}
+		});
+
+		signAndInitSoButton = new JButton();
+		signAndInitSoButton.setToolTipText("Click to sign file and initialize the Security Object");
+		signAndInitSoButton.setText("Sign and Init SO");
+		signAndInitSoButton.setMnemonic('s');
+		signAndInitSoButton.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		signAndInitSoButton.setEnabled(false);
+		signAndInitSoButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				progress.setValue(0);
+				if (signingCount > 0)
+					status.append("***************************************************************************\n");
+				status.append(dateFormat.format(new Date()) + " - ");
+				status.append("Config: " + propertiesFile.getName() + "\n");
+				status.append(dateFormat.format(new Date()) + " - Applying signature and initiazing SO (" + ++signingCount + ").\n");
+				checkRevocation = revocationCheckBoxMenuItem.isSelected();
+				progress.setValue(8);
+				worker = createSigningWorker(status, progress, true);
 				worker.execute();
 			}
 		});
@@ -508,11 +534,19 @@ public class Gui extends JPanel {
 		helpMenu.add(aboutMenu);
 
 		logger.debug("Created controls");
+		
+		JButton btnNewButton = new JButton("New button");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			}
+		});
 
 		GroupLayout glPanel = new GroupLayout(signingPanel);
-		glPanel.setHorizontalGroup(glPanel.createParallelGroup(Alignment.LEADING).addGroup(glPanel
-				.createSequentialGroup().addGap(18)
-				.addGroup(glPanel.createParallelGroup(Alignment.LEADING, false)
+		glPanel.setHorizontalGroup(
+			glPanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(glPanel.createSequentialGroup()
+					.addGap(18)
+					.addGroup(glPanel.createParallelGroup(Alignment.LEADING, false)
 						.addComponent(contentFileBrowseButton, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
 						.addComponent(signedFileDestLabel, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
 						.addComponent(securityObjectFileBrowseButton, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
@@ -525,85 +559,89 @@ public class Gui extends JPanel {
 						.addComponent(uuidLabel, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
 						.addComponent(cardholderUuidLabel, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
 						.addComponent(signButton, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
-						.addComponent(statusLabel, GroupLayout.DEFAULT_SIZE, 120,
-								Short.MAX_VALUE)
+						.addComponent(signAndInitSoButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(statusLabel, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
 						.addComponent(clearButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-				.addGap(18)
-				.addGroup(glPanel.createParallelGroup(Alignment.LEADING).addGroup(glPanel
-						.createParallelGroup(Alignment.LEADING, false)
-						.addComponent(contentFileTextField, GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
-						.addComponent(signedFileDestTextField, GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
-						.addComponent(securityObjectFileTextField, GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
-						.addComponent(signingKeyFileTextField, GroupLayout.DEFAULT_SIZE, 500,
-								GroupLayout.PREFERRED_SIZE)
-						.addComponent(keyAliasTextField, GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE)
-						.addComponent(passcodePasswordField, GroupLayout.PREFERRED_SIZE, 300,
-								GroupLayout.PREFERRED_SIZE)
-						.addComponent(fascnOidTextField, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)
-						.addComponent(fascnTextField, GroupLayout.PREFERRED_SIZE, 400, GroupLayout.PREFERRED_SIZE)
-						.addComponent(uuidOidTextField, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)
-						.addComponent(uuidTextField, GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE)
-						.addComponent(cardholderUuidTextField, GroupLayout.PREFERRED_SIZE, 300,
-								GroupLayout.PREFERRED_SIZE))
+					.addGap(18)
+					.addGroup(glPanel.createParallelGroup(Alignment.LEADING)
+						.addGroup(glPanel.createParallelGroup(Alignment.LEADING, false)
+							.addComponent(contentFileTextField, GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
+							.addComponent(signedFileDestTextField, GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
+							.addComponent(securityObjectFileTextField, GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
+							.addComponent(signingKeyFileTextField, GroupLayout.DEFAULT_SIZE, 500, GroupLayout.PREFERRED_SIZE)
+							.addComponent(keyAliasTextField, GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE)
+							.addComponent(passcodePasswordField, GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE)
+							.addComponent(fascnOidTextField, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)
+							.addComponent(fascnTextField, GroupLayout.PREFERRED_SIZE, 400, GroupLayout.PREFERRED_SIZE)
+							.addComponent(uuidOidTextField, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)
+							.addComponent(uuidTextField, GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE)
+							.addComponent(cardholderUuidTextField, GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE))
 						.addComponent(progress, GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
 						.addComponent(statusScrollPane, GroupLayout.PREFERRED_SIZE, 500, GroupLayout.PREFERRED_SIZE))
-				.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
-		glPanel.setVerticalGroup(glPanel.createParallelGroup(Alignment.LEADING)
-				.addGroup(glPanel.createSequentialGroup().addContainerGap()
-						.addGroup(glPanel.createParallelGroup(Alignment.BASELINE).addComponent(contentFileBrowseButton)
-								.addComponent(contentFileTextField, GroupLayout.PREFERRED_SIZE,
-										GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-						.addGap(6)
-						.addGroup(glPanel.createParallelGroup(Alignment.LEADING).addComponent(signedFileDestLabel)
-								.addComponent(signedFileDestTextField, GroupLayout.PREFERRED_SIZE,
-										GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-						.addGap(6)
-						.addGroup(glPanel.createParallelGroup(Alignment.BASELINE)
-								.addComponent(securityObjectFileBrowseButton).addComponent(securityObjectFileTextField,
-										GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-										GroupLayout.PREFERRED_SIZE))
-						.addGap(6)
-						.addGroup(glPanel.createParallelGroup(Alignment.LEADING).addComponent(signingKeyBrowseButton)
-								.addComponent(signingKeyFileTextField, GroupLayout.PREFERRED_SIZE,
-										GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-						.addGap(6)
-						.addGroup(glPanel.createParallelGroup(Alignment.BASELINE)
-								.addComponent(keyAliasLabel).addComponent(keyAliasTextField, GroupLayout.PREFERRED_SIZE,
-										GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-						.addGap(6)
-						.addGroup(glPanel.createParallelGroup(Alignment.LEADING).addComponent(passcodeLabel)
-								.addComponent(passcodePasswordField, GroupLayout.PREFERRED_SIZE,
-										GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-						.addGap(6)
-						.addGroup(glPanel.createParallelGroup(Alignment.LEADING)
-								.addComponent(fascnOidLabel).addComponent(fascnOidTextField, GroupLayout.PREFERRED_SIZE,
-										GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-						.addGap(6)
-						.addGroup(glPanel.createParallelGroup(Alignment.LEADING)
-								.addComponent(fascnLabel).addComponent(fascnTextField, GroupLayout.PREFERRED_SIZE,
-										GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-						.addGap(6)
-						.addGroup(glPanel.createParallelGroup(Alignment.LEADING)
-								.addComponent(uuidOidLabel).addComponent(uuidOidTextField, GroupLayout.PREFERRED_SIZE,
-										GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-						.addGap(6)
-						.addGroup(glPanel.createParallelGroup(Alignment.LEADING)
-								.addComponent(uuidLabel).addComponent(uuidTextField, GroupLayout.PREFERRED_SIZE,
-										GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-						.addGap(6)
-						.addGroup(glPanel.createParallelGroup(Alignment.LEADING).addComponent(cardholderUuidLabel)
-								.addComponent(cardholderUuidTextField, GroupLayout.PREFERRED_SIZE,
-										GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-						.addGap(6)
-						.addGroup(glPanel.createParallelGroup(Alignment.LEADING).addComponent(statusLabel)
-								.addComponent(progress, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE))
-						.addGap(18)
-						.addGroup(glPanel.createParallelGroup(Alignment.LEADING)
-								.addGroup(glPanel.createSequentialGroup().addComponent(signButton)
-										.addPreferredGap(ComponentPlacement.RELATED, 101, Short.MAX_VALUE).addComponent(
-												clearButton))
-								.addComponent(statusScrollPane, GroupLayout.DEFAULT_SIZE, 147, Short.MAX_VALUE))
-						.addContainerGap()));
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+		);
+		glPanel.setVerticalGroup(
+			glPanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(glPanel.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(glPanel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(contentFileBrowseButton)
+						.addComponent(contentFileTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(6)
+					.addGroup(glPanel.createParallelGroup(Alignment.LEADING)
+						.addComponent(signedFileDestLabel)
+						.addComponent(signedFileDestTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(6)
+					.addGroup(glPanel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(securityObjectFileBrowseButton)
+						.addComponent(securityObjectFileTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(6)
+					.addGroup(glPanel.createParallelGroup(Alignment.LEADING)
+						.addComponent(signingKeyBrowseButton)
+						.addComponent(signingKeyFileTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(6)
+					.addGroup(glPanel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(keyAliasLabel)
+						.addComponent(keyAliasTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(6)
+					.addGroup(glPanel.createParallelGroup(Alignment.LEADING)
+						.addComponent(passcodeLabel)
+						.addComponent(passcodePasswordField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(6)
+					.addGroup(glPanel.createParallelGroup(Alignment.LEADING)
+						.addComponent(fascnOidLabel)
+						.addComponent(fascnOidTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(6)
+					.addGroup(glPanel.createParallelGroup(Alignment.LEADING)
+						.addComponent(fascnLabel)
+						.addComponent(fascnTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(6)
+					.addGroup(glPanel.createParallelGroup(Alignment.LEADING)
+						.addComponent(uuidOidLabel)
+						.addComponent(uuidOidTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(6)
+					.addGroup(glPanel.createParallelGroup(Alignment.LEADING)
+						.addComponent(uuidLabel)
+						.addComponent(uuidTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(6)
+					.addGroup(glPanel.createParallelGroup(Alignment.LEADING)
+						.addComponent(cardholderUuidLabel)
+						.addComponent(cardholderUuidTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(6)
+					.addGroup(glPanel.createParallelGroup(Alignment.LEADING)
+						.addComponent(statusLabel)
+						.addComponent(progress, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE))
+					.addGap(18)
+					.addGroup(glPanel.createParallelGroup(Alignment.LEADING)
+						.addGroup(glPanel.createSequentialGroup()
+							.addComponent(signButton)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(signAndInitSoButton)
+							.addPreferredGap(ComponentPlacement.RELATED, 326, Short.MAX_VALUE)
+							.addComponent(clearButton))
+						.addComponent(statusScrollPane, GroupLayout.DEFAULT_SIZE, 52, Short.MAX_VALUE))
+					.addContainerGap())
+		);
 
 		logger.debug("Finished layout");
 
@@ -750,8 +788,10 @@ public class Gui extends JPanel {
 			// object generation
 			tempTable.replace(securityObjectFileTextField, true);
 			signButton.setEnabled(!tempTable.contains(false));
+			signAndInitSoButton.setEnabled(!tempTable.contains(false));
 		} else {
 			signButton.setEnabled(!reqFieldsTable.contains(false));
+			signAndInitSoButton.setEnabled(!reqFieldsTable.contains(false));
 		}
 
 		if (signButton.isEnabled() && (updateSecurityObjectCheckBoxMenuItem.isSelected() == true))
@@ -934,6 +974,7 @@ public class Gui extends JPanel {
 
 	protected JComponent makeTextPanel(String text) {
 		JPanel panel = new JPanel(false);
+		panel.setPreferredSize(new Dimension(700, 1024));
 		JLabel filler = new JLabel(text);
 		filler.setHorizontalAlignment(SwingConstants.CENTER);
 		panel.setLayout(new GridLayout(1, 1));
@@ -1055,7 +1096,7 @@ public class Gui extends JPanel {
 	}
 
 	public SwingWorker<Boolean, String> createSigningWorker(final javax.swing.JTextArea status,
-			final JProgressBar progress) {
+			final JProgressBar progress, final boolean initSo) {
 		return new SwingWorker<Boolean, String>() {
 			@Override
 			protected Boolean doInBackground() throws Exception {
@@ -1071,7 +1112,7 @@ public class Gui extends JPanel {
 					errors = false;
 					Hashtable<String, String> properties = new Hashtable<String, String>();
 					putProperties(properties);
-					pkcs7sign = new ContentSignerTool(contentFile, securityObjectFile, properties);
+					pkcs7sign = new ContentSignerTool(contentFile, securityObjectFile, properties, initSo);
 				}
 				return true;
 			}

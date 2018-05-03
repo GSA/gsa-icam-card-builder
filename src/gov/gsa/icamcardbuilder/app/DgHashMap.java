@@ -35,11 +35,13 @@ public class DgHashMap {
 	 * 
 	 * @param containerBytes
 	 *            byte array containing Security Object from file or card
+	 * @param initSo
+	 *            flag indicating to clear out the DG map and start over
 	 */
-	public DgHashMap(byte[] containerBytes) {
+	public DgHashMap(byte[] containerBytes, boolean initSo) {
 
 		byte[] so = this.getSoSecurityObject(containerBytes);
-		this.dgMap = new DgMap(containerBytes);
+		this.dgMap = new DgMap(containerBytes, initSo);
 
 		logger.debug("Security Object signed object length = " + so.length);
 
