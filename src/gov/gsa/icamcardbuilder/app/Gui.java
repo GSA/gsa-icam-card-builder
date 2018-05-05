@@ -62,6 +62,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.awt.Font;
+import javax.swing.JCheckBox;
 
 public class Gui extends JPanel {
 
@@ -87,6 +88,7 @@ public class Gui extends JPanel {
 	protected static boolean windowsOs = false;
 	protected static boolean macOs = false;
 	protected static boolean linuxOs = false;
+	protected static String cardDirectory = null;
 
 	// Menu bar and menu controls 
 
@@ -139,8 +141,9 @@ public class Gui extends JPanel {
 	protected static javax.swing.JProgressBar progress;
 
 	protected static JButton signButton;
-	protected static JButton signAndInitSoButton;
 	protected static JButton clearButton;
+	protected static JCheckBox initSecurityObjectCheckbox; 
+
 	// TODO: protected static javax.swing.JButton verifyButton;
 	protected static JTextArea status;
 	protected static JLabel statusLabel;
@@ -159,10 +162,10 @@ public class Gui extends JPanel {
 
 	protected int signingCount = 0;
 	private boolean located = false;
+	private boolean initSo = false;
 	protected static String pivCardApplicationAid = "";
 	protected static String pinUsagePolicy = "";
 
-	@SuppressWarnings("deprecation")
 	public Gui(JFrame frame) {
 
 		super(new GridLayout(1, 1));
@@ -284,30 +287,18 @@ public class Gui extends JPanel {
 				status.append(dateFormat.format(new Date()) + " - Applying signature (" + ++signingCount + ").\n");
 				checkRevocation = revocationCheckBoxMenuItem.isSelected();
 				progress.setValue(8);
-				worker = createSigningWorker(status, progress, false);
+				worker = createSigningWorker(status, progress);
 				worker.execute();
 			}
 		});
 
-		signAndInitSoButton = new JButton();
-		signAndInitSoButton.setToolTipText("Click to sign file and initialize the Security Object");
-		signAndInitSoButton.setText("Sign and Init SO");
-		signAndInitSoButton.setMnemonic('s');
-		signAndInitSoButton.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		signAndInitSoButton.setEnabled(false);
-		signAndInitSoButton.addActionListener(new ActionListener() {
+		initSecurityObjectCheckbox = new JCheckBox("Initialize Security Object");
+		initSecurityObjectCheckbox.setToolTipText("Check if you wish to clear the Security Object's DG table");
+		initSecurityObjectCheckbox.setSelected(false);
+		initSecurityObjectCheckbox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				progress.setValue(0);
-				if (signingCount > 0)
-					status.append("***************************************************************************\n");
-				status.append(dateFormat.format(new Date()) + " - ");
-				status.append("Config: " + propertiesFile.getName() + "\n");
-				status.append(dateFormat.format(new Date()) + " - Applying signature and initiazing SO (" + ++signingCount + ").\n");
-				checkRevocation = revocationCheckBoxMenuItem.isSelected();
-				progress.setValue(8);
-				worker = createSigningWorker(status, progress, true);
-				worker.execute();
+				initSo = true;
 			}
 		});
 
@@ -534,35 +525,34 @@ public class Gui extends JPanel {
 		helpMenu.add(aboutMenu);
 
 		logger.debug("Created controls");
-		
-		JButton btnNewButton = new JButton("New button");
-		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-			}
-		});
+
 
 		GroupLayout glPanel = new GroupLayout(signingPanel);
 		glPanel.setHorizontalGroup(
 			glPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(glPanel.createSequentialGroup()
 					.addGap(18)
-					.addGroup(glPanel.createParallelGroup(Alignment.LEADING, false)
-						.addComponent(contentFileBrowseButton, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
-						.addComponent(signedFileDestLabel, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
-						.addComponent(securityObjectFileBrowseButton, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
-						.addComponent(signingKeyBrowseButton, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
-						.addComponent(keyAliasLabel, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
-						.addComponent(passcodeLabel, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
-						.addComponent(fascnOidLabel, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
-						.addComponent(fascnLabel, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
-						.addComponent(uuidOidLabel, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
-						.addComponent(uuidLabel, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
-						.addComponent(cardholderUuidLabel, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
-						.addComponent(signButton, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
-						.addComponent(signAndInitSoButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(statusLabel, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
-						.addComponent(clearButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-					.addGap(18)
+					.addGroup(glPanel.createParallelGroup(Alignment.TRAILING)
+						.addGroup(glPanel.createSequentialGroup()
+							.addGroup(glPanel.createParallelGroup(Alignment.LEADING, false)
+								.addComponent(contentFileBrowseButton, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
+								.addComponent(signedFileDestLabel, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
+								.addComponent(securityObjectFileBrowseButton, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
+								.addComponent(signingKeyBrowseButton, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
+								.addComponent(keyAliasLabel, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
+								.addComponent(passcodeLabel, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
+								.addComponent(fascnOidLabel, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
+								.addComponent(fascnLabel, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
+								.addComponent(uuidOidLabel, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
+								.addComponent(uuidLabel, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
+								.addComponent(cardholderUuidLabel, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
+								.addComponent(signButton, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
+								.addComponent(statusLabel, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
+								.addComponent(clearButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+							.addGap(38))
+						.addGroup(glPanel.createSequentialGroup()
+							.addComponent(initSecurityObjectCheckbox, GroupLayout.PREFERRED_SIZE, 153, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)))
 					.addGroup(glPanel.createParallelGroup(Alignment.LEADING)
 						.addGroup(glPanel.createParallelGroup(Alignment.LEADING, false)
 							.addComponent(contentFileTextField, GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
@@ -576,9 +566,9 @@ public class Gui extends JPanel {
 							.addComponent(uuidOidTextField, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)
 							.addComponent(uuidTextField, GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE)
 							.addComponent(cardholderUuidTextField, GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE))
-						.addComponent(progress, GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
+						.addComponent(progress, GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE)
 						.addComponent(statusScrollPane, GroupLayout.PREFERRED_SIZE, 500, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addContainerGap(14, Short.MAX_VALUE))
 		);
 		glPanel.setVerticalGroup(
 			glPanel.createParallelGroup(Alignment.LEADING)
@@ -636,10 +626,11 @@ public class Gui extends JPanel {
 						.addGroup(glPanel.createSequentialGroup()
 							.addComponent(signButton)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(signAndInitSoButton)
-							.addPreferredGap(ComponentPlacement.RELATED, 326, Short.MAX_VALUE)
+							.addGap(18)
+							.addComponent(initSecurityObjectCheckbox)
+							.addPreferredGap(ComponentPlacement.RELATED, 285, Short.MAX_VALUE)
 							.addComponent(clearButton))
-						.addComponent(statusScrollPane, GroupLayout.DEFAULT_SIZE, 52, Short.MAX_VALUE))
+						.addComponent(statusScrollPane, GroupLayout.DEFAULT_SIZE, 406, Short.MAX_VALUE))
 					.addContainerGap())
 		);
 
@@ -788,10 +779,10 @@ public class Gui extends JPanel {
 			// object generation
 			tempTable.replace(securityObjectFileTextField, true);
 			signButton.setEnabled(!tempTable.contains(false));
-			signAndInitSoButton.setEnabled(!tempTable.contains(false));
+			initSecurityObjectCheckbox.setEnabled(!tempTable.contains(false));
 		} else {
 			signButton.setEnabled(!reqFieldsTable.contains(false));
-			signAndInitSoButton.setEnabled(!reqFieldsTable.contains(false));
+			initSecurityObjectCheckbox.setEnabled(!reqFieldsTable.contains(false));
 		}
 
 		if (signButton.isEnabled() && (updateSecurityObjectCheckBoxMenuItem.isSelected() == true))
@@ -805,6 +796,7 @@ public class Gui extends JPanel {
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			securityObjectFile = securityObjectFileChooser.getSelectedFile();
 			securityObjectFileTextField.setText(securityObjectFile.getAbsolutePath());
+			setInitSecurityObjectCheckBox();
 		}
 	}
 
@@ -846,6 +838,22 @@ public class Gui extends JPanel {
 
 		return outPath;
 	}
+	
+	/**
+	 * Sets the init Security Object checkbox based on whether the
+	 * directory has changed.
+	 */
+	private void setInitSecurityObjectCheckBox()
+	{
+	    File file = new File(securityObjectFileTextField.getText());
+	    String soDir = new String(file.getParentFile().getName());
+	    if (cardDirectory == null || !(cardDirectory.equals(soDir))) {
+	        cardDirectory = soDir;
+	        initSecurityObjectCheckbox.setSelected(true);
+	    } else {
+	        initSecurityObjectCheckbox.setSelected(false);
+	    }
+	}
 
 	private void openPropertiesFileActionPerformed(java.awt.event.ActionEvent evt) {
 
@@ -885,8 +893,10 @@ public class Gui extends JPanel {
 					cardholderUuidTextField.setText(prop.getProperty("cardholderUuid").trim().replace("-", ""));
 				if (prop.containsKey("signingKeyFile"))
 					signingKeyFileTextField.setText(pathFixup(prop.getProperty("signingKeyFile").trim()));
-				if (prop.containsKey("securityObjectFile"))
+				if (prop.containsKey("securityObjectFile")) {
 					securityObjectFileTextField.setText(pathFixup(prop.getProperty("securityObjectFile").trim()));
+					setInitSecurityObjectCheckBox();
+				}
 				if (prop.containsKey("passcode")) {
 					passcodePasswordField
 							.setText((prop.getProperty("passcode").trim() == null) ? "" : prop.getProperty("passcode"));
@@ -1096,11 +1106,12 @@ public class Gui extends JPanel {
 	}
 
 	public SwingWorker<Boolean, String> createSigningWorker(final javax.swing.JTextArea status,
-			final JProgressBar progress, final boolean initSo) {
+			final JProgressBar progress) {
 		return new SwingWorker<Boolean, String>() {
 			@Override
 			protected Boolean doInBackground() throws Exception {
 				revocationStatus = "Not Checked";
+				initSo = initSecurityObjectCheckbox.isSelected();
 				if (contentFile == null) {
 					logger.fatal("No file was selected");
 					String updateText = (dateFormat.format(new Date())
@@ -1113,6 +1124,7 @@ public class Gui extends JPanel {
 					Hashtable<String, String> properties = new Hashtable<String, String>();
 					putProperties(properties);
 					pkcs7sign = new ContentSignerTool(contentFile, securityObjectFile, properties, initSo);
+					initSecurityObjectCheckbox.setSelected(false);
 				}
 				return true;
 			}

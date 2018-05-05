@@ -34,14 +34,13 @@ public class DgHashMap {
 	 * Constructor for creating a DgMap object from raw bytes
 	 * 
 	 * @param containerBytes
-	 *            byte array containing Security Object from file or card
-	 * @param initSo
-	 *            flag indicating to clear out the DG map and start over
+	 *            byte array containing Security Object from file or card\
+	 * @return DgHashMap object
 	 */
-	public DgHashMap(byte[] containerBytes, boolean initSo) {
+	public DgHashMap(byte[] containerBytes) {
 
 		byte[] so = this.getSoSecurityObject(containerBytes);
-		this.dgMap = new DgMap(containerBytes, initSo);
+		this.dgMap = new DgMap(containerBytes);
 
 		logger.debug("Security Object signed object length = " + so.length);
 
@@ -80,7 +79,7 @@ public class DgHashMap {
 	 */
 	private void init(DataGroupHash[] dgHashArray) {
 		this.dgHashMap = new LinkedHashMap<Integer, DataGroupHash>(16);
-		logger.debug("Security Object hash count = " + dgHashArray.length);
+		logger.debug("Security Object hash count = " + ((dgHashArray == null) ? "0" : dgHashArray.length));
 		if (dgHashArray != null) {
 			for (int i = 0; i < dgHashArray.length; i++) {
 				Byte dgNumber = (byte) dgHashArray[i].getDataGroupNumber();
@@ -100,9 +99,10 @@ public class DgHashMap {
 	 *            a new hash to add
 	 * @return the data group (DG) number assigned to this container
 	 */
-	public Byte addDgHash(Short containerId, byte[] hash) {
+	public Byte addDgHash(short containerId, byte[] hash) {
 		Byte dgNumber = 0;
 		// If the container is already there, remove it
+		logger.debug("addDgHash(" + containerId + ", " + Utils.bytesToHex(hash) + ")");
 		if (this.dgMap.containsContainerId(containerId)) {
 			dgNumber = this.dgMap.removeMapping(containerId);
 			this.dgHashMap.remove((Integer) (int) dgNumber);
@@ -126,7 +126,8 @@ public class DgHashMap {
 	 * @param hash
 	 *            the hash that will be replacing the container's hash
 	 */
-	public void replaceDgHash(Short containerId, byte[] hash) {
+	public void replaceDgHash(short containerId, byte[] hash) {
+		logger.debug("replaceDgHash(" + containerId + ", " + Utils.bytesToHex(hash) + ")");
 		this.removeDgHash(containerId);
 		Byte dgNumber = this.addDgHash(containerId, hash);
 		logger.debug("Replace DG Number " + dgNumber + " = "
@@ -136,16 +137,24 @@ public class DgHashMap {
 	/**
 	 * Deletes the hash for a given container ID
 	 * 
-	 * @param containerId
+	 * @param desiredContainerId
 	 *            the container ID to be deleted
 	 */
-	public void removeDgHash(Short containerId) {
-		if (this.dgMap.containsContainerId(containerId)) {
-			Byte dgNumber = this.dgMap.removeMapping(containerId);
-			logger.debug("Remove DG Number " + dgNumber + " = " + Utils
-					.bytesToHex(this.dgHashMap.get((Integer) (int) dgNumber).getDataGroupHashValue().getOctets()));
-			this.dgHashMap.remove(containerId);
+	@SuppressWarnings("unlikely-arg-type")
+	public void removeDgHash(Short desiredContainerId) {
+		DataGroupHash result = null;
+		logger.debug(String.format("Remove DG hash for container %04X", desiredContainerId));
+		if (this.dgMap.containsContainerId(desiredContainerId)) {
+			Byte dgNumber = this.dgMap.removeMapping(desiredContainerId);
+			logger.debug(String.format("Remove DG mapping number = %2d:%s", dgNumber, Utils.bytesToHex(this.dgHashMap.get((Integer) (int) dgNumber).getDataGroupHashValue().getOctets())));
+			if (dgNumber != null) {
+				result = dgHashMap.remove((Integer) (int) dgNumber);
+			}
+			logger.debug(String .format("Remove result was %s", (result != null) ? "successfuil" : "unsuccessful"));
+		} else {
+			logger.debug(String.format("DG map does not contain entry for %04X", desiredContainerId));
 		}
+		
 	}
 
 	/**
@@ -155,6 +164,7 @@ public class DgHashMap {
 	 *         are entries
 	 */
 	protected boolean isEmpty() {
+		logger.debug("isEmpty() is " + this.dgHashMap.isEmpty());
 		return this.dgHashMap.isEmpty();
 	}
 
@@ -163,6 +173,7 @@ public class DgHashMap {
 	 */
 	public void sync() {
 
+		logger.debug("Syncing DG hashes with the DG map");
 		// First check for orphaned hashes
 		if (!this.dgHashMap.isEmpty()) {
 			for (Integer k : this.dgHashMap.keySet()) {
@@ -182,6 +193,7 @@ public class DgHashMap {
 				// If a mapping entry exists but there's no hash then then
 				// the mapping entry must be removed.
 				if (false == this.dgHashMap.containsKey((Integer) (int) dgNumber)) {
+					logger.debug("Removing Container ID orphan " + k);
 					dgMap.removeMapping(k);
 				}
 			}

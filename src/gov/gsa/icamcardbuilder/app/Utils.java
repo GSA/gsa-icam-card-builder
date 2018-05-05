@@ -42,6 +42,7 @@ public class Utils {
 			fis.close();
 			Gui.status.append(dateFormat.format(new Date()) + " - Read file " + name + "\n");
 			logger.info("Read " + name);
+			logger.debug("Bytes = " + Utils.bytesToHex(fileBytes));
 		} catch (Exception x) {
 			Gui.errors = true;
 			logger.fatal(x.getMessage());
@@ -69,6 +70,7 @@ public class Utils {
 			fos.write(bytesToWrite);
 			fos.close();
 			logger.info("Wrote out to: " + outputFilename);
+			logger.debug("Bytes = " + Utils.bytesToHex(bytesToWrite));
 			logger.info("Done");
 			Gui.status.append(dateFormat.format(new Date()) + " - Completed writing " + friendlyName + "\n");
 			return null;

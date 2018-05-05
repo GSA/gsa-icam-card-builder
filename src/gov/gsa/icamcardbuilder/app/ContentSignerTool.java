@@ -83,7 +83,6 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.Store;
 
 import gov.gsa.icamcardbuilder.app.Utils;
-//import sun.security.rsa.SunRsaSign;
 
 public class ContentSignerTool {
 
@@ -93,17 +92,10 @@ public class ContentSignerTool {
 	private byte[] contentFileBytes = null;
 	private byte[] securityObjectFileBytes = null;
 	private boolean updateSecurityObject = true;
-	private short desiredContainerId = (short) 0xffff;
+	private short desiredContainerId;
 	private PrivateKey privateKey = null;
 	private X509Certificate contentSigningCert = null;
 
-	protected static final short discoveryObjectContainerId = (short) 0x6050;
-	protected static final short cccContainerId = (short) 0xdb00;
-	protected static final short chuidContainerId = (short) 0x3000;
-	protected static final short printedInformationContainerId = (short) 0x3001;
-	protected static final short fingerprintContainerId = (short) 0x6010;
-	protected static final short facialImageContainerId = (short) 0x6030;
-	protected static final short irisContainerId = (short) 0x1015;
 	protected static final int cccCardIdentifier = 0xf0;
 	protected static final int cccCapabilityContainerVersionNumberTag = 0xf1;
 	protected static final int cccCapabilityGrammarVersionNumber = 0xf2;
@@ -135,7 +127,7 @@ public class ContentSignerTool {
 	protected static final String defaultDigAlgName = "SHA-256";
 	protected static final String defaultSigAlgName = "RSA";
 
-	private boolean clearDg = false;
+	private boolean clearDoHash = false;
 	private String digestAlgorithmName = defaultDigAlgName;
 	private AlgorithmIdentifier digestAlgorithmAid = null;
 	private String signatureAlgorithmName = defaultSigAlgName;
@@ -206,6 +198,13 @@ public class ContentSignerTool {
 				return;
 			}
 		}
+		
+		if (initSo) {
+			String message = "Security Object DG table will be initialized.";
+			logger.info(message);
+			Gui.status.append(dateFormat.format(new Date()) + " - " + message + "\n");
+		}
+		
 		try {
 			getProperties(properties);
 		} catch (NoSuchPropertyException e1) {
@@ -282,7 +281,7 @@ public class ContentSignerTool {
 				return;
 			}
 			containerBufferBytes = contentFileBytes;
-			desiredContainerId = cccContainerId;
+			desiredContainerId = PivContainers.cccContainerId;
 			break;
 		case discoveryObjectTag:
 			// Not a signed object
@@ -325,11 +324,11 @@ public class ContentSignerTool {
 			} else {
 				// An empty PIN usage policy indicates to clear the Discovery
 				// Object (and remove the SO hash)
-				clearDg = true;
+				clearDoHash = true;
 				doContainer.replace(discoveryObjectTag, new byte[0]);
 				contentBytes = Utils.valuesToBytes(doContainer, "Discovery Object", 0);
 			}
-			desiredContainerId = discoveryObjectContainerId;
+			desiredContainerId = PivContainers.discoveryObjectContainerId;
 			containerBufferBytes = writeDoContainer(contentFile, contentBytes);
 			/*
 			 * This is a real hack. The Security Object hash for Discovery
@@ -410,7 +409,7 @@ public class ContentSignerTool {
 			}
 
 			contentBytes = Utils.valuesToBytes(chuidValues, "CHUID", errorDetectionCodeTag);
-			desiredContainerId = chuidContainerId;
+			desiredContainerId = PivContainers.chuidContainerId;
 
 			if ((signatureBytes = createDetachedSignature(contentBytes, idPivChuidSecurityObjectOid, true)) != null) {
 				// Write out the complete container object
@@ -459,7 +458,7 @@ public class ContentSignerTool {
 				piValues.remove(errorDetectionCodeTag);
 			
 			contentBytes = Utils.valuesToBytes(piValues, "Printed Information", errorDetectionCodeTag);
-			desiredContainerId = printedInformationContainerId;
+			desiredContainerId = PivContainers.printedInformationContainerId;
 			containerBufferBytes = writePiContainer(contentFile, contentBytes);
 			break;
 		case biometricObjectTag: // BiometricObject
@@ -519,10 +518,10 @@ public class ContentSignerTool {
 					Gui.progress.setValue(0);
 					return;
 				}
-				desiredContainerId = facialImageContainerId;
+				desiredContainerId = PivContainers.facialImageContainerId;
 				Gui.status.append(dateFormat.format(new Date()) + " - Facial image CBEFF.\n");
 			} else if ("FMR".equals(formatIdentifierString)) {
-				desiredContainerId = fingerprintContainerId;
+				desiredContainerId = PivContainers.fingerprintContainerId;
 				Gui.status.append(dateFormat.format(new Date()) + " - Fingerprint CBEFF.\n");
 				// First finger quality is at byte 120, number of minutiae is at
 				// chars[121]
@@ -531,7 +530,7 @@ public class ContentSignerTool {
 				contentFileBytes[120] = (byte) 60;
 				contentFileBytes[122 + (6 * contentFileBytes[121]) + 4] = (byte) 60;
 			} else if ("IIR".equals(formatIdentifierString)) {
-				desiredContainerId = irisContainerId;
+				desiredContainerId = PivContainers.irisContainerId;
 				Gui.status.append(dateFormat.format(new Date()) + " - Iris CBEFF.\n");
 			}
 
@@ -616,12 +615,23 @@ public class ContentSignerTool {
 				tag = Utils.getTag(securityObjectFileBytes, 0);
 
 				switch (tag) {
-				case securityObjectDgMapTag: // Security Object DG Mapping
-					DgHashMap dgHashMap = new DgHashMap(securityObjectFileBytes, initSo);
-					dgHashMap.addDgHash(desiredContainerId, containerDigestBytes);
-					if (clearDg)
+				case securityObjectDgMapTag: 
+					DgHashMap dgHashMap = new DgHashMap(securityObjectFileBytes);
+					// If clearing the Security Object hash map, remove all hashes
+					if (initSo) {
+						for (int i = 0; i < PivContainers.pivContainers.length; i++) {
+							dgHashMap.removeDgHash(PivContainers.pivContainers[i]);
+						}
+						// Now add in the one we just signed
+						dgHashMap.addDgHash(desiredContainerId, containerDigestBytes);
+					} else if (!clearDoHash) {
+						dgHashMap.addDgHash(desiredContainerId, containerDigestBytes);
+					} else {
+						// Handle empty Discovery Object
 						dgHashMap.removeDgHash(desiredContainerId);
+					}
 
+					// Create a new BC DataGroupHash
 					DataGroupHash ndghArray[] = dgHashMap.getDgHashes();
 					byte newMapping[] = dgHashMap.getDgMapping();
 					ContentInfo origSoContentInfo = dgHashMap.getCountentInfo();
@@ -683,8 +693,6 @@ public class ContentSignerTool {
 				return;
 			}
 		}
-
-		//Security.removeProvider(bc.getName());
 	}
 
 	/**
