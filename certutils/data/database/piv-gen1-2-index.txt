@@ -49,3 +49,7 @@ V	321201235959Z		590000000000000001AC	unknown	/C=US/O=U.S. Government/OU=ICAM Te
 R	321231235959Z	180511005844Z,cessationOfOperation	D18FC8F76557A6D1	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM PIV Authentication
 R	321201235959Z	180511005845Z,cessationOfOperation	D18FC8F76557A6D2	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM PIV Authentication
 R	321201235959Z	180511005846Z,cessationOfOperation	D18FC8F76557A6D3	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/serialNumber=D13810D828AB6C10C339E5A1685A08C92ADE0A6184E739C3E7
+V	321201235959Z		590000000000000001AD	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Dig Sig SP 800-73-4 Public Private Key mismatch
+V	321201235959Z		590000000000000001AE	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Key Mgmt SP 800-73-4 Public Private Key mismatch
+V	321201235959Z		590000000000000001AF	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Dig Sig SP 800-73-4 Revoked Certificates
+V	321201235959Z		590000000000000001B0	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Key Mgmt SP 800-73-4 Revoked Certificates
