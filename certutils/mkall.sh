@@ -126,6 +126,8 @@ DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
 cp -p data/$SUBJ.p12 "$DEST"
 cp -p data/pem/$SUBJ.crt "$DEST"
 
+# Cards 1-24 have immutable PIV Auth and Card Auth certs, so we don't create them.
+
 ## Card 01
 T=Golden_PIV
 sh mkcert.sh -w -b -s "ICAM_Test_Card_PIV_Dig_Sig_SP_800-73-4_$T" -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -n 01 -t piv-dig-sig || exit $?
@@ -262,7 +264,7 @@ cp -p data/pem/ICAM_*_$T.crt "$DEST"
 renameIn "$DEST" 1 1
 
 ## Card 16
-T=Card_Auth_FASCN_mismatch
+T=Card_Authent_FASCN_mismatch
 sh mkcert.sh -w -b -s "ICAM_Test_Card_PIV_Dig_Sig_SP_800-73-4_$T" -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -n 16 -t piv-dig-sig || exit $?
 sh mkcert.sh -w -b -s "ICAM_Test_Card_PIV_Key_Mgmt_SP_800-73-4_$T" -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -n 16 -t piv-key-mgmt || exit $?
 DEST="../cards/ICAM_Card_Objects/16_$T"
@@ -298,7 +300,7 @@ cp -p data/pem/ICAM_*_$T.crt "$DEST"
 renameIn "$DEST" 1 1
 
 ## Card 20
-T=Card_Auth_UUID_mismatch
+T=Card_Authent_UUID_mismatch
 sh mkcert.sh -w -b -s "ICAM_Test_Card_PIV_Dig_Sig_SP_800-73-4_$T" -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -n 20 -t pivi-dig-sig || exit $?
 sh mkcert.sh -w -b -s "ICAM_Test_Card_PIV_Key_Mgmt_SP_800-73-4_$T" -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -n 20 -t pivi-key-mgmt || exit $?
 DEST="../cards/ICAM_Card_Objects/20_$T"
@@ -317,7 +319,6 @@ renameIn "$DEST" 1 1
 
 ## Card 22
 T=Fingerprints_UUID_mismatch
-T=CHUID_UUID_mismatch
 sh mkcert.sh -w -b -s "ICAM_Test_Card_PIV_Dig_Sig_SP_800-73-4_$T" -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -n 22 -t pivi-dig-sig || exit $?
 sh mkcert.sh -w -b -s "ICAM_Test_Card_PIV_Key_Mgmt_SP_800-73-4_$T" -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -n 22 -t pivi-key-mgmt || exit $?
 DEST="../cards/ICAM_Card_Objects/22_$T"
@@ -326,7 +327,7 @@ cp -p data/pem/ICAM_*_$T.crt "$DEST"
 renameIn "$DEST" 1 1
 
 ## Card 23
-T=Private_Key_mismatch
+T=Public_Private_Key_mismatch
 sh mkcert.sh -w -b -s "ICAM_Test_Card_PIV_Dig_Sig_SP_800-73-4_$T" -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -n 23 -t piv-dig-sig || exit $?
 sh mkcert.sh -w -b -s "ICAM_Test_Card_PIV_Key_Mgmt_SP_800-73-4_$T" -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -n 23 -t piv-key-mgmt || exit $?
 DEST="../cards/ICAM_Card_Objects/23_$T"
