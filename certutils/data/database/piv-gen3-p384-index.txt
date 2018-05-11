@@ -1,0 +1,3 @@
+V	321230235959Z		70000000000000000019	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV ECC Issued P-256 SM Certificate Signer 2
+V	321230235959Z		7000000000000000001A	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV ECC Issued P-384 SM Certificate Signer 3
+V	321230235959Z		7000000000000000001B	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV OCSP Valid Signer P384 gen3

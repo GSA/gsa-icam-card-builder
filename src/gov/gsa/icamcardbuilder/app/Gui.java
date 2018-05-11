@@ -463,7 +463,7 @@ public class Gui extends JPanel {
 		fileMenu.setText("File");
 
 		openFile.setAccelerator(
-				KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
+				KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_DOWN_MASK));
 
 		openFile.setIcon(new ImageIcon(getClass().getResource("/resources/open.png")));
 		openFile.setMnemonic('o');
@@ -479,7 +479,7 @@ public class Gui extends JPanel {
 		fileMenu.add(openFile);
 
 		closeApp.setAccelerator(
-				KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, java.awt.event.InputEvent.CTRL_MASK));
+				KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, java.awt.event.InputEvent.CTRL_DOWN_MASK));
 		closeApp.setIcon(new ImageIcon(getClass().getResource("/resources/close.png")));
 		closeApp.setText("Close");
 		closeApp.setToolTipText("Close Application");
@@ -497,13 +497,13 @@ public class Gui extends JPanel {
 		optionsMenu.setToolTipText("Options Menu Item");
 
 		updateSecurityObjectCheckBoxMenuItem.setAccelerator(
-				KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.CTRL_MASK));
+				KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.CTRL_DOWN_MASK));
 		updateSecurityObjectCheckBoxMenuItem.setToolTipText("Click to toggle security object re-signing");
 		updateSecurityObjectCheckBoxMenuItem.setSelected(true);
 		optionsMenu.add(updateSecurityObjectCheckBoxMenuItem);
 
 		revocationCheckBoxMenuItem.setAccelerator(
-				KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, java.awt.event.InputEvent.CTRL_MASK));
+				KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, java.awt.event.InputEvent.CTRL_DOWN_MASK));
 		revocationCheckBoxMenuItem.setToolTipText("Click to toggle security object re-signing");
 		revocationCheckBoxMenuItem.setState(true);
 		optionsMenu.add(revocationCheckBoxMenuItem);
@@ -513,7 +513,7 @@ public class Gui extends JPanel {
 		helpMenu.setToolTipText("Help Menu Item");
 
 		aboutMenu.setAccelerator(
-				KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.CTRL_MASK));
+				KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.CTRL_DOWN_MASK));
 		aboutMenu.setIcon(new ImageIcon(getClass().getResource("/resources/info.png"))); // NOI18N
 		aboutMenu.setText("About");
 		aboutMenu.addActionListener(new java.awt.event.ActionListener() {

@@ -1,3 +1,5 @@
+V	321230235959Z		6A00000000000000000F	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV-I Content Signer - gold gen3
+V	321230235959Z		6A000000000000000010	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV-I OCSP Valid Signer gen3
 V	321201235959Z		6A000000000000000011	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV-I Auth Fed SP 800-73-4
 V	321201235959Z		6A000000000000000012	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV-I Dig Sig Fed SP 800-73-4
 V	321201235959Z		6A000000000000000013	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV-I Key Mgmt Fed SP 800-73-4

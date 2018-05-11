@@ -52,33 +52,41 @@ renameIn () {
 			fi
 		fi
 
-		F=$(ls ICAM*Dig_Sig*.p12)
-		if [ $MOVE -eq 1 ]; then mv $F "4 - $F"; fi
-		if [ $COPY -eq 1 ]; then cp -p "4 - $F" "$DIG_SIG_P12_NAME"; fi
-		F=$(ls ICAM*Dig_Sig*.crt)
-		if [ $MOVE -eq 1 ]; then mv $F "4 - $F"; fi
-		if [ $COPY -eq 1 ]; then cp -p "4 - $F" "$DIG_SIG_CERT_NAME"; fi
+		F=$(ls ICAM*Dig_Sig*.p12 2>/dev/null)
+		RES=$?
+		if [ $RES -eq 0 -a $MOVE -eq 1 ]; then mv $F "4 - $F"; fi
+		if [ $RES -eq 0 -a $COPY -eq 1 ]; then cp -p "4 - $F" "$DIG_SIG_P12_NAME"; fi
+		F=$(ls ICAM*Dig_Sig*.crt 2>/dev/null)
+		RES=$?
+		if [ $RES -eq 0 -a $MOVE -eq 1 ]; then mv $F "4 - $F"; fi
+		if [ $RES -eq 0 -a $COPY -eq 1 ]; then cp -p "4 - $F" "$DIG_SIG_CERT_NAME"; fi
 
-		F=$(ls ICAM*Key_Mgmt*.p12)
-		if [ $MOVE -eq 1 ]; then mv $F "5 - $F"; fi
-		if [ $COPY -eq 1 ]; then cp -p "5 - $F" "$KEY_MGMT_P12_NAME"; fi
-		F=$(ls ICAM*Key_Mgmt*.crt)
-		if [ $MOVE -eq 1 ]; then mv $F "5 - $F"; fi
-		if [ $COPY -eq 1 ]; then cp -p "5 - $F" "$KEY_MGMT_CERT_NAME"; fi
+		F=$(ls ICAM*Key_Mgmt*.p12 2>/dev/null)
+		RES=$?
+		if [ $RES -eq 0 -a $MOVE -eq 1 ]; then mv $F "5 - $F"; fi
+		if [ $RES -eq 0 -a $COPY -eq 1 ]; then cp -p "5 - $F" "$KEY_MGMT_P12_NAME"; fi
+		F=$(ls ICAM*Key_Mgmt*.crt 2>/dev/null)
+		RES=$?
+		if [ $RES -eq 0 -a $MOVE -eq 1 ]; then mv $F "5 - $F"; fi
+		if [ $RES -eq 0 -a $COPY -eq 1 ]; then cp -p "5 - $F" "$KEY_MGMT_CERT_NAME"; fi
 
-		F=$(ls ICAM*Card_Auth*.p12)
-		if [ $MOVE -eq 1 ]; then mv $F "6 - $F"; fi
-		if [ $COPY -eq 1 ]; then cp -p "6 - $F" "$CARD_AUTH_P12_NAME"; fi
-		F=$(ls ICAM*Card_Auth*.crt)
-		if [ $MOVE -eq 1 ]; then mv $F "6 - $F"; fi
-		if [ $COPY -eq 1 ]; then cp -p "6 - $F" "$CARD_AUTH_CERT_NAME"; fi
+		F=$(ls ICAM*Card_Auth_*.p12 2>/dev/null)
+		RES=$?
+		if [ $RES -eq 0 -a $MOVE -eq 1 ]; then mv $F "6 - $F"; fi
+		if [ $RES -eq 0 -a $COPY -eq 1 ]; then cp -p "6 - $F" "$CARD_AUTH_P12_NAME"; fi
+		F=$(ls ICAM*Card_Auth_*.crt 2>/dev/null)
+		RES=$?
+		if [ $RES -eq 0 -a $MOVE -eq 1 ]; then mv $F "6 - $F"; fi
+		if [ $RES -eq 0 -a $COPY -eq 1 ]; then cp -p "6 - $F" "$CARD_AUTH_CERT_NAME"; fi
 
-		F=$(ls ICAM*PIV*_Auth*.p12|egrep "PIV_Auth|PIV-I_Auth")
-		if [ $MOVE -eq 1 ]; then mv $F "3 - $F"; fi
-		if [ $COPY -eq 1 ]; then cp -p "3 - $F" "$PIV_AUTH_P12_NAME"; fi
-		F=$(ls ICAM*PIV*_Auth*.crt|egrep "PIV_Auth|PIV-I_Auth")
-		if [ $MOVE -eq 1 ]; then mv $F "3 - $F"; fi
-		if [ $COPY -eq 1 ]; then cp -p "3 - $F" "$PIV_AUTH_CERT_NAME"; fi
+		F=$(ls ICAM*PIV*_Auth_*.p12 2>/dev/null | egrep "PIV_Auth|PIV-I_Auth")
+		RES=$?
+		if [ $RES -eq 0 -a $MOVE -eq 1 ]; then mv $F "3 - $F"; fi
+		if [ $RES -eq 0 -a $COPY -eq 1 ]; then cp -p "3 - $F" "$PIV_AUTH_P12_NAME"; fi
+		F=$(ls ICAM*PIV*_Auth_*.crt 2>/dev/null | egrep "PIV_Auth|PIV-I_Auth")
+		RES=$?
+		if [ $RES -eq 0 -a $MOVE -eq 1 ]; then mv $F "3 - $F"; fi
+		if [ $RES -eq 0 -a $COPY -eq 1 ]; then cp -p "3 - $F" "$PIV_AUTH_CERT_NAME"; fi
 
 		X=1
 		# Key History starts at 14

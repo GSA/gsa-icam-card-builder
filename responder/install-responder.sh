@@ -106,9 +106,7 @@ for F in \\
   ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Present_gen3.p12 \\
   ICAM_Test_Card_PIV_OCSP_Invalid_Sig_Signer_gen3.p12 \\
   ICAM_Test_Card_PIV-I_OCSP_Valid_Signer_gen3.p12 \\
-  ICAM_Test_Card_PIV_OCSP_Valid_Signer_P384_gen3.p12 \\
-  ICAM_Test_Card_SSL_and_TLS.p12
-
+  ICAM_Test_Card_PIV_OCSP_Valid_Signer_P384_gen3.p12
 do
 		COUNT=\$(expr \$COUNT + 1)
 		case \$COUNT in

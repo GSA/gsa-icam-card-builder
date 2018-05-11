@@ -140,7 +140,6 @@ public class DgHashMap {
 	 * @param desiredContainerId
 	 *            the container ID to be deleted
 	 */
-	@SuppressWarnings("unlikely-arg-type")
 	public void removeDgHash(Short desiredContainerId) {
 		DataGroupHash result = null;
 		logger.debug(String.format("Remove DG hash for container %04X", desiredContainerId));
@@ -152,7 +151,7 @@ public class DgHashMap {
 			}
 			logger.debug(String .format("Remove result was %s", (result != null) ? "successfuil" : "unsuccessful"));
 		} else {
-			logger.debug(String.format("DG map does not contain entry for %04X", desiredContainerId));
+			logger.warn(String.format("DG map does not contain entry for %04X", desiredContainerId));
 		}
 		
 	}

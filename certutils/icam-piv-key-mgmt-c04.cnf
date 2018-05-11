@@ -1,0 +1,68 @@
+[ ca ]
+default_ca = ca_default
+
+[ ca_default ]
+dir = .
+database = ${dir}/database/piv-gen1-2-index.txt 
+unique_subject = no
+new_certs_dir = .
+private_key = ${dir}/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2.private.pem 
+certificate = ${dir}/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2.crt 
+name_opt = ca_default
+x509_extensions = ee_ext
+default_days = 2190 
+default_md = sha256
+serial = ${dir}/database/piv-gen1-2-serial
+policy = policy_match
+email_in_dn = no
+crl_extensions = crl_ext
+string_mask = nombstr
+
+[ policy_match ]
+C = match
+O = optional
+OU = optional
+CN = optional
+emailAddress = optional
+
+[ crl_ext ]
+authorityKeyIdentifier=keyid:always,issuer:always
+
+[ req ]
+prompt = yes
+string_mask = nombstr
+distinguished_name = req_distinguished_name
+attributes = req_attributes
+req_extensions = v3_req
+
+[ req_distinguished_name ]
+C = Country Name
+C_default = US
+O = Organization
+O_default = U.S. Government 
+OU = Organizational Unit
+OU_default = ICAM Test Cards
+CN = Common Name
+CN_default = ICAM Test Card Key Mgmt SP 800-73-4 Tampered CHUID
+emailAddress = E-Mail Address
+emailAddress_default = icam.test.cards@gsa.gov
+
+[ req_attributes ]
+
+[ v3_req ]
+basicConstraints = CA:FALSE
+subjectKeyIdentifier = hash
+
+[ ee_ext ]
+authorityKeyIdentifier = keyid:issuer
+subjectKeyIdentifier = hash
+keyUsage = critical, keyEncipherment
+authorityInfoAccess = caIssuers;URI:http://http.apl-test.cite.fpki-lab.gov/aia/certsIssuedToICAMTestCardSigningCA.p7c, OCSP;URI:http://ocsp.apl-test.cite.fpki-lab.gov
+crlDistributionPoints = URI:http://http.apl-test.cite.fpki-lab.gov/crls/ICAMTestCardSigningCA.crl
+certificatePolicies=ia5org,2.16.840.1.101.3.2.1.48.9
+subjectAltName = @subjectAltName_sect
+
+[ subjectAltName_sect ]
+otherName = 2.16.840.1.101.3.6.6;FORMAT:HEX,OCT:D1:38:10:D8:28:AB:6C:10:C3:39:E5:A1:68:5A:08:C9:2A:DE:0A:61:84:E7:39:C3:E7
+URI = urn:uuid:4f12712f-8916-4792-a797-5e1b30ef671d
+email = icam.test.cards@gsa.gov

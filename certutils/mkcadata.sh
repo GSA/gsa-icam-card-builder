@@ -10,11 +10,39 @@
 
 . ./revoke.sh
 
+# SKIDs of all signing CAs.  Note that piv-gen3-p256 and piv-gen3-rsa2048 are not used.
+
+PIV_GEN3_P256=0D51EDB2C8D33DB97AA05FE0D4F59A275363AB3C
+PIV_GEN3_P384=243394A67A7941F42F5D208A6F4E610BA4851CFA
+PIV_GEN3_RSA2048=3FDC04DB5C26E9A7FA60C2205982130B0E4AEA45
+PIV_GEN1_2=0A657668E6A866BB506AB5BB2B0F91D621EEA2D1
+PIV_GEN3=0C703BB5460F1B743D0762F30AD090AC7AE33E84
+PIVI_GEN3=20DC6669B935ACCCEDDBB43A6C5C6950BE69AB31
+
 sortbyser() {
 	SRC=$1
 	DST=/tmp/$(basename $SRC).$$
 	sort -t$'\t' -u -k4 $SRC >$DST
 	mv $DST $SRC 
+}
+
+skids() {
+	SKIDS=""
+	FS=""
+	for F in $(ls data/pem/*Signing_CA*.crt | grep -v xcert); do
+	AKID=$(openssl x509 -in $F -text -noout | \
+	perl -n -e '
+	BEGIN { my $found = 0; } 
+	chomp(); 
+	if ($found == 1) { 
+		s/^[\s:]+//; s/://g; print $_ ; exit; 
+	} 
+	if (m/X509v3 Subject Key Identifier:/) { 
+		$found = 1; 
+	}')
+	SKIDS=${FS}${SKIDS}
+	FS=" "
+	done
 }
 
 process() {
@@ -41,7 +69,7 @@ process() {
 	piv-rsa-2048) 
 		DEST=$PIVRSA2048_LOCAL ;;
 	piv-gen3-p384) 
-		DEST=$PIVGEN3_LOCAL ;;
+		DEST=$PIVGEN3P384_LOCAL ;;
 	pivi-gen1-2) 
 		DEST=$PIVIGEN1_LOCAL ;;
 	pivi-gen3) 
@@ -101,11 +129,11 @@ reindex() {
 
 	pushd ../cards/ICAM_Card_Objects >/dev/null 2>&1
 		echo "Creating index for Gen1-2 PIV certs..."
-		for D in 01 23 24
+		for D in 01 03 04 05 06 07 08 09 10 11 12 13 14 17 18 23 24
 		do
 			pushd ${D}_* >/dev/null 2>&1
 				pwd
-				F="3 - PIV_Auth.p12"
+				F="3 - ICAM_PIV_Auth_SP_800-73-4.p12"
 				G=$(basename "$F" .p12).crt
 				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
 
@@ -114,7 +142,25 @@ reindex() {
 				STATUS=V
 				process piv-gen1-2 $STATUS $Y $X
 
-				F="4 - PIV_Card_Auth.p12"
+				F="4 - ICAM_PIV_Dig_Sig_SP_800-73-4.p12"
+				G=$(basename "$F" .p12).crt
+				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
+
+				X=$(openssl x509 -serial -subject -in "$G" -noout) 
+				Y=$(openssl x509 -in "$G" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
+				STATUS=V
+				process piv-gen1-2 $STATUS $Y $X
+
+				F="5 - ICAM_PIV_Key_Mgmt_SP_800-73-4.p12"
+				G=$(basename "$F" .p12).crt
+				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
+
+				X=$(openssl x509 -serial -subject -in "$G" -noout) 
+				Y=$(openssl x509 -in "$G" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
+				STATUS=V
+				process piv-gen1-2 $STATUS $Y $X
+
+				F="6 - ICAM_PIV_Card_Auth_SP_800-73-4.p12"
 				G=$(basename "$F" .p12).crt
 				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
 
@@ -127,11 +173,11 @@ reindex() {
 		done
 
 		echo "Creating index for Gen1-2 PIV-I certs (in piv-gen1-2 index)..."
-		for D in 02 19 21 22
+		for D in 02 21 22
 		do
 			pushd ${D}_* >/dev/null 2>&1
 				pwd
-				F="3 - PIV_Auth.p12"
+				F="3 - ICAM_PIV_Auth_SP_800-73-4.p12"
 				G=$(basename "$F" .p12).crt
 				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
 				X=$(openssl x509 -serial -subject -in "$G" -noout) 
@@ -139,7 +185,23 @@ reindex() {
 				STATUS=V
 				process piv-gen1-2 $STATUS $Y $X
 
-				F="4 - PIV_Card_Auth.p12"
+				F="4 - ICAM_PIV_Dig_Sig_SP_800-73-4.p12"
+				G=$(basename "$F" .p12).crt
+				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
+				X=$(openssl x509 -serial -subject -in "$G" -noout) 
+				Y=$(openssl x509 -in "$G" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
+				STATUS=V
+				process piv-gen1-2 $STATUS $Y $X
+
+				F="5 - ICAM_PIV_Key_Mgmt_SP_800-73-4.p12"
+				G=$(basename "$F" .p12).crt
+				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
+				X=$(openssl x509 -serial -subject -in "$G" -noout) 
+				Y=$(openssl x509 -in "$G" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
+				STATUS=V
+				process piv-gen1-2 $STATUS $Y $X
+
+				F="6 - ICAM_PIV_Card_Auth_SP_800-73-4.p12"
 				G=$(basename "$F" .p12).crt
 				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
 				X=$(openssl x509 -serial -subject -in "$G" -noout) 
@@ -150,7 +212,7 @@ reindex() {
 		done
 
 		echo "Creating index for Gen3 PIV certs..."
-		for D in 25 26 27 28 37 38 41 42 43 44 45 46 47 48 49 50 51 52 53 55 56
+		for D in 25 26 27 28 37 38 41 42 43 44 45 46 47 48 49 50 51 52 53 55
 		do
 			pushd ${D}_* >/dev/null 2>&1
 				pwd
@@ -232,7 +294,7 @@ reindex() {
 	pushd data >/dev/null 2>&1
 		pwd
 		CTR=0
-		for C in $SSLP12S $OCSPP12S $CONTP12S
+		for C in $OCSPP12S $CONTP12S
 		do
 			CTR=$(expr $CTR + 1); if [ $CTR -lt 10 ]; then PAD="0"; else PAD=""; fi
 
@@ -245,7 +307,7 @@ reindex() {
 			K="pem/$(basename $C .p12).private.pem"
 			if [ ! -f "$K" ]; then p12tokey "$C" "$K"; fi
 
-			I=$(openssl x509 -in $F -issuer -noout 2>&10 | grep -y signing | grep -v expired |sed 's/^.*CN=//g; s/ICAM_Test_Card_//g; s/ /_/g'|sort -u)
+			I=$(openssl x509 -in $F -issuer -noout 2>&10 | grep -y signing | grep -v expired |sed 's/^.*CN=//g; s/ /_/g'|sort -u)
 			Y=$(openssl x509 -in "$F" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
 			X=$(openssl x509 -serial -subject -in "$F" -noout) 
 
@@ -259,22 +321,33 @@ reindex() {
 			fi
 
 			# Figure out *-index.txt names
+			AKID=$(openssl x509 -in $F -text -noout 2>&10 | grep keyid: | sed 's/\s//g; s/keyid://g; s/://g')
 
-			case $I in
-			*PIV_P-384_Signing_CA)
-				T=piv; G=gen3-p384 ;;
-			*PIV_RSA_2048_Signing_CA)
-				T=piv; G=rsa-2048 ;;
-			*PIV_I_Signing_CA)
-				T=pivi; G=gen3 ;;
-			*) # Start date > 2016 is Gen3
-				T=piv
-				B=$(openssl x509 -in $F -startdate -noout 2>&10 | awk '{ print $4 }' | sed 's/[:\r]//g')
-				if [ "$B" -gt 2016 ]; then G=gen3; else G=gen1-2; fi
-				# Lump Gen1 PIV-I with PIV (should have been caught by date check)
-				if [ "${T}-${G}" == "pivi-gen1-2" ]; then
+			case $AKID in
+				$PIV_GEN3_P384)
 					T=piv
-				fi ;;
+					G=gen3-p384
+					;;
+				$PIV_GEN3_RSA2048)
+					T=piv
+					G=rsa-2048
+					;;
+				$PIVI_GEN3)
+					T=pivi
+					G=gen3
+					;;
+				$PIV_GEN3)
+					T=piv
+					G=gen3
+					;;
+				$PIV_GEN1_2)
+					T=piv
+					G=gen1-2
+					;;
+				*) 
+					echo "Unknown CA $AKID for $F"
+					continue
+					;;
 			esac
 
 			STATUS=V
@@ -357,8 +430,6 @@ cp -p ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/*.crt data/pem
 cp -p ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/*.p12 data
 rm -f /tmp/hashes.txt
 
-SSLP12S="ICAM_Test_Card_SSL_and_TLS.p12"
-
 SIGNCAP12S="ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2.p12 \
 	ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.p12 \
 	ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.p12 \
@@ -366,6 +437,7 @@ SIGNCAP12S="ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2.p12 \
 	ICAM_Test_Card_PIV_P-384_Signing_CA_gold_gen3.p12"
 
 CONTP12S="ICAM_Test_Card_PIV_Content_Signer_-_gold_gen1-2.p12 \
+	ICAM_Test_Card_PIV_Content_Signer_-_legacy_gen1-2.p12 \
 	ICAM_Test_Card_PIV_Content_Signer_-_gold_gen3.p12 \
 	ICAM_Test_Card_PIV_Content_Signer_Expiring_-_gold_gen3.p12 \
 	ICAM_Test_Card_PIV_Revoked_Content_Signer_gen1-2.p12 \
@@ -391,7 +463,7 @@ if [ $# -eq 1 -a r$1 == r"-r" ]; then
 	reindex
 fi
 
-for F in $SSLP12S $OCSPP12S $SIGNCAP12S
+for F in $OCSPP12S $SIGNCAP12S
 do
 	cp -p data/$F .
 	cp -p data/pem/$(basename $F .p12).crt .
@@ -450,8 +522,8 @@ sortbyser $PIVGEN1_LOCAL
 
 ## Gen1-2 Card 24 Revoked PIV Auth 
 echo "Gen1-2 Card 24 Revoked PIV Auth..."
-cp -p ../cards/ICAM_Card_Objects/24_Revoked_Certificates/3\ -\ PIV_Auth.crt data/pem/ICAM_Test_Card_24_PIV_Auth.crt
-cp -p ../cards/ICAM_Card_Objects/24_Revoked_Certificates/3\ -\ PIV_Auth.p12 data/ICAM_Test_Card_24_PIV_Auth.p12
+cp -p ../cards/ICAM_Card_Objects/24_Revoked_Certificates/3\ -\ ICAM_PIV_Auth_SP_800-73-4.crt data/pem/ICAM_Test_Card_24_PIV_Auth.crt
+cp -p ../cards/ICAM_Card_Objects/24_Revoked_Certificates/3\ -\ ICAM_PIV_Auth_SP_800-73-4.p12 data/ICAM_Test_Card_24_PIV_Auth.p12
 SUBJ=ICAM_Test_Card_24_PIV_Auth
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2
 CONFIG=${CWD}/icam-piv-revoked-ee-gen1-2.cnf
@@ -463,8 +535,8 @@ sortbyser $PIVGEN1_LOCAL
 
 ## Gen1-2 Card 24 Revoked PIV Card Auth 
 echo "Gen1-2 Card 24 Revoked PIV Card Auth..."
-cp -p ../cards/ICAM_Card_Objects/24_Revoked_Certificates/4\ -\ PIV_Card_Auth.crt data/pem/ICAM_Test_Card_24_PIV_Card_Auth.crt
-cp -p ../cards/ICAM_Card_Objects/24_Revoked_Certificates/4\ -\ PIV_Card_Auth.p12 data/ICAM_Test_Card_24_PIV_Card_Auth.p12
+cp -p ../cards/ICAM_Card_Objects/24_Revoked_Certificates/6\ -\ ICAM_PIV_Card_Auth_SP_800-73-4.crt data/pem/ICAM_Test_Card_24_PIV_Card_Auth.crt
+cp -p ../cards/ICAM_Card_Objects/24_Revoked_Certificates/6\ -\ ICAM_PIV_Card_Auth_SP_800-73-4.p12 data/ICAM_Test_Card_24_PIV_Card_Auth.p12
 SUBJ=ICAM_Test_Card_24_PIV_Card_Auth
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2
 CONFIG=${CWD}/icam-piv-revoked-ee-gen1-2.cnf
@@ -500,7 +572,6 @@ do
 done
 
 tar cv --owner=root --group=root -f responder-certs.tar \
-	$SSLP12S \
 	$OCSPP12S \
 	$CERTLIST \
 	$(basename $PIVGEN1_LOCAL) \
@@ -516,7 +587,7 @@ tar cv --owner=root --group=root -f responder-certs.tar \
 	$(basename ${PIVIGEN3_LOCAL}.attr) \
 	$(basename ${PIVGEN3P384_LOCAL}.attr)
 
-rm -f $SSLP12S $OCSPP12S $SIGNP12S $CERTLIST
+rm -f $OCSPP12S $SIGNP12S $CERTLIST
 rm -f $PIVGEN1_LOCAL ${PIVGEN1_LOCAL}.attr
 rm -f $PIVGEN3_LOCAL ${PIVGEN3_LOCAL}.attr
 rm -f $PIVIGEN1_LOCAL ${PIVIGEN1_LOCAL}.attr

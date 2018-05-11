@@ -19,7 +19,7 @@ public class CheckUnrestrictedCrypto {
 		Boolean verbose = Arrays.asList(args).contains("-v");
 		int jceAlgs = 0, bcAlgs = 0;
 		for (final Provider p : providers) {
-			System.out.format("Provider %s: %s%s", p.getName(), p.getVersion(), EOL);
+			System.out.format("Provider %s: %s%s", p.getName(), p.getVersionStr(), EOL);
 			for (final Object o : p.keySet()) {
 				if (verbose) {
 					System.out.format("\t%s : %s%s", o, p.getProperty((String) o), EOL);

@@ -62,8 +62,8 @@ public class DgMap {
 		int i = 0;
 		for (short k : dgMap.keySet()) {
 			mapping[i++] = dgMap.get(k);
-			mapping[i++] = (byte) ((byte) (k & 0xff00) >> 8);
-			mapping[i++] = (byte) (k & 0xff);
+			mapping[i++] = (byte) ((short) k >> 8);
+			mapping[i++] = (byte) ((short) k & 0x000ff);
 		}
 		return mapping;
 	}

@@ -631,10 +631,18 @@ public class ContentSignerTool {
 						dgHashMap.removeDgHash(desiredContainerId);
 					}
 
+					ContentInfo origSoContentInfo = dgHashMap.getCountentInfo();
+					int hashCount = dgHashMap.getDgHashes().length;
+					if (hashCount < 2) {
+						// Add in a fake one in order to meet the (2..ub-DataGroups) LDSSecurityObject rule
+						dgHashMap.addDgHash((short) 0xffff, containerDigestBytes);
+					} else if (hashCount > 2) {
+						// Remove the fake
+						dgHashMap.removeDgHash((short) 0xffff);
+					}
+					byte newMapping[] = dgHashMap.getDgMapping();
 					// Create a new BC DataGroupHash
 					DataGroupHash ndghArray[] = dgHashMap.getDgHashes();
-					byte newMapping[] = dgHashMap.getDgMapping();
-					ContentInfo origSoContentInfo = dgHashMap.getCountentInfo();
 					LDSSecurityObject nldsso = null;
 
 					Gui.progress.setValue(50);

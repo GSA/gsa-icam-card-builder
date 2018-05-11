@@ -4,6 +4,48 @@ V	321231235959Z		5853CCE2521801412003	unknown	/C=US/O=U.S. Government/OU=ICAM Te
 V	321201235959Z		5853CCE2521801412004	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM PIV-I Authentication
 V	321201235959Z		5853CCE2521801412005	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/serialNumber=be127ea0-d180-124d-e044-000f202b235a
 V	321231235959Z		5853CCE2521801412006	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM PIV-I Content Signer
-R	321231235959Z	180410192719Z,cessationOfOperation	D18FC8F76557A6D1	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM PIV Authentication
-R	321201235959Z	180410192720Z,cessationOfOperation	D18FC8F76557A6D2	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM PIV Authentication
-R	321201235959Z	180410192721Z,cessationOfOperation	D18FC8F76557A6D3	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/serialNumber=D13810D828AB6C10C339E5A1685A08C92ADE0A6184E739C3E7
+V	320508235959Z		5853CCE25218014120EE	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM PIV Content Signer
+V	321230235959Z		59000000000000000008	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV OCSP Valid Signer gen1-2
+V	321201235959Z		5900000000000000017D	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Dig Sig SP 800-73-4 Golden PIV
+V	321201235959Z		5900000000000000017E	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Key Mgmt SP 800-73-4 Golden PIV
+V	321201235959Z		5900000000000000017F	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Dig Sig SP 800-73-4 Golden PIV-I
+V	321201235959Z		59000000000000000180	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Key_Mgmt SP 800-73-4 Golden PIV-I
+V	321201235959Z		59000000000000000181	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Dig Sig SP 800-73-4 SKID Mismatch
+V	321201235959Z		59000000000000000182	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Key Mgmt SP 800-73-4 SKID Mismatch
+V	321201235959Z		59000000000000000183	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Dig Sig SP 800-73-4 Tampered CHUID
+V	321201235959Z		59000000000000000184	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Key Mgmt SP 800-73-4 Tampered CHUID
+V	321201235959Z		59000000000000000185	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Dig Sig SP 800-73-4 Tampered Certificates
+V	321201235959Z		59000000000000000186	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Key Mgmt SP 800-73-4 Tampered Certificates
+V	321201235959Z		59000000000000000187	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Dig Sig SP 800-73-4 Tampered PHOTO
+V	321201235959Z		59000000000000000188	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Key Mgmt SP 800-73-4 Tampered PHOTO
+V	321201235959Z		59000000000000000189	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Dig Sig SP 800-73-4 Tampered Fingerprints
+V	321201235959Z		5900000000000000018A	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Key Mgmt SP 800-73-4 Tampered Fingerprints
+V	321201235959Z		5900000000000000018B	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Dig Sig SP 800-73-4 Tampered Security Object
+V	321201235959Z		5900000000000000018C	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Key Mgmt SP 800-73-4 Tampered Security Object
+V	321201235959Z		5900000000000000018D	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Dig Sig SP 800-73-4 Expired CHUID Signer
+V	321201235959Z		5900000000000000018E	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Key Mgmt SP 800-73-4 Expired CHUID Signer
+V	321201235959Z		5900000000000000018F	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Dig Sig SP 800-73-4 Expired Cert Signer
+V	321201235959Z		59000000000000000190	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Key Mgmt SP 800-73-4 Expired Cert Signer
+V	321201235959Z		59000000000000000191	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Dig Sig SP 800-73-4 Certs Expire after CHUID
+V	321201235959Z		59000000000000000192	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Key Mgmt SP 800-73-4 Certs Expire after CHUID
+V	321201235959Z		59000000000000000193	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Dig Sig SP 800-73-4 Certs not yet valid
+V	321201235959Z		59000000000000000194	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Key Mgmt SP 800-73-4 Certs not yet valid
+V	321201235959Z		59000000000000000195	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Dig Sig SP 800-73-4 Certs are expired
+V	321201235959Z		59000000000000000196	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Key Mgmt SP 800-73-4 Certs are expired
+V	321201235959Z		59000000000000000197	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Dig Sig SP 800-73-4 Expired CHUID
+V	321201235959Z		59000000000000000198	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Key Mgmt SP 800-73-4 Expired CHUID
+V	321201235959Z		5900000000000000019D	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Dig Sig SP 800-73-4 PHOTO FASCN mismatch
+V	321201235959Z		5900000000000000019E	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Key Mgmt SP 800-73-4 PHOTO FASCN mismatch
+V	321201235959Z		5900000000000000019F	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Dig Sig SP 800-73-4 Fingerprints FASCN mismatch
+V	321201235959Z		590000000000000001A0	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Key Mgmt SP 800-73-4 Fingerprints FASCN mismatch
+V	321201235959Z		590000000000000001A5	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Dig Sig SP 800-73-4 PHOTO UUID mismatch
+V	321201235959Z		590000000000000001A6	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Key_Mgmt SP 800-73-4 PHOTO UUID mismatch
+V	321201235959Z		590000000000000001A7	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Dig Sig SP 800-73-4 Fingerprints UUID mismatch
+V	321201235959Z		590000000000000001A8	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Key_Mgmt SP 800-73-4 Fingerprints UUID mismatch
+V	321201235959Z		590000000000000001A9	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Dig Sig SP 800-73-4 Public Private Key mismatch
+V	321201235959Z		590000000000000001AA	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Key Mgmt SP 800-73-4 Public Private Key mismatch
+V	321201235959Z		590000000000000001AB	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Dig Sig SP 800-73-4 Public Private Key mismatch
+V	321201235959Z		590000000000000001AC	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Key Mgmt SP 800-73-4 Public Private Key mismatch
+R	321231235959Z	180511005844Z,cessationOfOperation	D18FC8F76557A6D1	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM PIV Authentication
+R	321201235959Z	180511005845Z,cessationOfOperation	D18FC8F76557A6D2	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM PIV Authentication
+R	321201235959Z	180511005846Z,cessationOfOperation	D18FC8F76557A6D3	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/serialNumber=D13810D828AB6C10C339E5A1685A08C92ADE0A6184E739C3E7
