@@ -327,18 +327,22 @@ cp -p data/pem/ICAM_*_$T.crt "$DEST"
 renameIn "$DEST" 1 1
 
 ## Card 23
-T=Public_Private_Key_mismatch
-sh mkcert.sh -w -b -s "ICAM_Test_Card_PIV_Dig_Sig_SP_800-73-4_$T" -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -n 23 -t piv-dig-sig || exit $?
-sh mkcert.sh -w -b -s "ICAM_Test_Card_PIV_Key_Mgmt_SP_800-73-4_$T" -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -n 23 -t piv-key-mgmt || exit $?
-DEST="../cards/ICAM_Card_Objects/23_$T"
-cp -p data/ICAM_*_$T.p12 "$DEST"
-cp -p data/pem/ICAM_*_$T.crt "$DEST"
-renameIn "$DEST" 1 1
+# Note: The certs for this card can't be done using OpenSSL since it will 
+# not create a .p12 file whose keys don't match
+#T=Public_Private_Key_mismatch
+#sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Auth_SP_800-73-4_$T -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -n 23 -t piv-auth || exit $?
+#sh mkcert.sh -w -b -s "ICAM_Test_Card_PIV_Dig_Sig_SP_800-73-4_$T" -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -n 23 -t piv-dig-sig || exit $?
+#sh mkcert.sh -w -b -s "ICAM_Test_Card_PIV_Key_Mgmt_SP_800-73-4_$T" -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -n 23 -t piv-key-mgmt || exit $?
+#sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Card_Auth_SP_800-73-4_$T -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -n 23 -t piv-card-auth || exit $?
+#DEST="../cards/ICAM_Card_Objects/23_$T"
+#cp -p data/ICAM_*_$T.p12 "$DEST"
+#cp -p data/pem/ICAM_*_$T.crt "$DEST"
+#renameIn "$DEST" 1 1
 
-## Card 24
+# Card 24
 T=Revoked_Certificates
-sh mkcert.sh -w -b -s "ICAM_Test_Card_PIV_Dig_Sig_SP_800-73-4_$T" -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -n 23 -t piv-dig-sig || exit $?
-sh mkcert.sh -w -b -s "ICAM_Test_Card_PIV_Key_Mgmt_SP_800-73-4_$T" -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -n 23 -t piv-key-mgmt || exit $?
+sh mkcert.sh -w -b -s "ICAM_Test_Card_PIV_Dig_Sig_SP_800-73-4_$T" -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -n 24 -t piv-dig-sig || exit $?
+sh mkcert.sh -w -b -s "ICAM_Test_Card_PIV_Key_Mgmt_SP_800-73-4_$T" -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -n 24 -t piv-key-mgmt || exit $?
 DEST="../cards/ICAM_Card_Objects/24_$T"
 cp -p data/ICAM_*_$T.p12 "$DEST"
 cp -p data/pem/ICAM_*_$T.crt "$DEST"

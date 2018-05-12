@@ -358,14 +358,14 @@ DEST="../cards/ICAM_Card_Objects/23_$T"
 cp -p data/ICAM_*_$T.p12 "$DEST"
 cp -p data/pem/ICAM_*_$T.crt "$DEST"
 renameIn "$DEST" 1 1
-
-# Card 24
-T=Revoked_Certificates
-sh mkcert.sh -w -b -s "ICAM_Test_Card_PIV_Dig_Sig_SP_800-73-4_$T" -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -n 24 -t piv-dig-sig || exit $?
-sh mkcert.sh -w -b -s "ICAM_Test_Card_PIV_Key_Mgmt_SP_800-73-4_$T" -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -n 24 -t piv-key-mgmt || exit $?
-DEST="../cards/ICAM_Card_Objects/24_$T"
-cp -p data/ICAM_*_$T.p12 "$DEST"
-cp -p data/pem/ICAM_*_$T.crt "$DEST"
-renameIn "$DEST" 1 1
-
-
+#RAF#
+#RAF## Card 24
+#RAF#T=Revoked_Certificates
+#RAF#sh mkcert.sh -w -b -s "ICAM_Test_Card_PIV_Dig_Sig_SP_800-73-4_$T" -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -n 24 -t piv-dig-sig || exit $?
+#RAF#sh mkcert.sh -w -b -s "ICAM_Test_Card_PIV_Key_Mgmt_SP_800-73-4_$T" -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -n 24 -t piv-key-mgmt || exit $?
+#RAF#DEST="../cards/ICAM_Card_Objects/24_$T"
+#RAF#cp -p data/ICAM_*_$T.p12 "$DEST"
+#RAF#cp -p data/pem/ICAM_*_$T.crt "$DEST"
+#RAF#renameIn "$DEST" 1 1
+#RAF#
+#RAF#
