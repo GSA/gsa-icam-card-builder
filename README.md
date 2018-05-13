@@ -248,8 +248,6 @@ Work remaining to be done if we want this to be really close to perfect:
   2. Add a Verify button and the functionality behind it.
   3. Write a user guide.
   4. Create an installer.
-  5. Test out some stronger algorithms.
-  6. Add .config files for legacy (Gen 1 and 2) ICAM cards.
 
 See the [list of issues](https://github.com/GSA/gsa-icam-card-builder/issues) for
 more information.
