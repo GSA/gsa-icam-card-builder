@@ -22,7 +22,6 @@ public class DgMap {
 	 * 
 	 * @param fileBytes
 	 *            the bytes in the Security Object container
-	 * @return DgMap object
 	 */
 	protected DgMap(byte[] fileBytes) {
 		byte[] mapping = getSoMapping(fileBytes);
@@ -156,6 +155,10 @@ public class DgMap {
 	
 	/**
 	 * Decrements the mapping size byte
+	 * 
+	 * @param desiredContainerId tell SP 800-73-4 DG container ID
+	 * 
+	 * @return the value of the container ID or null if not found
 	 */
 
 	public Byte removeMapping(short desiredContainerId) {

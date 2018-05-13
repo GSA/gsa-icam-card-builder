@@ -35,7 +35,6 @@ public class DgHashMap {
 	 * 
 	 * @param containerBytes
 	 *            byte array containing Security Object from file or card\
-	 * @return DgHashMap object
 	 */
 	public DgHashMap(byte[] containerBytes) {
 
