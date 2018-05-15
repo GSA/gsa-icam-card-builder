@@ -1,3 +1,8 @@
+Bag Attributes
+    localKeyID: 3A 74 BE C3 5C 48 AD DC FE 37 93 F8 05 A1 92 79 42 CA D3 1D 
+    friendlyName: ICAM Test Card PIV Root CA - gold gen1-3
+subject=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Root CA
+issuer=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Root CA
 -----BEGIN CERTIFICATE-----
 MIIE8DCCA1igAwIBAgICFkAwDQYJKoZIhvcNAQELBQAwYjELMAkGA1UEBhMCVVMx
 GDAWBgNVBAoTD1UuUy4gR292ZXJubWVudDEYMBYGA1UECxMPSUNBTSBUZXN0IENh

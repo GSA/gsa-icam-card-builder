@@ -1,3 +1,8 @@
+Bag Attributes
+    localKeyID: 29 CA 54 2A B1 DF 28 84 A1 CA D6 5D B6 4B DF D1 DF CA D1 88 
+    friendlyName: ICAM Test Card PIV-I Root CA - gold gen3
+subject=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV-I Root CA
+issuer=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV-I Root CA
 -----BEGIN CERTIFICATE-----
 MIIFCTCCA3GgAwIBAgIKaFPM4lIYAUEg6TANBgkqhkiG9w0BAQsFADBoMQswCQYD
 VQQGEwJVUzEYMBYGA1UEChMPVS5TLiBHb3Zlcm5tZW50MRgwFgYDVQQLEw9JQ0FN

@@ -1,3 +1,8 @@
+Bag Attributes
+    localKeyID: 43 E9 77 BE 39 46 0E 9F 4D E6 D2 20 85 76 80 74 60 4B A0 14 
+    friendlyName: ICAM Test Card PIV Signing CA - xcert Gen3signsGen1-2
+subject=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Signing CA
+issuer=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Signing CA
 -----BEGIN CERTIFICATE-----
 MIIGfzCCBOegAwIBAgIKYAAAAAAAAAAAYTANBgkqhkiG9w0BAQsFADBlMQswCQYD
 VQQGEwJVUzEYMBYGA1UEChMPVS5TLiBHb3Zlcm5tZW50MRgwFgYDVQQLEw9JQ0FN

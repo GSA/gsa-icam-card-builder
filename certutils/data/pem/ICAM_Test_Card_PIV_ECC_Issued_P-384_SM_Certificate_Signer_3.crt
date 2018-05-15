@@ -1,3 +1,8 @@
+Bag Attributes
+    localKeyID: F6 19 8F 95 BB 68 D0 7F A2 0A 15 B8 BD F8 92 25 A0 45 04 94 
+    friendlyName: ICAM Test Card PIV ECC Issued P-384 SM Certificate Signer 3
+subject=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV ECC Issued P-384 SM Certificate Signer 3
+issuer=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV P-384 Signing CA
 -----BEGIN CERTIFICATE-----
 MIIDxzCCA02gAwIBAgIKcAAAAAAAAAAAGjAKBggqhkjOPQQDAjBvMQswCQYDVQQG
 EwJVUzEYMBYGA1UEChMPVS5TLiBHb3Zlcm5tZW50MRgwFgYDVQQLEw9JQ0FNIFRl

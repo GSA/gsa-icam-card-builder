@@ -1,3 +1,8 @@
+Bag Attributes
+    localKeyID: 0D D0 21 53 C0 7B 7B 87 E9 4F 65 3B 8F 95 6E 65 D9 98 D4 8C 
+    friendlyName: ICAM Test Card PIV Signing CA - gold gen1-2
+subject=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Signing CA
+issuer=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Root CA
 -----BEGIN CERTIFICATE-----
 MIIF4jCCBEqgAwIBAgIJAPQ/RS4ZJwm3MA0GCSqGSIb3DQEBCwUAMGIxCzAJBgNV
 BAYTAlVTMRgwFgYDVQQKEw9VLlMuIEdvdmVybm1lbnQxGDAWBgNVBAsTD0lDQU0g

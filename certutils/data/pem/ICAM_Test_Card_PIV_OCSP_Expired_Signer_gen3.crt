@@ -1,3 +1,8 @@
+Bag Attributes
+    localKeyID: 56 1A B5 31 31 82 B1 FA D7 91 9C 1B 20 63 EA C4 D9 03 53 E7 
+    friendlyName: ICAM Test Card PIV OCSP Expired Signer gen3
+subject=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV OCSP Expired Signer gen3
+issuer=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Signing CA
 -----BEGIN CERTIFICATE-----
 MIIFZzCCA8+gAwIBAgIKYAAAAAAAAAAAzjANBgkqhkiG9w0BAQsFADBlMQswCQYD
 VQQGEwJVUzEYMBYGA1UEChMPVS5TLiBHb3Zlcm5tZW50MRgwFgYDVQQLEw9JQ0FN

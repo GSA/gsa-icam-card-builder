@@ -1,3 +1,8 @@
+Bag Attributes
+    localKeyID: 0D AE 3C 88 08 3B 88 1F AB B7 7A D2 C5 37 B4 6C 11 49 76 55 
+    friendlyName: ICAM Test Card PIV RSA Issued Intermediate CVC Signer
+subject=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV RSA Issued Intermediate CVC Signer
+issuer=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV RSA 2048 Signing CA
 -----BEGIN CERTIFICATE-----
 MIIEDTCCAvWgAwIBAgILAKAAAAAAAAAAAAEwDQYJKoZIhvcNAQELBQAwcjELMAkG
 A1UEBhMCVVMxGDAWBgNVBAoTD1UuUy4gR292ZXJubWVudDEYMBYGA1UECxMPSUNB
