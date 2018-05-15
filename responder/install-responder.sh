@@ -147,7 +147,7 @@ chmod 600 *.key
 mv ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2.crt PIV_Signing_CA_gen1-2.crt
 mv ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt PIV_Signing_CA_gen3.crt
 mv ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.crt PIV-I_Signing_CA_gen3.crt
-mv ICAM_Test_Card_PIV_P-384_Signing_CA_gold_gen3.crt PIV_Signing_CA_gen3_p384.crt
+mv ICAM_Test_Card_PIV_P-384_Signing_CA_-_gold_gen3.crt PIV_Signing_CA_gen3_p384.crt
 # Uncomment these when we have responders for them
 #mv ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3 PIV_Signing_CA_gen3_rsa_2048.crt
 #mv ICAM_Test_Card_PIV_P-256_Signing_CA_gold_gen3.crt PIV_Signing_CA_gen3_p256.crt
