@@ -457,7 +457,7 @@ OCSPP12S="ICAM_Test_Card_PIV_OCSP_Expired_Signer_gen3.p12 \
 	ICAM_Test_Card_PIV_OCSP_Valid_Signer_gen1-2.p12 \
 	ICAM_Test_Card_PIV_OCSP_Valid_Signer_gen3.p12 \
 	ICAM_Test_Card_PIV_OCSP_Valid_Signer_P384_gen3.p12 \
-	ICAM_Test_Card_PIV-I_OCSP_Response_Signer_-_gold_gen3.p12"
+	ICAM_Test_Card_PIV-I_OCSP_Valid_Signer_-_gold_gen3.p12"
 
 CERTLIST=""
 
