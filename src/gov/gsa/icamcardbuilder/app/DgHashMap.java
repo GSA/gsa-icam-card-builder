@@ -58,7 +58,7 @@ public class DgHashMap {
 			asn1is.close();
 			ldsso = LDSSecurityObject.getInstance(soSeq);
 			if (ldsso.getDatagroupHash().length * 3 != dgMap.getDgMapByteLength()) {
-				logger.warn(String.format("DgMap map contains %d entries, number of DataGroup hashes is %d", (int) (dgMap.getDgMapByteLength() / 3), (int) ldsso.getDatagroupHash().length));
+				logger.warn(String.format("DgMap map contains %d entries, number of DataGroup hashes is %d", (dgMap.getDgMapByteLength() / 3), ldsso.getDatagroupHash().length));
 			}
 			initDgHash((initSo) ? null : ldsso.getDatagroupHash());
 			in.close();
