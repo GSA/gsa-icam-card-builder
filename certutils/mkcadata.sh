@@ -655,14 +655,14 @@ rm -f *.p12 *.crt
 
 # AIA, SIA, CRLs roots
 
-cp -pr ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/{aia,sia,crls,roots} .
+cp -pr ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/{aia,sia,crls,roots,bridge} .
 
-chmod 755 aia crls sia roots
-chmod 644 aia/* crls/* sia/* roots/*
+chmod 755 aia crls sia roots bridge
+chmod 644 aia/* crls/* sia/* roots/* bridge/*
 
 # Backup AIA, CRLs, and SIA
-tar cv --owner=root --group=root -f aiacrlsia.tar aia crls sia roots
-rm -rf aia sia crls roots
+tar cv --owner=root --group=root -f aiacrlsia.tar aia crls sia roots bridge
+rm -rf aia sia crls roots bridge
 
 mv responder-certs.tar ../responder
 mv aiacrlsia.tar ../responder
