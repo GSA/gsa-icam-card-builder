@@ -10,7 +10,7 @@
 
 . ./revoke.sh
 
-# SKIDs of all signing CAs.  Note that piv-gen3-p256 and piv-gen3-rsa2048 are not used.
+# SKIDs of all signing CAs.  Note that piv-gen3-p256 and piv-gen3-rsa-2048 are not yet used.
 
 PIV_GEN3_P256=0D51EDB2C8D33DB97AA05FE0D4F59A275363AB3C
 PIV_GEN3_P384=243394A67A7941F42F5D208A6F4E610BA4851CFA
@@ -19,10 +19,30 @@ PIV_GEN1_2=0A657668E6A866BB506AB5BB2B0F91D621EEA2D1
 PIV_GEN3=0C703BB5460F1B743D0762F30AD090AC7AE33E84
 PIVI_GEN3=20DC6669B935ACCCEDDBB43A6C5C6950BE69AB31
 
-sortbyser() {
+makeuniq() {
 	SRC=$1
 	DST=/tmp/$(basename $SRC).$$
-	sort -t$'\t' -u -k4 $SRC >$DST
+	cat $SRC | 
+	awk 'BEGIN { FS="\t"; OFS=FS; pad = "000000000000000000000000" } 
+	{ 
+		snpad = substr(pad,1, (24-length($4)))
+		printf("%s%s\n", snpad, $4) 
+	}' | \
+	sort -k 1 | uniq >j.idx
+
+	cat $SRC | awk 'BEGIN { FS="\t"; OFS=FS; pad = "000000000000000000000000" } 
+	{ 
+		snpad = substr(pad,1, (24-length($4)))
+		printf("%s\t%s\t%s\t%s%s\t%s\t%s\n", $1, $2, $3, snpad, $4, $5, $6) 
+	}' | \
+	sort -t$'\t' -k 4 >j.dat
+
+	join -t$'\t' -1 4 -2 1 j.dat j.idx | uniq -w 24 | \
+	awk 'BEGIN { FS="\t"; OFS=FS } 
+	/\t/ {
+			gsub(/^[0]+/, "", $1)
+			printf("%s\t%s\t%s\t%s\t%s\t%s\n", $2, $3, $4, $1, $5, $6, $7) 
+	}' >$DST
 	mv $DST $SRC 
 }
 
@@ -70,6 +90,8 @@ process() {
 		DEST=$PIVRSA2048_LOCAL ;;
 	piv-gen3-p384) 
 		DEST=$PIVGEN3P384_LOCAL ;;
+	piv-gen3-p256) 
+		DEST=$PIVGEN3P256_LOCAL ;;
 	pivi-gen1-2) 
 		DEST=$PIVIGEN1_LOCAL ;;
 	pivi-gen3) 
@@ -79,7 +101,7 @@ process() {
 		exit 1
 	esac
 	echo "${STAT}${TAB}${EXP}${TAB}${REV}${TAB}${SER}${TAB}unknown${TAB}${SUB}" >>$DEST
-	sortbyser $DEST 
+	#makeuniq $DEST 
 }
 
 p12tocert() {
@@ -126,10 +148,11 @@ reindex() {
 	>$PIVIGEN3_LOCAL
 	>$PIVRSA2048_LOCAL
 	>$PIVGEN3P384_LOCAL
+	>$PIVGEN3P256_LOCAL
 
 	pushd ../cards/ICAM_Card_Objects >/dev/null 2>&1
 		echo "Creating index for Gen1-2 PIV certs..."
-		for D in 01 03 04 05 06 07 08 09 10 11 12 13 14 17 18 23 24
+		for D in 01 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 23 24
 		do
 			pushd ${D}_* >/dev/null 2>&1
 				pwd
@@ -173,7 +196,7 @@ reindex() {
 		done
 
 		echo "Creating index for Gen1-2 PIV-I certs (in piv-gen1-2 index)..."
-		for D in 02 21 22
+		for D in 02 19 20 21 22
 		do
 			pushd ${D}_* >/dev/null 2>&1
 				pwd
@@ -311,10 +334,6 @@ reindex() {
 			Y=$(openssl x509 -in "$F" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
 			X=$(openssl x509 -serial -subject -in "$F" -noout) 
 
-			#PIV_P-384_Signing_CA    - T is always piv, G is always gen3-p384
-			#PIV_RSA_2048_Signing_CA - T is alsway piv, G is always rsa-2048
-			#PIV-I_Signing_CA        - T is always pivi, G is always gen3
-
 			echo "${PAD}${CTR}: ${C}..."
 			if [ $(expr "$F" : ".*SSL.*$") -ge 3 ]; then
 				continue
@@ -324,6 +343,10 @@ reindex() {
 			AKID=$(openssl x509 -in $F -text -noout 2>&10 | grep keyid: | sed 's/\s//g; s/keyid://g; s/://g')
 
 			case $AKID in
+				$PIV_GEN3_P256)
+					T=piv
+					G=gen3-p256
+					;;
 				$PIV_GEN3_P384)
 					T=piv
 					G=gen3-p384
@@ -408,6 +431,7 @@ PIVIGEN1_DEST=$CWD/data/database/pivi-gen1-2-index.txt
 PIVIGEN3_DEST=$CWD/data/database/pivi-gen3-index.txt
 PIVRSA2048_DEST=$CWD/data/database/piv-rsa-2048-index.txt
 PIVGEN3P384_DEST=$CWD/data/database/piv-gen3-p384-index.txt
+PIVGEN3P256_DEST=$CWD/data/database/piv-gen3-p256-index.txt
 LEGACY_DEST=$CWD/data/database/legacy-index.txt
 
 PIVGEN1_LOCAL=$CWD/piv-gen1-2-index.txt
@@ -416,6 +440,7 @@ PIVIGEN1_LOCAL=$CWD/pivi-gen1-2-index.txt
 PIVIGEN3_LOCAL=$CWD/pivi-gen3-index.txt
 PIVRSA2048_LOCAL=$CWD/piv-rsa-2048-index.txt
 PIVGEN3P384_LOCAL=$CWD/piv-gen3-p384-index.txt
+PIVGEN3P256_LOCAL=$CWD/piv-gen3-p256-index.txt
 LEGACY_LOCAL=$CWD/legacy-index.txt
 
 cp $PIVGEN1_DEST $PIVGEN1_LOCAL
@@ -424,6 +449,7 @@ cp $PIVIGEN1_DEST $PIVIGEN1_LOCAL
 cp $PIVIGEN3_DEST $PIVIGEN3_LOCAL
 cp $PIVRSA2048_DEST $PIVRSA2048_LOCAL
 cp $PIVGEN3P384_DEST $PIVGEN3P384_LOCAL
+cp $PIVGEN3P256_DEST $PIVGEN3P256_LOCAL
 cp $LEGACY_DEST $LEGACY_LOCAL
 
 cp -p ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/*.crt data/pem
@@ -462,7 +488,7 @@ OCSPP12S="ICAM_Test_Card_PIV_OCSP_Expired_Signer_gen3.p12 \
 CERTLIST=""
 
 if [ $# -eq 1 -a r$1 == r"-r" ]; then
-	rm -f $PIVGEN1_LOCAL $PIVGEN3_LOCAL $PIVIGEN3_LOCAL $PIVGEN3P384_LOCAL
+	rm -f $PIVGEN1_LOCAL $PIVGEN3_LOCAL $PIVIGEN3_LOCAL $PIVGEN3P384_LOCAL $PIVGEN3P256_LOCAL
 	reindex
 fi
 
@@ -481,6 +507,7 @@ done
 /bin/mv $PIVIGEN3_DEST $PIVIGEN3_DEST.old 2>/dev/null
 /bin/mv $PIVRSA2048_DEST $PIVRSA2048_DEST.old 2>/dev/null
 /bin/mv $PIVGEN3P384_DEST $PIVGEN3P384_DEST.old 2>/dev/null
+/bin/mv $PIVGEN3P256_DEST $PIVGEN3P256_DEST.old 2>/dev/null
 
 # Move our "rebuilt" version into place
 
@@ -491,40 +518,58 @@ cp -p $PIVIGEN3_LOCAL $PIVIGEN3_DEST
 cp -p $PIVIGEN3_LOCAL $PIVIGEN3_DEST
 cp -p $PIVRSA2048_LOCAL $PIVRSA2048_DEST
 cp -p $PIVGEN3P384_LOCAL $PIVGEN3P384_DEST
+cp -p $PIVGEN3P384_LOCAL $PIVGEN3P384_DEST
+cp -p $PIVGEN3P256_LOCAL $PIVGEN3P256_DEST
+
+# Create indices with unique serial numbers.  First, remove all duplicate
+# serial numbers from the database files. Since the .cnf files operate
+# on the actual files, copy them to the destination so that OpenSSL finds
+# them.
+
+for F in $PIVGEN1_LOCAL $PIVGEN3_LOCAL $PIVIGEN1_LOCAL $PIVIGEN3_LOCAL $PIVIGEN3_LOCAL $PIVRSA2048_LOCAL $PIVGEN3P384_LOCAL $PIVGEN3P384_LOCAL $PIVGEN3P256_LOCAL
+do
+	makeuniq $F
+	cp -p $F data/database
+done
+
+# Start revoking certs that we need to be revoked.
 
 echo "Revoking known revoked certs..."
-## OCSP revoked signer with id-pkix-ocsp-nocheck present using RSA 2048 (RSA 2048 CA)
-echo "OCSP revoked signer with id-pkix-ocsp-nocheck present using RSA 2048 (RSA 2048 CA)..."
+## OCSP revoked signer with id-pkix-ocsp-nocheck present using Gen3 CA
+echo "OCSP revoked signer with id-pkix-ocsp-nocheck present using Gen3 CA..."
 SUBJ=ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Present_gen3 
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3
 CONFIG=${CWD}/icam-piv-ocsp-revoked-nocheck-not-present.cnf
 CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardGen3SigningCA.crl
 revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN3CRL
 if [ $? -gt 0 ]; then exit 1; fi
-sortbyser $PIVGEN3_LOCAL
+cp -p data/database/$(basename $PIVGEN3_LOCAL) .
+makeuniq $PIVGEN3_LOCAL
 
-## OCSP revoked signer with id-pkix-ocsp-nocheck NOT present using RSA 2048 (RSA 2048 CA)
-echo "OCSP revoked signer with id-pkix-ocsp-nocheck NOT present using RSA 2048 (RSA 2048 CA)..."
+## OCSP revoked signer with id-pkix-ocsp-nocheck NOT present using Gen3 CA
+echo "OCSP revoked signer with id-pkix-ocsp-nocheck NOT present using Gen3 CA..."
 SUBJ=ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Not_Present_gen3 
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3
 CONFIG=${CWD}/icam-piv-ocsp-revoked-nocheck-present.cnf
 CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardGen3SigningCA.crl
 revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN3CRL
 if [ $? -gt 0 ]; then exit 1; fi
-sortbyser $PIVGEN3_LOCAL
+cp -p data/database/$(basename $PIVGEN3_LOCAL) .
+makeuniq $PIVGEN3_LOCAL
 
-### Gen1-2 Content Signing Cert
-echo "Gen1-2 Content Signing Cert..."
+### Gen1-2 Content Signing Cert using Gen1-2 CA
+echo "Gen1-2 Content Signing Cert using Gen1-2 CA..."
 SUBJ=ICAM_Test_Card_PIV_Revoked_Content_Signer_gen1-2
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2
 CONFIG=${CWD}/icam-piv-revoked-ee-gen1-2.cnf
 CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardSigningCA.crl
 revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN1CRL
 if [ $? -gt 0 ]; then exit 1; fi
-sortbyser $PIVGEN1_LOCAL
+cp -p data/database/$(basename $PIVGEN1_LOCAL) .
+makeuniq $PIVGEN1_LOCAL
 
-## Gen1-2 Card 24 Revoked PIV Auth 
-echo "Gen1-2 Card 24 Revoked PIV Auth..."
+## Gen1-2 Card 24 Revoked PIV Auth using Gen1-2 CA 
+echo "Gen1-2 Card 24 Revoked PIV Auth using Gen1-2 CA..."
 cp -p ../cards/ICAM_Card_Objects/24_Revoked_Certificates/3\ -\ ICAM_PIV_Auth_SP_800-73-4.crt data/pem/ICAM_Test_Card_24_PIV_Auth.crt
 cp -p ../cards/ICAM_Card_Objects/24_Revoked_Certificates/3\ -\ ICAM_PIV_Auth_SP_800-73-4.p12 data/ICAM_Test_Card_24_PIV_Auth.p12
 SUBJ=ICAM_Test_Card_24_PIV_Auth
@@ -534,10 +579,11 @@ CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardSignin
 revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN1CRL
 RETCODE=$?
 if [ $RETCODE -gt 0 ]; then echo "Revoke failed, returned $RETCODE"; exit 1; fi
-sortbyser $PIVGEN1_LOCAL
+cp -p data/database/$(basename $PIVGEN1_LOCAL) .
+makeuniq $PIVGEN1_LOCAL
 
-## Gen1-2 Card 24 Revoked PIV Card Auth 
-echo "Gen1-2 Card 24 Revoked PIV Card Auth..."
+## Gen1-2 Card 24 Revoked PIV Card Auth using Gen1-2 CA 
+echo "Gen1-2 Card 24 Revoked PIV Card Auth using Gen1-2 CA..."
 cp -p ../cards/ICAM_Card_Objects/24_Revoked_Certificates/6\ -\ ICAM_PIV_Card_Auth_SP_800-73-4.crt data/pem/ICAM_Test_Card_24_PIV_Card_Auth.crt
 cp -p ../cards/ICAM_Card_Objects/24_Revoked_Certificates/6\ -\ ICAM_PIV_Card_Auth_SP_800-73-4.p12 data/ICAM_Test_Card_24_PIV_Card_Auth.p12
 SUBJ=ICAM_Test_Card_24_PIV_Card_Auth
@@ -546,17 +592,19 @@ CONFIG=${CWD}/icam-piv-revoked-ee-gen1-2.cnf
 CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardSigningCA.crl
 revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN1CRL
 if [ $? -gt 0 ]; then exit 1; fi
-sortbyser $PIVGEN1_LOCAL
+cp -p data/database/$(basename $PIVGEN1_LOCAL) .
+makeuniq $PIVGEN1_LOCAL
 
-## Gen1-2 Revoked Content Signer
-echo "Gen1-2 Revoked Content Signer..."
+## Gen1-2 Revoked Content Signer using Gen1-2 CA
+echo "Gen1-2 Revoked Content Signer using Gen1-2 CA..."
 SUBJ=ICAM_Test_Card_PIV_Revoked_Content_Signer_gen1-2
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2
 CONFIG=${CWD}/icam-piv-revoked-ee-gen1-2.cnf
 CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardSigningCA.crl
 revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN1CRL
 if [ $? -gt 0 ]; then exit 1; fi
-sortbyser $PIVGEN1_LOCAL
+cp -p data/database/$(basename $PIVGEN1_LOCAL) .
+makeuniq $PIVGEN1_LOCAL
 
 # End of CA work, now move back to local directory to archive it
 
@@ -566,9 +614,10 @@ cp -p $PIVIGEN1_DEST $PIVIGEN1_LOCAL
 cp -p $PIVIGEN3_DEST $PIVIGEN3_LOCAL
 cp -p $PIVRSA2048_DEST $PIVRSA2048_LOCAL
 cp -p $PIVGEN3P384_DEST $PIVGEN3P384_LOCAL
+cp -p $PIVGEN3P256_DEST $PIVGEN3P256_LOCAL
 cp -p $LEGACY_DEST $LEGACY_LOCAL
 
-for F in $PIVGEN1_DEST $PIVGEN3_DEST $PIVIGEN1_DEST $PIVIGEN3_DEST $PIVRSA2048_DEST $PIVGEN3P384_DEST
+for F in $PIVGEN1_DEST $PIVGEN3_DEST $PIVIGEN1_DEST $PIVIGEN3_DEST $PIVRSA2048_DEST $PIVGEN3P384_DEST $PIVGEN3P256_DEST
 do
 	echo "unique_subject = no" >${F}.attr
 	cp -p ${F}.attr .
@@ -583,12 +632,14 @@ tar cv --owner=root --group=root -f responder-certs.tar \
 	$(basename $PIVIGEN3_LOCAL) \
 	$(basename $PIVRSA2048_LOCAL) \
 	$(basename $PIVGEN3P384_LOCAL) \
+	$(basename $PIVGEN3P256_LOCAL) \
 	$(basename $LEGACY_LOCAL) \
 	$(basename ${PIVGEN1_LOCAL}.attr) \
 	$(basename ${PIVGEN3_LOCAL}.attr) \
 	$(basename ${PIVIGEN1_LOCAL}.attr) \
 	$(basename ${PIVIGEN3_LOCAL}.attr) \
-	$(basename ${PIVGEN3P384_LOCAL}.attr)
+	$(basename ${PIVGEN3P384_LOCAL}.attr) \
+	$(basename ${PIVGEN3P256_LOCAL}.attr)
 
 rm -f $OCSPP12S $SIGNP12S $CERTLIST
 rm -f $PIVGEN1_LOCAL ${PIVGEN1_LOCAL}.attr
@@ -597,6 +648,7 @@ rm -f $PIVIGEN1_LOCAL ${PIVIGEN1_LOCAL}.attr
 rm -f $PIVIGEN3_LOCAL ${PIVIGEN3_LOCAL}.attr
 rm -f $PIVRSA2048_LOCAL ${PIVRSA2048_LOCAL}.attr
 rm -f $PIVGEN3P384_LOCAL ${PIVGEN3P384_LOCAL}.attr
+rm -f $PIVGEN3P256_LOCAL ${PIVGEN3P256_LOCAL}.attr
 rm -f $LEGACY_LOCAL
 rm -f data/pem/*.private.pem
 rm -f *.p12 *.crt
