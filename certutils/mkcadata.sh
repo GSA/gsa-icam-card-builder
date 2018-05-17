@@ -44,6 +44,7 @@ makeuniq() {
 			printf("%s\t%s\t%s\t%s\t%s\t%s\n", $2, $3, $4, $1, $5, $6, $7) 
 	}' >$DST
 	mv $DST $SRC 
+	rm -f j.idx j.dat
 }
 
 skids() {

@@ -242,6 +242,8 @@ firewall-cmd --permanent --zone=trusted --add-port=2564/tcp
 firewall-cmd --permanent --zone=trusted --add-port=2565/tcp
 firewall-cmd --permanent --zone=trusted --add-port=2566/tcp
 firewall-cmd --permanent --zone=trusted --add-port=2567/tcp
+firewall-cmd --direct --permanent --add-rule ipv4 filter INPUT_direct 0 -p tcp --dport 80 -m state --state NEW -m recent --set
+firewall-cmd --direct --permanent --add-rule ipv4 filter INPUT_direct 1 -p tcp --dport 80 -m state --state NEW -m recent --update --seconds 15 --hitcount 30 -j DROP
 firewall-cmd --reload
 
 # $HTTP, openssl
