@@ -3,7 +3,7 @@
 This directory contains subdirectories for each ICAM Test Card.  ICAM Test Cards have been published in 3 phases which we'll call "generations" or simply "Gen".
 The generations are:
 
-* Gen 1-2: Cards 1-24, (FIPS 201-1/SP 800-73-3, FRTC 1.2.0 and 1.3.0-2)
+* Gen 1-2: Cards 1-24, (FIPS 201-1/SP 800-73-4, FRTC 1.2.0 and 1.3.0-2)
 * Gen 3: Cards 25-28, 37, 38, 39, 41-47, 49-55 (FIPS 201-2/SP 800-73-4,  FRTC 1.3.3)
 
 The complete list of ICAM test cards for FRTC 1.3.3 is listed in the table below.
@@ -46,7 +46,7 @@ The complete list of ICAM test cards for FRTC 1.3.3 is listed in the table below
 | 34 | Future: Card with PPS F=512, D=8 (78,125 baud) | ISO Standards Conformance |
 | 35 | Future: Card with PPS F=512, D=16 (156,250 baud) | ISO Standards Conformance |
 | 36 | Future: Card with PPS F=512, D=32 (312,500 baud) | ISO Standards Conformance |
-| 37 | Golden FIPS 201-2 Card with PPS F=512, D=64 (625,000 baud) | ISO Standards Conformance |
+| 37 | Golden FIPS 201-2 Card with PPS F=512, D=64 (625,000 baud), ECC Card Auth, Secure Messaging | ISO Standards Conformance |
 | 38 | Hash value within the Security Object does not match hash value of its corresponding data group buffer. | Manipulated Data |
 | 39 | Valid: Federally-issued PIV-I.  Federally issued PIV-I card using FASC-N with the agency's Agency Code plus System Code, Credential Number, Credential Series Code, and Issue Code. | Incorrect Identifier |
 | 40 | Deprecated: Federally-issued PIV-I.  Valid: Federally issued PIV-I card using fourteen 9s. | Incorrect Identifier |
