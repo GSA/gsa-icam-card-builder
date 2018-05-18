@@ -31,7 +31,6 @@ public class DgHashMap {
 	 *            byte array containing Security Object from file or card
 	 * @param initSo
 	 *            flag to indicate to clear out the existing hashes and mappings
-	 * @return DgHashMap object
 	 */
 	public DgHashMap(byte[] containerBytes, boolean initSo) {
 
