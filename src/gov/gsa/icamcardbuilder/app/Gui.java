@@ -293,7 +293,7 @@ public class Gui extends JPanel {
 		});
 
 		initSecurityObjectCheckbox = new JCheckBox("Initialize Security Object");
-		initSecurityObjectCheckbox.setToolTipText("Check if you wish to clear the Security Object's DG table");
+		initSecurityObjectCheckbox.setToolTipText("Check if you wish to clear the Security Object's DG hash table");
 		initSecurityObjectCheckbox.setSelected(false);
 		initSecurityObjectCheckbox.addActionListener(new ActionListener() {
 			@Override
