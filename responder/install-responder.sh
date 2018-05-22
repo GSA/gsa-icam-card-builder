@@ -193,7 +193,6 @@ grep $IPADDR /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
 grep $HOSTNAME /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
 
 if [ $CRLHOST -eq 1 ]; then
-  grep crl.apl-test.cite.fpki-lab.gov /etc/host >/dev/null 2>&1; GC=$(expr $? + $GC)
   grep http.apl-test.cite.fpki-lab.gov /etc/host >/dev/null 2>&1; GC=$(expr $? + $GC)
 fi
 grep -i ocsp.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
@@ -209,7 +208,6 @@ if [ $GC -gt 0 ]; then
   cp -p /etc/hosts /etc/hosts.$$
   grep -v lab.gov /etc/hosts >/tmp/hosts
   echo "$IPADDR $HOSTNAME" >>/tmp/hosts
-  echo "$IPADDR crl.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
   echo "$IPADDR http.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
   echo "$IPADDR ocsp.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
   echo "$IPADDR ocspGen3.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
@@ -243,7 +241,7 @@ firewall-cmd --permanent --zone=trusted --add-port=2565/tcp
 firewall-cmd --permanent --zone=trusted --add-port=2566/tcp
 firewall-cmd --permanent --zone=trusted --add-port=2567/tcp
 firewall-cmd --direct --permanent --add-rule ipv4 filter INPUT_direct 0 -p tcp --dport 80 -m state --state NEW -m recent --set
-firewall-cmd --direct --permanent --add-rule ipv4 filter INPUT_direct 1 -p tcp --dport 80 -m state --state NEW -m recent --update --seconds 15 --hitcount 30 -j DROP
+firewall-cmd --direct --permanent --add-rule ipv4 filter INPUT_direct 1 -p tcp --dport 80 -m state --state NEW -m recent --update --seconds 60 --hitcount 150 -j DROP
 firewall-cmd --reload
 
 # $HTTP, openssl
@@ -277,9 +275,6 @@ done
 if [ x$OS == x"centos" ]; then setsebool -P httpd_unified 1; fi
 
 if [ $CRLHOST -eq 1 ]; then
-	mkdir -p crl.apl-test.cite.fpki-lab.gov
-	mkdir -p crl.apl-test.cite.fpki-lab.gov/crls
-	mkdir -p crl.apl-test.cite.fpki-lab.gov/logs
 	mkdir -p http.apl-test.cite.fpki-lab.gov
 	mkdir -p http.apl-test.cite.fpki-lab.gov/aia
 	mkdir -p http.apl-test.cite.fpki-lab.gov/sia
@@ -295,7 +290,7 @@ if [ $CRLHOST -eq 1 ]; then
 			done
 		fi
   popd >/dev/null 2>&1
-	cp -p http.apl-test.cite.fpki-lab.gov/crls/ICAMTestCardRootCA.crl crl.apl-test.cite.fpki-lab.gov/crls
+	cp -p http.apl-test.cite.fpki-lab.gov/crls/ICAMTestCardRootCA.crl
 fi
 
 # Prevent indexing
@@ -330,19 +325,6 @@ mkdir -p sites-enabled
 cd sites-available
 
 if [ $CRLHOST -eq 1 ]; then
-  cat << %% >crl.apl-test.cite.fpki-lab.gov.conf
-<VirtualHost crl.apl-test.cite.fpki-lab.gov:80>
-  ServerName crl.apl-test.cite.fpki-lab.gov
-  DocumentRoot /var/www/crl.apl-test.cite.fpki-lab.gov
-  ErrorLog /var/www/crl.apl-test.cite.fpki-lab.gov/logs/error.log
-  CustomLog /var/www/crl.apl-test.cite.fpki-lab.gov/logs/requests.log combined
-  <Directory "/var/www/crl.apl-test.cite.fpki-lab.gov">
-    Options -Indexes
-    AllowOverride none
-  </Directory>
-</VirtualHost>
-%%
-
   cat << %% >http.apl-test.cite.fpki-lab.gov.conf
 <VirtualHost http.apl-test.cite.fpki-lab.gov:80>
   ServerName http.apl-test.cite.fpki-lab.gov
@@ -355,7 +337,6 @@ if [ $CRLHOST -eq 1 ]; then
   IndexOptions FancyIndexing HTMLTable VersionSort NameWidth=210 DescriptionWidth=0
   LogLevel debug
   ErrorLog /var/www/http.apl-test.cite.fpki-lab.gov/logs/error_log
-  CustomLog /var/www/http.apl-test.cite.fpki-lab.gov/logs/requests.log combined
   TransferLog /var/www/http.apl-test.cite.fpki-lab.gov/logs/access_log
 </VirtualHost>
 %%
@@ -369,7 +350,6 @@ cat << %% >ocsp.apl-test.cite.fpki-lab.gov.conf
   RewriteCond %{CONTENT_TYPE} !^application/ocsp-request$
   RewriteRule ^/(.*) http://localhost:2560/ [P]
   ErrorLog /var/www/ocsp.apl-test.cite.fpki-lab.gov/logs/error.log
-  CustomLog /var/www/ocsp.apl-test.cite.fpki-lab.gov/logs/requests.log combined
   <Location "/">
     AllowMethods POST
   </Location>
@@ -384,7 +364,6 @@ cat << %% >ocspGen3.apl-test.cite.fpki-lab.gov.conf
   RewriteCond %{CONTENT_TYPE} !^application/ocsp-request$
   RewriteRule ^/(.*) http://localhost:2561/ [P]
   ErrorLog /var/www/ocspGen3.apl-test.cite.fpki-lab.gov/logs/error.log
-  CustomLog /var/www/ocspGen3.apl-test.cite.fpki-lab.gov/logs/requests.log combined
   <Location "/">
     AllowMethods POST
   </Location>
@@ -399,7 +378,6 @@ cat << %% >ocspExpired.apl-test.cite.fpki-lab.gov.conf
   RewriteCond %{CONTENT_TYPE} !^application/ocsp-request$
   RewriteRule ^/(.*) http://localhost:2562/ [P]
   ErrorLog /var/www/ocspExpired.apl-test.cite.fpki-lab.gov/logs/error.log
-  CustomLog /var/www/ocspExpired.apl-test.cite.fpki-lab.gov/logs/requests.log combined
   <Location "/">
     AllowMethods POST
   </Location>
@@ -414,7 +392,6 @@ cat << %% >ocspInvalidSig.apl-test.cite.fpki-lab.gov.conf
   RewriteCond %{CONTENT_TYPE} !^application/ocsp-request$
   RewriteRule ^/(.*) http://localhost:2563/ [P]
   ErrorLog /var/www/ocspInvalidSig.apl-test.cite.fpki-lab.gov/logs/error.log
-  CustomLog /var/www/ocspInvalidSig.apl-test.cite.fpki-lab.gov/logs/requests.log combined
   <Location "/">
     AllowMethods POST
   </Location>
@@ -429,7 +406,6 @@ cat << %% >ocspRevoked.apl-test.cite.fpki-lab.gov.conf
   RewriteCond %{CONTENT_TYPE} !^application/ocsp-request$
   RewriteRule ^/(.*) http://localhost:2564/ [P]
   ErrorLog /var/www/ocspRevoked.apl-test.cite.fpki-lab.gov/logs/error.log
-  CustomLog /var/www/ocspRevoked.apl-test.cite.fpki-lab.gov/logs/requests.log combined
   <Location "/">
     AllowMethods POST
   </Location>
@@ -444,7 +420,6 @@ cat << %% >ocspNocheckNotPresent.apl-test.cite.fpki-lab.gov.conf
   RewriteCond %{CONTENT_TYPE} !^application/ocsp-request$
   RewriteRule ^/(.*) http://localhost:2565/ [P]
   ErrorLog /var/www/ocspNocheckNotPresent.apl-test.cite.fpki-lab.gov/logs/error.log
-  CustomLog /var/www/ocspNocheckNotPresent.apl-test.cite.fpki-lab.gov/logs/requests.log combined
   <Location "/">
     AllowMethods POST
   </Location>
@@ -459,7 +434,6 @@ cat << %% >ocsp-pivi.apl-test.cite.fpki-lab.gov.conf
   RewriteCond %{CONTENT_TYPE} !^application/ocsp-request$
   RewriteRule ^/(.*) http://localhost:2566/ [P]
   ErrorLog /var/www/ocsp-pivi.apl-test.cite.fpki-lab.gov/logs/error.log
-  CustomLog /var/www/ocsp-pivi.apl-test.cite.fpki-lab.gov/logs/requests.log combined
   <Location "/">
     AllowMethods POST
   </Location>
@@ -474,7 +448,6 @@ cat << %% >ocspGen3p384.apl-test.cite.fpki-lab.gov.conf
   RewriteCond %{CONTENT_TYPE} !^application/ocsp-request$
   RewriteRule ^/(.*) http://localhost:2567/ [P]
   ErrorLog /var/www/ocspGen3p384.apl-test.cite.fpki-lab.gov/logs/error.log
-  CustomLog /var/www/ocspGen3p384.apl-test.cite.fpki-lab.gov/logs/requests.log combined
   <Location "/">
     AllowMethods POST
   </Location>
