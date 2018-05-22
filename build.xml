@@ -119,7 +119,7 @@
 			doctitle="GSA ICAM Card Builder" nodeprecated="false"
 			nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false"
 			packagenames="gov.gsa.icamcardbuilder.app"
-			source="10" sourcepath="src" splitindex="true" use="true" version="true">
+			source="1.8" sourcepath="src" splitindex="true" use="true" version="true">
 			<link href="http://download.oracle.com/javase/8/docs/api/" />
 			<link href="http://docs.oracle.com/javase/8/docs/jre/api/security/smartcardio/spec/" />
 			<link href="https://www.bouncycastle.org/docs/docs1.5on/" />
