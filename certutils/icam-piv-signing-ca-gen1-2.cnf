@@ -1,0 +1,46 @@
+oid_section = xca_oids
+
+[ xca_oids ]
+dom = 1.3.6.1.4.1.311.20.2
+MsCaV = 1.3.6.1.4.1.311.21.1
+msEFSFR = 1.3.6.1.4.1.311.10.3.4.1
+iKEIntermediate = 1.3.6.1.5.5.8.2.2
+nameDistinguisher = 0.2.262.1.10.7.20
+id-kp-eapOverPPP = 1.3.6.1.5.5.7.3.13
+id-kp-eapOverLAN = 1.3.6.1.5.5.7.3.14
+
+[ req ]
+default_bits = 1024
+default_keyfile = privkey.pem
+distinguished_name = xca_dn
+x509_extensions = xca_extensions
+req_extensions = xca_extensions
+string_mask = MASK:0x2002
+utf8 = yes
+prompt = no
+
+[ xca_dn ]
+0.C=US
+1.O=U.S. Government
+2.OU=ICAM Test Cards
+3.CN=ICAM Test Card Signing CA
+
+[ xca_extensions ]
+policyMappings=@policyMappings_sect
+certificatePolicies=ia5org,2.16.840.1.101.3.2.1.48.3, 2.16.840.1.101.3.2.1.48.4, 2.16.840.1.101.3.2.1.48.9, 2.16.840.1.101.3.2.1.48.11, 2.16.840.1.101.3.2.1.48.13, 2.16.840.1.101.3.2.1.48.78, 2.16.840.1.101.3.2.1.48.79, 2.16.840.1.101.3.2.1.48.80, 2.16.840.1.101.3.2.1.48.86
+policyConstraints=requireExplicitPolicy:1
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid
+authorityInfoAccess=caIssuers;URI:http://http.apl-test.cite.fpki-lab.gov/aia/certsIssuedToICAMTestCardRootCA.p7c
+crlDistributionPoints=crlDistributionPoint0_sect
+keyUsage=critical,keyCertSign, cRLSign
+basicConstraints=critical,CA:TRUE,pathlen:0
+
+[crlDistributionPoint0_sect]
+fullname=URI:http://http.apl-test.cite.fpki-lab.gov/crls/ICAMTestCardRootCA.crl
+[policyMappings_sect]
+2.16.840.1.101.3.2.1.48.78 = 2.16.840.1.101.3.2.1.48.248
+2.16.840.1.101.3.2.1.48.79 = 2.16.840.1.101.3.2.1.48.249
+2.16.840.1.101.3.2.1.48.3 = 2.16.840.1.101.3.2.1.48.250
+2.16.840.1.101.3.2.1.48.4 = 2.16.840.1.101.3.2.1.48.251
+2.16.840.1.101.3.2.1.48.80 = 2.16.840.1.101.3.2.1.48.252

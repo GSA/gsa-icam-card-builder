@@ -64,5 +64,5 @@ subjectAltName = @subjectAltName_sect
 
 [ subjectAltName_sect ]
 #otherName = 2.16.840.1.101.3.6.6;FORMAT:HEX,OCT:D4:E7:39:DA:73:9C:ED:39:CE:73:9D:A1:68:58:21:08:42:10:85:15:CC:E7:39:B7:FA
-URI = urn:uuid:af8b1780-863c-42af-8925-02206f311a28
+URI = urn:uuid:be127ea0-d180-124d-e044-000f202b235a
 email = icam.test.cards@gsa.gov
