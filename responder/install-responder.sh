@@ -329,13 +329,17 @@ if [ $CRLHOST -eq 1 ]; then
 <VirtualHost http.apl-test.cite.fpki-lab.gov:80>
   ServerName http.apl-test.cite.fpki-lab.gov
   DocumentRoot /var/www/http.apl-test.cite.fpki-lab.gov
+  <IfModule mod_expires.c>
+    ExpiresActive on
+    ExpiresDefault "access plus 5 seconds"
+  </IfModule>
   <Directory "/var/www/http.apl-test.cite.fpki-lab.gov">
     Options +Indexes
     IndexIgnore logs
     AllowOverride all
   </Directory>
   IndexOptions FancyIndexing HTMLTable VersionSort NameWidth=210 DescriptionWidth=0
-  LogLevel debug
+  LogLevel info
   ErrorLog /var/www/http.apl-test.cite.fpki-lab.gov/logs/error_log
   TransferLog /var/www/http.apl-test.cite.fpki-lab.gov/logs/access_log
 </VirtualHost>
