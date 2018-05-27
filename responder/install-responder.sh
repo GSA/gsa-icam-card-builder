@@ -290,7 +290,6 @@ if [ $CRLHOST -eq 1 ]; then
 			done
 		fi
   popd >/dev/null 2>&1
-	cp -p http.apl-test.cite.fpki-lab.gov/crls/ICAMTestCardRootCA.crl
 fi
 
 # Prevent indexing
