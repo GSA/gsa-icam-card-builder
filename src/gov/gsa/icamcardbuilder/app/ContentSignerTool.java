@@ -620,9 +620,6 @@ public class ContentSignerTool {
 					// If clearing the Security Object hash map, remove all hashes
 					if (initSo) {
 						dgHashMap = new DgHashMap(securityObjectFileBytes, initSo);
-//						for (int i = 0; i < PivContainers.pivContainers.length; i++) {
-//							dgHashMap.removeDgHash(PivContainers.pivContainers[i]);
-//						}
 						// Now add in the one we just signed
 						dgHashMap.addDgHash(desiredContainerId, containerDigestBytes);
 					} else if (!clearDoHash) {
