@@ -33,7 +33,7 @@ echo.
 echo ****** Testing PIV-I Content Signing cert ******
 pause
 echo on
-certutil -verify -urlfetch "CHUID.crt" 2.16.840.1.101.3.8.7 2.16.840.1.101.3.2.1.48.80
+certutil -verify -urlfetch "CHUID_Signer.crt" 2.16.840.1.101.3.8.7 2.16.840.1.101.3.2.1.48.80
 echo off
 echo ****** PIV-I Content Signing cert test complete ******
 pause
