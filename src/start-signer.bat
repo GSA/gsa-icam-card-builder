@@ -8,7 +8,7 @@ REM
 REM First parameter is relative path to default cards directory.
 
 if NOT EXIST %1 (
-  echo "Error: %1 doesn't exist.  Using cards/ICAM_Card_Objects
+  echo "Error: %1 doesn't exist.  Using cards/ICAM_Card_Objects"
   SET ROOT=cards/ICAM_Card_Objects
 ) ELSE ( 
   ROOT=%1

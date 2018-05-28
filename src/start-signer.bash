@@ -6,12 +6,9 @@
 # "-noverify" option to get around the issue.  The risk is that the bytecode 
 # isn't being verified.
 
-ROOT=cards/ICAM_Card_Objects
-
-if [ z$1 == "z" ]; then
-	echo "No parameter given.  Using $ROOT"
-elif [ ! -d $1 ]; then
-  echo "Error: $1 doesn't exist.  Using $ROOT"
+if [ ! -d $1 ]; then
+  echo "Error: $1 doesn't exist.  Using cards/ICAM_Card_Objects
+  ROOT=cards/ICAM_Card_Objects
 else
   ROOT=$1
 fi
