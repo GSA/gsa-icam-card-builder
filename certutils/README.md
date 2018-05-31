@@ -222,7 +222,7 @@ initial policy set.*
 
 \* Earlier ICAM test cards 1-24 directly assert these policies which was incorrect.  Any ICAM Test Cards encoded after May 2018 assert policy OIDs in arc 2.16.840.1.101.3.2.1.48.248-252.
 
-The normative reference for these policies can be found at [FPKI CITE](https://www.idmanagement.gov/wp-content/uploads/sites/1171/uploads/FPKI_CITE_v1_0_4.pdf).
+The normative reference for these policies can be found at [FPKI CITE](https://www.idmanagement.gov/wp-content/uploads/sites/1171/uploads/fpki-cite-participation-guide.pdf).
 
 ### Production PIV and PIV-I Card Certificate Policy OIDs
 The certificate policy OIDs used by the Federal Government are found
