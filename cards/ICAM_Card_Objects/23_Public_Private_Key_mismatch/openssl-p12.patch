@@ -1,0 +1,120 @@
+diff -U 10 -rp openssl-1.0.1u/apps/pkcs12.c openssl-1.0.1u.dummyp12/apps/pkcs12.c
+--- openssl-1.0.1u/apps/pkcs12.c        2016-09-22 06:29:27.000000000 -0400
++++ openssl-1.0.1u.dummyp12/apps/pkcs12.c       2018-05-30 09:43:34.000000000 -0400
+@@ -125,20 +125,21 @@ int MAIN(int argc, char **argv)
+     STACK_OF(OPENSSL_STRING) *canames = NULL;
+     char *cpass = NULL, *mpass = NULL;
+     char *passargin = NULL, *passargout = NULL, *passarg = NULL;
+     char *passin = NULL, *passout = NULL;
+     char *inrand = NULL;
+     char *macalg = NULL;
+     char *CApath = NULL, *CAfile = NULL;
+ # ifndef OPENSSL_NO_ENGINE
+     char *engine = NULL;
+ # endif
++    int forceDummyP12 = 0;
+ 
+     apps_startup();
+ 
+     enc = EVP_des_ede3_cbc();
+     if (bio_err == NULL)
+         bio_err = BIO_new_fp(stderr, BIO_NOCLOSE);
+ 
+     if (!load_config(bio_err, NULL))
+         goto end;
+ 
+@@ -537,20 +538,34 @@ int MAIN(int argc, char **argv)
+                 for (i = 0; i < sk_X509_num(certs); i++) {
+                     x = sk_X509_value(certs, i);
+                     if (X509_check_private_key(x, key)) {
+                         ucert = x;
+                         /* Zero keyid and alias */
+                         X509_keyid_set1(ucert, NULL, 0);
+                         X509_alias_set1(ucert, NULL, 0);
+                         /* Remove from list */
+                         (void)sk_X509_delete(certs, i);
+                         break;
++                    } else {
++                        forceDummyP12++;
++                        if(forceDummyP12 == 1 && i == 0) {
++                            /* If we're producing a dummy PKCS#12, the first cert in the input file is
++                             * treated as the user cert being exported, since we can't lean on the key
++                             * match to discern. */
++                            ucert = x;
++                            /* Zero keyid and alias */
++                            X509_keyid_set1(ucert, NULL, 0);
++                            X509_alias_set1(ucert, NULL, 0);
++                            /* Remove from list */
++                            (void)sk_X509_delete(certs, i);
++                            break;
++                        }
+                     }
+                 }
+                 if (!ucert) {
+                     BIO_printf(bio_err,
+                                "No certificate matches private key\n");
+                     goto export_end;
+                 }
+             }
+ 
+         }
+Only in openssl-1.0.1u.dummyp12/apps: pkcs12.c.orig
+diff -U 10 -rp openssl-1.0.1u/crypto/pkcs12/p12_crt.c openssl-1.0.1u.dummyp12/crypto/pkcs12/p12_crt.c
+--- openssl-1.0.1u/crypto/pkcs12/p12_crt.c      2016-09-22 06:23:06.000000000 -0400
++++ openssl-1.0.1u.dummyp12/crypto/pkcs12/p12_crt.c     2018-05-30 09:41:06.000000000 -0400
+@@ -108,22 +108,27 @@ PKCS12 *PKCS12_create(char *pass, char *
+         iter = PKCS12_DEFAULT_ITER;
+     if (!mac_iter)
+         mac_iter = 1;
+ 
+     if (!pkey && !cert && !ca) {
+         PKCS12err(PKCS12_F_PKCS12_CREATE, PKCS12_R_INVALID_NULL_ARGUMENT);
+         return NULL;
+     }
+ 
+     if (pkey && cert) {
++#if defined(RH_ENABLE_PAIRWISE_CONSISTENCY_CHECK)
++/* In our builds of OpenSSL, disable the pairwise consistency check by default, to
++ * facilitate generation of dummy p12s for iOS encryption credentials.
++ */
+         if (!X509_check_private_key(cert, pkey))
+             return NULL;
++#endif /*defined(RH_ENABLE_PAIRWISE_CONSISTENCY_CHECK)*/
+         X509_digest(cert, EVP_sha1(), keyid, &keyidlen);
+     }
+ 
+     if (cert) {
+         bag = PKCS12_add_cert(&bags, cert);
+         if (name && !PKCS12_add_friendlyname(bag, name, -1))
+             goto err;
+         if (keyidlen && !PKCS12_add_localkeyid(bag, keyid, keyidlen))
+             goto err;
+     }
+Only in openssl-1.0.1u.dummyp12/: dummy-p12.patch
+diff -U 10 -rp openssl-1.0.1u/engines/e_chil.c openssl-1.0.1u.dummyp12/engines/e_chil.c
+--- openssl-1.0.1u/engines/e_chil.c     2016-09-22 06:29:27.000000000 -0400
++++ openssl-1.0.1u.dummyp12/engines/e_chil.c    2018-05-30 09:41:06.000000000 -0400
+@@ -1223,20 +1223,22 @@ static int hwcrhk_get_pass(const char *p
+             UI_ctrl(ui, UI_CTRL_PRINT_ERRORS, 1, 0, 0);
+ 
+             if (ok >= 0)
+                 do {
+                     ok = UI_process(ui);
+                 }
+                 while (ok < 0 && UI_ctrl(ui, UI_CTRL_IS_REDOABLE, 0, 0, 0));
+ 
+             if (ok >= 0)
+                 *len_io = strlen(buf);
++            else
++                *len_io = 0;
+ 
+             UI_free(ui);
+             OPENSSL_free(prompt);
+         }
+     } else {
+         *len_io = callback(buf, *len_io, 0, callback_data);
+     }
+     if (!*len_io)
+         return -1;
+     return 0;
+Only in openssl-1.0.1u.dummyp12/engines: e_chil.c.orig
