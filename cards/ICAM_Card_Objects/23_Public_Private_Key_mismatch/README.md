@@ -25,6 +25,7 @@ sudo make install
 ```
 4. Set the path for the OS to find the patched version of OpenSSL first.
 ```
+export PATH=/usr/local/ssl/bin:$PATH
 type openssl
 ```
 
