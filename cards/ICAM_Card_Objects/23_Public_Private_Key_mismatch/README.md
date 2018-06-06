@@ -31,7 +31,7 @@ type openssl
 
 5. The system should respond with:
 ```
-openssl is /usr/local/ssl/bin/openssl`
+openssl is /usr/local/ssl/bin/openssl
 ```
 6. Copy the PEM formatted PIV Authentication and Card authentication certificates from Golden PIV Card 1 to an available directory.  The file names to copy are:
 ```
