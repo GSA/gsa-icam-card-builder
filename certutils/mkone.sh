@@ -348,16 +348,16 @@ cp -p ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/*.p12 data
 #RAF#cp -p data/pem/ICAM_*_$T.crt "$DEST"
 #RAF#renameIn "$DEST" 1 1
 #RAF#
-## Card 23
-T=Public_Private_Key_mismatch
-sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Auth_SP_800-73-4_$T -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -n 23 -t piv-auth || exit $?
-sh mkcert.sh -w -b -s "ICAM_Test_Card_PIV_Dig_Sig_SP_800-73-4_$T" -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -n 23 -t piv-dig-sig || exit $?
-sh mkcert.sh -w -b -s "ICAM_Test_Card_PIV_Key_Mgmt_SP_800-73-4_$T" -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -n 23 -t piv-key-mgmt || exit $?
-sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Card_Auth_SP_800-73-4_$T -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -n 23 -t piv-card-auth || exit $?
-DEST="../cards/ICAM_Card_Objects/23_$T"
-cp -p data/ICAM_*_$T.p12 "$DEST"
-cp -p data/pem/ICAM_*_$T.crt "$DEST"
-renameIn "$DEST" 1 1
+#RAF### Card 23
+#T=Public_Private_Key_mismatch
+#sh mkcert1.sh -w -b -s ICAM_Test_Card_PIV_Auth_SP_800-73-4_$T -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -n 23 -t piv-auth || exit $?
+#RAF#sh mkcert.sh -w -b -s "ICAM_Test_Card_PIV_Dig_Sig_SP_800-73-4_$T" -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -n 23 -t piv-dig-sig || exit $?
+#RAF#sh mkcert.sh -w -b -s "ICAM_Test_Card_PIV_Key_Mgmt_SP_800-73-4_$T" -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -n 23 -t piv-key-mgmt || exit $?
+#sh mkcert1.sh -w -b -s ICAM_Test_Card_PIV_Card_Auth_SP_800-73-4_$T -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -n 23 -t piv-card-auth || exit $?
+#DEST="../cards/ICAM_Card_Objects/23_$T"
+#cp -p data/ICAM_*_$T.p12 "$DEST"
+#cp -p data/pem/ICAM_*_$T.crt "$DEST"
+#renameIn "$DEST" 1 1
 #RAF#
 #RAF## Card 24
 #RAF#T=Revoked_Certificates
@@ -369,3 +369,9 @@ renameIn "$DEST" 1 1
 #RAF#renameIn "$DEST" 1 1
 #RAF#
 #RAF#
+## Gen3 Content Signer issued by RSA 2040 Signing CA
+SUBJ=ICAM_Test_Card_PIV_RSA_2048_Content_Signer_-_gold_gen3 
+sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3 -t piv-content-signer-rsa-2048 -r 2048 --cakey rsa2048 || exit $?
+DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
+cp -p data/$SUBJ.p12 "$DEST"
+cp -p data/pem/$SUBJ.crt "$DEST"

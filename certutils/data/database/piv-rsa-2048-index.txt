@@ -1,1 +1,2 @@
 V	321230235959Z		A0000000000000000001	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV RSA Issued Intermediate CVC Signer
+V	321230235959Z		A0000000000000000002	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV RSA 2048 Content Signer - gold gen3

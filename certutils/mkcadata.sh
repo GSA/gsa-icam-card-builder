@@ -470,6 +470,7 @@ CONTP12S="ICAM_Test_Card_PIV_Content_Signer_-_expired_gen1-2.p12 \
 	ICAM_Test_Card_PIV_Content_Signer_-_gold_gen3.p12 \
 	ICAM_Test_Card_PIV_Content_Signer_-_legacy_gold_gen1-2.p12 \
 	ICAM_Test_Card_PIV_Content_Signer_Expiring_-_gold_gen3.p12 \
+	ICAM_Test_Card_PIV_RSA_2048_Content_Signer_-_gold_gen3.p12 \
 	ICAM_Test_Card_PIV_ECC_Issued_P-256_SM_Certificate_Signer_2.p12 \
 	ICAM_Test_Card_PIV_ECC_Issued_P-384_SM_Certificate_Signer_3.p12 \
 	ICAM_Test_Card_PIV_ECC_Issued_P-256_Content_Signer_-_gold_gen3.p12 \
@@ -641,8 +642,10 @@ tar cv --owner=root --group=root -f responder-certs.tar \
 	$(basename ${PIVGEN3_LOCAL}.attr) \
 	$(basename ${PIVIGEN1_LOCAL}.attr) \
 	$(basename ${PIVIGEN3_LOCAL}.attr) \
+	$(basename ${PIVRSA2048_LOCAL}.attr) \
 	$(basename ${PIVGEN3P384_LOCAL}.attr) \
-	$(basename ${PIVGEN3P256_LOCAL}.attr)
+	$(basename ${PIVGEN3P256_LOCAL}.attr) \
+	$(basename ${LEGACY_LOCAL}.attr)
 
 rm -f $OCSPP12S $SIGNP12S $CERTLIST
 rm -f $PIVGEN1_LOCAL ${PIVGEN1_LOCAL}.attr
@@ -652,7 +655,7 @@ rm -f $PIVIGEN3_LOCAL ${PIVIGEN3_LOCAL}.attr
 rm -f $PIVRSA2048_LOCAL ${PIVRSA2048_LOCAL}.attr
 rm -f $PIVGEN3P384_LOCAL ${PIVGEN3P384_LOCAL}.attr
 rm -f $PIVGEN3P256_LOCAL ${PIVGEN3P256_LOCAL}.attr
-rm -f $LEGACY_LOCAL
+rm -f $LEGACY_LOCAL ${LEGACY_LOCAL}.attr
 rm -f data/pem/*.private.pem
 rm -f *.p12 *.crt
 
