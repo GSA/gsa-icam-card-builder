@@ -1,5 +1,5 @@
 ## Key Mismatch Creation
-This particular card is designed to have a public key that matches the Golden PIV Card 1 but has a different public key, creating the classic key mismatch scenario.
+This particular card is designed to have a public key that matches the Golden PIV Card 1 but has a different private key, creating the classic key mismatch scenario.
 
 The steps for creating this card involve using modified version of OpenSSL that allows .p12 files to be generated without testing whether the public and private keys belong to the same key pair.
 
