@@ -32,7 +32,7 @@ The complete list of ICAM test cards for FRTC 1.3.3 is listed in the table below
 | 20 | Valid Card Authentication Certificate copied from one card to another (PIV-I) | Copied Credential |
 | 21 | Valid PHOTO copied from one card to another (PIV-I) | Copied Credential |
 | 22 | Valid FINGERPRINT copied from one card to another (PIV-I) | Copied Credential |
-| 23 | Private and Public Key replaced | Manipulated Keys |
+| 23 | Private and Public Key mismatch | Manipulated Keys |
 | 24 | Revoked authentication certificates | Revoked Credential |
 | 25 | Discovery object is not present | Only Application PIN is present and shall be used. |
 | 26 | Discovery object tag 0x5F2F is present  | First byte: 0x40, Second byte 0x00 | Only Application PIN is present and shall be used.|
