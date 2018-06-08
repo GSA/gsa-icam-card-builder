@@ -644,8 +644,7 @@ tar cv --owner=root --group=root -f responder-certs.tar \
 	$(basename ${PIVIGEN3_LOCAL}.attr) \
 	$(basename ${PIVRSA2048_LOCAL}.attr) \
 	$(basename ${PIVGEN3P384_LOCAL}.attr) \
-	$(basename ${PIVGEN3P256_LOCAL}.attr) \
-	$(basename ${LEGACY_LOCAL}.attr)
+	$(basename ${PIVGEN3P256_LOCAL}.attr)
 
 rm -f $OCSPP12S $SIGNP12S $CERTLIST
 rm -f $PIVGEN1_LOCAL ${PIVGEN1_LOCAL}.attr
