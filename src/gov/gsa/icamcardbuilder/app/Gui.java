@@ -67,7 +67,7 @@ import javax.swing.JCheckBox;
 public class Gui extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	protected final static String version = "1.8.52";
+	protected final static String version = "1.8.53";
 	protected static String cardsDirectory = null;
 	private static String cardsDirectoryArg = null;
 	protected static boolean debug = true;
@@ -118,6 +118,7 @@ public class Gui extends JPanel {
 	protected JTextField uuidTextField;
 	protected JTextField cardholderUuidTextField;
 	protected JFileChooser propertiesFileChooser = new JFileChooser();
+	protected JFileChooser directoryChooser = new JFileChooser();
 	protected JFileChooser contentFileChooser = new JFileChooser();
 	protected static JButton contentFileBrowseButton;
 	protected JFileChooser securityObjectFileChooser = new JFileChooser();
@@ -152,6 +153,7 @@ public class Gui extends JPanel {
 	protected File keyFile;
 	protected Hashtable<JTextField, Boolean> reqFieldsTable = new Hashtable<JTextField, Boolean>();
 	protected File propertiesFile;
+	protected File propertiesFiles[];
 	protected String digestAlgorithm = null;
 	protected String signatureAlgorithm = null;
 	protected static String currentDirectory = null;
@@ -160,6 +162,8 @@ public class Gui extends JPanel {
 	protected static String employeeAffiliation = null;
 	protected static String agencyCardSerialNumber = "1234567890";
 
+	protected int filesToProcess = 0;
+	protected int pfIndex = 0;
 	protected int signingCount = 0;
 	private boolean located = false;
 	private boolean initSo = false;
@@ -283,12 +287,17 @@ public class Gui extends JPanel {
 				if (signingCount > 0)
 					status.append("***************************************************************************\n");
 				status.append(dateFormat.format(new Date()) + " - ");
-				status.append("Config: " + propertiesFile.getName() + "\n");
+				status.append("Config: " + propertiesFiles[pfIndex].getName() + "\n");
 				status.append(dateFormat.format(new Date()) + " - Applying signature (" + ++signingCount + ").\n");
 				checkRevocation = revocationCheckBoxMenuItem.isSelected();
 				progress.setValue(8);
 				worker = createSigningWorker(status, progress);
 				worker.execute();
+				if (pfIndex + 1 < propertiesFiles.length) {
+					processProperties(propertiesFiles[++pfIndex]);
+				} else {
+					clearForm();
+				}
 			}
 		});
 
@@ -462,12 +471,9 @@ public class Gui extends JPanel {
 		fileMenu.setMnemonic('f');
 		fileMenu.setText("File");
 
-		openFile.setAccelerator(
-				KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_DOWN_MASK));
-
 		openFile.setIcon(new ImageIcon(getClass().getResource("/resources/open.png")));
-		openFile.setMnemonic('o');
-		openFile.setText("Open Config");
+		openFile.setMnemonic('p');
+		openFile.setText("Open Properties File");
 		openFile.setToolTipText("Open properties file");
 		openFile.setInheritsPopupMenu(true);
 		openFile.addActionListener(new java.awt.event.ActionListener() {
@@ -525,7 +531,6 @@ public class Gui extends JPanel {
 		helpMenu.add(aboutMenu);
 
 		logger.debug("Created controls");
-
 
 		GroupLayout glPanel = new GroupLayout(signingPanel);
 		glPanel.setHorizontalGroup(
@@ -672,6 +677,25 @@ public class Gui extends JPanel {
 		signingPanel.setLayout(glPanel);
 
 		logger.debug("Finished GUI creation");
+	}
+	
+	private void clearForm() {
+		
+		contentFileTextField.setText("");
+		signedFileDestTextField.setText("");
+		securityObjectFileTextField.setText("");
+		signingKeyFileTextField.setText("");
+		fascnOidTextField.setText("");
+		fascnTextField.setText("");
+		uuidOidTextField.setText("");
+		uuidTextField.setText("");
+		cardholderUuidTextField.setText("");
+		passcodePasswordField.setText("");
+		keyAliasTextField.setText("");
+		
+		updateSecurityObject = true;
+		updateSecurityObjectCheckBoxMenuItem.setSelected(updateSecurityObject);
+		setInitSecurityObjectCheckBox();
 	}
 
 	protected void updateSecurityObjectCheckBoxPerformed(ActionEvent e) {
@@ -854,6 +878,90 @@ public class Gui extends JPanel {
 	        initSecurityObjectCheckbox.setSelected(false);
 	    }
 	}
+	
+	private void processProperties(File file) {
+		
+		FileInputStream input = null;
+		Properties prop = new Properties();
+		try {
+			input = new FileInputStream(file);
+			propertiesFile = file;
+			// load a properties file
+			prop.load(input);
+
+			// get the property value and print it out
+			if (prop.containsKey("fascnOid"))
+				fascnOidTextField.setText(prop.getProperty("fascnOid").trim());
+			if (prop.containsKey("fascn"))
+				fascnTextField.setText(prop.getProperty("fascn").trim());
+			if (prop.containsKey("uuidOid"))
+				uuidOidTextField.setText(prop.getProperty("uuidOid").trim());
+			if (prop.containsKey("uuid"))
+				uuidTextField.setText(prop.getProperty("uuid").trim().replace("-", ""));
+			if (prop.containsKey("cardholderUuid"))
+				cardholderUuidTextField.setText(prop.getProperty("cardholderUuid").trim().replace("-", ""));
+			if (prop.containsKey("signingKeyFile"))
+				signingKeyFileTextField.setText(pathFixup(prop.getProperty("signingKeyFile").trim()));
+			if (prop.containsKey("securityObjectFile")) {
+				securityObjectFileTextField.setText(pathFixup(prop.getProperty("securityObjectFile").trim()));
+				setInitSecurityObjectCheckBox();
+			}
+			if (prop.containsKey("passcode")) {
+				passcodePasswordField
+						.setText((prop.getProperty("passcode").trim() == null) ? "" : prop.getProperty("passcode"));
+			}
+			if (prop.containsKey("keyAlias"))
+				keyAliasTextField.setText(prop.getProperty("keyAlias"));
+			if (prop.containsKey("updateSecurityObject"))
+				updateSecurityObject = prop.getProperty("updateSecurityObject").trim().toUpperCase().equals("Y")
+						? true : false;
+			updateSecurityObjectCheckBoxMenuItem.setSelected(updateSecurityObject);
+			if (prop.containsKey("digestAlgorithm"))
+				digestAlgorithm = prop.getProperty("digestAlgorithm").trim();
+			if (prop.containsKey("signatureAlgorithm"))
+				signatureAlgorithm = prop.getProperty("signatureAlgorithm").trim();
+			if (prop.containsKey("expirationDate"))
+				expirationDate = prop.getProperty("expirationDate").trim();
+			if (prop.containsKey("name"))
+				piName = prop.getProperty("name").trim();
+			if (prop.containsKey("employeeAffiliation"))
+				employeeAffiliation = prop.getProperty("employeeAffiliation").trim();
+			if (prop.containsKey("agencyCardSerialNumber"))
+				agencyCardSerialNumber = prop.getProperty("agencyCardSerialNumber").trim();
+			if (prop.containsKey("contentFile")) {
+				String contentFileName = pathFixup(prop.getProperty("contentFile").trim());
+				if (contentFileName != null && contentFileName.length() > 0) {
+					contentFileTextField.setText(pathFixup(prop.getProperty("contentFile")));
+					signedFileDestTextField.setText(
+							pathFixup(contentFileName.substring(0, contentFileName.lastIndexOf(File.separator))));
+					contentFile = new File(contentFileName);
+				} else {
+					String message = "Selected file is empty or does not exist.";
+					logger.fatal(message);
+					status.append(dateFormat.format(new Date()) + " - " + message + "\n");
+					errors = true;
+				}
+			}
+			if (prop.containsKey("pivCardApplicationAid"))
+				pivCardApplicationAid = prop.getProperty("pivCardApplicationAid").trim();
+			if (prop.containsKey("pinUsagePolicy"))
+				pinUsagePolicy = prop.getProperty("pinUsagePolicy").trim();
+		}			
+		catch (IOException ex) {
+			String message = "Selected file is empty or does not exist.";
+			logger.fatal(message);
+			status.append(dateFormat.format(new Date()) + " - " + message + "\n");
+			errors = true;
+		} finally {
+			if (input != null) {
+				try {
+					input.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 
 	private void openPropertiesFileActionPerformed(java.awt.event.ActionEvent evt) {
 
@@ -867,90 +975,16 @@ public class Gui extends JPanel {
 			}
 		}
 		propertiesFileChooser.setPreferredSize(new Dimension(840, 500));
+		propertiesFileChooser.setMultiSelectionEnabled(true);
 		propertiesFileChooser
 				.setFileFilter(new FileNameExtensionFilter("Properties Files", new String[] { "properties" }));
 		propertiesFileChooser.setCurrentDirectory(new File(currentDirectory));
 		int returnVal = propertiesFileChooser.showOpenDialog(frame);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
-			propertiesFile = propertiesFileChooser.getSelectedFile();
-			FileInputStream input = null;
-			Properties prop = new Properties();
-			try {
-				input = new FileInputStream(propertiesFile);
-				// load a properties file
-				prop.load(input);
-
-				// get the property value and print it out
-				if (prop.containsKey("fascnOid"))
-					fascnOidTextField.setText(prop.getProperty("fascnOid").trim());
-				if (prop.containsKey("fascn"))
-					fascnTextField.setText(prop.getProperty("fascn").trim());
-				if (prop.containsKey("uuidOid"))
-					uuidOidTextField.setText(prop.getProperty("uuidOid").trim());
-				if (prop.containsKey("uuid"))
-					uuidTextField.setText(prop.getProperty("uuid").trim().replace("-", ""));
-				if (prop.containsKey("cardholderUuid"))
-					cardholderUuidTextField.setText(prop.getProperty("cardholderUuid").trim().replace("-", ""));
-				if (prop.containsKey("signingKeyFile"))
-					signingKeyFileTextField.setText(pathFixup(prop.getProperty("signingKeyFile").trim()));
-				if (prop.containsKey("securityObjectFile")) {
-					securityObjectFileTextField.setText(pathFixup(prop.getProperty("securityObjectFile").trim()));
-					setInitSecurityObjectCheckBox();
-				}
-				if (prop.containsKey("passcode")) {
-					passcodePasswordField
-							.setText((prop.getProperty("passcode").trim() == null) ? "" : prop.getProperty("passcode"));
-				}
-				if (prop.containsKey("keyAlias"))
-					keyAliasTextField.setText(prop.getProperty("keyAlias"));
-				if (prop.containsKey("updateSecurityObject"))
-					updateSecurityObject = prop.getProperty("updateSecurityObject").trim().toUpperCase().equals("Y")
-							? true : false;
-				updateSecurityObjectCheckBoxMenuItem.setSelected(updateSecurityObject);
-				if (prop.containsKey("digestAlgorithm"))
-					digestAlgorithm = prop.getProperty("digestAlgorithm").trim();
-				if (prop.containsKey("signatureAlgorithm"))
-					signatureAlgorithm = prop.getProperty("signatureAlgorithm").trim();
-				if (prop.containsKey("expirationDate"))
-					expirationDate = prop.getProperty("expirationDate").trim();
-				if (prop.containsKey("name"))
-					piName = prop.getProperty("name").trim();
-				if (prop.containsKey("employeeAffiliation"))
-					employeeAffiliation = prop.getProperty("employeeAffiliation").trim();
-				if (prop.containsKey("agencyCardSerialNumber"))
-					agencyCardSerialNumber = prop.getProperty("agencyCardSerialNumber").trim();
-				if (prop.containsKey("contentFile")) {
-					String contentFileName = pathFixup(prop.getProperty("contentFile").trim());
-					if (contentFileName != null && contentFileName.length() > 0) {
-						contentFileTextField.setText(pathFixup(prop.getProperty("contentFile")));
-						signedFileDestTextField.setText(
-								pathFixup(contentFileName.substring(0, contentFileName.lastIndexOf(File.separator))));
-						contentFile = new File(contentFileName);
-					} else {
-						String message = "Selected file is empty or does not exist.";
-						logger.fatal(message);
-						status.append(dateFormat.format(new Date()) + " - " + message + "\n");
-						errors = true;
-					}
-				}
-				if (prop.containsKey("pivCardApplicationAid"))
-					pivCardApplicationAid = prop.getProperty("pivCardApplicationAid").trim();
-				if (prop.containsKey("pinUsagePolicy"))
-					pinUsagePolicy = prop.getProperty("pinUsagePolicy").trim();
-			}			
-			catch (IOException ex) {
-				String message = "Selected file is empty or does not exist.";
-				logger.fatal(message);
-				status.append(dateFormat.format(new Date()) + " - " + message + "\n");
-				errors = true;
-			} finally {
-				if (input != null) {
-					try {
-						input.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
+			propertiesFiles = propertiesFileChooser.getSelectedFiles();
+			if (propertiesFiles.length > 0) {
+				pfIndex = 0;
+				processProperties(propertiesFiles[pfIndex]);
 			}
 		}
 	}
@@ -962,7 +996,6 @@ public class Gui extends JPanel {
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			keyFile = signingKeyFileChooser.getSelectedFile();
 			signingKeyFileTextField.setText(keyFile.getAbsolutePath());
-			;
 		}
 	}
 
