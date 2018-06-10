@@ -695,7 +695,7 @@ public class Gui extends JPanel {
 		
 		updateSecurityObject = true;
 		updateSecurityObjectCheckBoxMenuItem.setSelected(updateSecurityObject);
-		setInitSecurityObjectCheckBox();
+		initSecurityObjectCheckbox.setSelected(true);;
 	}
 
 	protected void updateSecurityObjectCheckBoxPerformed(ActionEvent e) {

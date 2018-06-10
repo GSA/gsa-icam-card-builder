@@ -211,6 +211,11 @@ public class ContentSignerTool {
 			System.out.println("NoSuchPropertyException handled\n");
 			Gui.progress.setValue(0);
 			return;
+		} finally {
+			if (fascn == null || uuid == null) {
+				System.out.println("FASC-N or UUID not defined\n");
+				Gui.progress.setValue(0);
+			}
 		}
 
 		if ((contentFileBytes = Utils.getFileContentBytes(contentFile)) == null)
@@ -462,6 +467,13 @@ public class ContentSignerTool {
 			containerBufferBytes = writePiContainer(contentFile, contentBytes);
 			break;
 		case biometricObjectTag: // BiometricObject
+			LinkedHashMap<Integer, byte[]> cbeffValues;
+			if ((cbeffValues = getDoContents(contentFileBytes)) == null) {
+				System.out.println("Empty container\n");
+				Gui.progress.setValue(0);
+				return;
+			}
+	
 			// We do this fakery to get the size of the signature block, which
 			// is needed by CBEFF headers. Chicken/egg problem.
 			signedFakeBytes = createDetachedSignature("FAKE".getBytes(), idPivBiometricContentTypeOid, false);
