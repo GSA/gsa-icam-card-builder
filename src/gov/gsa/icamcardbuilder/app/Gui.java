@@ -22,6 +22,8 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
+
 import javax.swing.AbstractButton;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
@@ -67,7 +69,7 @@ import javax.swing.JCheckBox;
 public class Gui extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	protected final static String version = "1.8.53";
+	protected final static String version = "1.8.54";
 	protected static String cardsDirectory = null;
 	private static String cardsDirectoryArg = null;
 	protected static boolean debug = true;
@@ -169,6 +171,7 @@ public class Gui extends JPanel {
 	private boolean initSo = false;
 	protected static String pivCardApplicationAid = "";
 	protected static String pinUsagePolicy = "";
+	private CountDownLatch latch = new CountDownLatch(1);
 
 	public Gui(JFrame frame) {
 
@@ -290,14 +293,25 @@ public class Gui extends JPanel {
 				status.append("Config: " + propertiesFiles[pfIndex].getName() + "\n");
 				status.append(dateFormat.format(new Date()) + " - Applying signature (" + ++signingCount + ").\n");
 				checkRevocation = revocationCheckBoxMenuItem.isSelected();
-				progress.setValue(8);
-				worker = createSigningWorker(status, progress);
-				worker.execute();
-				if (pfIndex + 1 < propertiesFiles.length) {
-					processProperties(propertiesFiles[++pfIndex]);
-				} else {
-					clearForm();
+				latch = new CountDownLatch(1);
+				try {
+					if (pfIndex < propertiesFiles.length) {
+						progress.setValue(8);
+						worker = createSigningWorker(status, progress);
+						worker.execute();
+						latch.await();
+						if (++pfIndex == propertiesFiles.length) {
+							clearForm();
+							signButton.setEnabled(false);
+						} else {
+							processProperties(propertiesFiles[pfIndex]);							
+						}
+					} 
+				} catch  (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
 				}
+				latch = null;
 			}
 		});
 
@@ -679,7 +693,7 @@ public class Gui extends JPanel {
 		logger.debug("Finished GUI creation");
 	}
 	
-	private void clearForm() {
+	private void clearForm() throws InterruptedException {
 		
 		contentFileTextField.setText("");
 		signedFileDestTextField.setText("");
@@ -1143,6 +1157,7 @@ public class Gui extends JPanel {
 		return new SwingWorker<Boolean, String>() {
 			@Override
 			protected Boolean doInBackground() throws Exception {
+				
 				revocationStatus = "Not Checked";
 				initSo = initSecurityObjectCheckbox.isSelected();
 				if (contentFile == null) {
@@ -1159,6 +1174,7 @@ public class Gui extends JPanel {
 					pkcs7sign = new ContentSignerTool(contentFile, securityObjectFile, properties, initSo);
 					initSecurityObjectCheckbox.setSelected(false);
 				}
+				latch.countDown();
 				return true;
 			}
 
