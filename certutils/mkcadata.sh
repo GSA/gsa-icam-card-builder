@@ -670,6 +670,34 @@ do
 	CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardRSA2048PIVSigningCA.crl
 	revoke $SUBJ $ISSUER $CONFIG pem $CRL 1
 	if [ $? -gt 0 ]; then exit 1; fi
+
+	cp -p ../cards/ICAM_Card_Objects/${F}_Test/4\ -\ ICAM_PIV_Dig_Sig_SP_800-73-4.crt data/pem/ICAM_Test_Card_${F}_PIV_Dig_Sig.crt
+	cp -p ../cards/ICAM_Card_Objects/${F}_Test/4\ -\ ICAM_PIV_Dig_Sig_SP_800-73-4.p12 data/pem/ICAM_Test_Card_${F}_PIV_Dig_Sig.p12
+	SUBJ=ICAM_Test_Card_${F}_PIV_Dig_Sig
+	ISSUER=ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3
+	CONFIG=${CWD}/icam-piv-rsa-2048-piv-auth.cnf
+	CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardRSA2048PIVSigningCA.crl
+	revoke $SUBJ $ISSUER $CONFIG pem $CRL 1
+	if [ $? -gt 0 ]; then exit 1; fi
+
+	cp -p ../cards/ICAM_Card_Objects/${F}_Test/5\ -\ ICAM_PIV_Key_Mgmt_SP_800-73-4.crt data/pem/ICAM_Test_Card_${F}_PIV_Key_Mgmt.crt
+	cp -p ../cards/ICAM_Card_Objects/${F}_Test/5\ -\ ICAM_PIV_Key_Mgmt_SP_800-73-4.p12 data/pem/ICAM_Test_Card_${F}_PIV_Key_Mgmt.p12
+	SUBJ=ICAM_Test_Card_${F}_PIV_Key_Mgmt
+	ISSUER=ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3
+	CONFIG=${CWD}/icam-piv-rsa-2048-piv-auth.cnf
+	CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardRSA2048PIVSigningCA.crl
+	revoke $SUBJ $ISSUER $CONFIG pem $CRL 1
+	if [ $? -gt 0 ]; then exit 1; fi
+
+	cp -p ../cards/ICAM_Card_Objects/${F}_Test/6\ -\ ICAM_PIV_Card_Auth_SP_800-73-4.crt data/pem/ICAM_Test_Card_${F}_PIV_Card_Auth.crt
+	cp -p ../cards/ICAM_Card_Objects/${F}_Test/6\ -\ ICAM_PIV_Card_Auth_SP_800-73-4.p12 data/pem/ICAM_Test_Card_${F}_PIV_Card_Auth.p12
+	SUBJ=ICAM_Test_Card_${F}_PIV_Card_Auth
+	ISSUER=ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3
+	CONFIG=${CWD}/icam-piv-rsa-2048-piv-auth.cnf
+	CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardRSA2048PIVSigningCA.crl
+	revoke $SUBJ $ISSUER $CONFIG pem $CRL 1
+	if [ $? -gt 0 ]; then exit 1; fi
+
 done
 cp -p data/database/$(basename $PIVRSA2048_LOCAL) .
 
