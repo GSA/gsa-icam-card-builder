@@ -19,7 +19,7 @@ PIV_GEN1_2=0A657668E6A866BB506AB5BB2B0F91D621EEA2D1
 PIV_GEN3=0C703BB5460F1B743D0762F30AD090AC7AE33E84
 PIVI_GEN3=20DC6669B935ACCCEDDBB43A6C5C6950BE69AB31
 
-makeuniq() {
+mkunique() {
 	SRC=$1
 	DST=/tmp/$(basename $SRC).$$
 	cat $SRC | 
@@ -102,7 +102,6 @@ process() {
 		exit 1
 	esac
 	echo "${STAT}${TAB}${EXP}${TAB}${REV}${TAB}${SER}${TAB}unknown${TAB}${SUB}" >>$DEST
-	#makeuniq $DEST 
 }
 
 p12tocert() {
@@ -112,12 +111,12 @@ p12tocert() {
 	if [ -f "$1" -a -f "$2" ]; then
 		CRTUPDT=$(stat --printf="%Y\n" "$2")
 	fi
-	if [ $P12UPDT -ge $CRTUPDT ]; then
+	if [ 1 -eq 1 -o $P12UPDT -ge $CRTUPDT ]; then
 		openssl pkcs12 \
 			-in "$1" \
 			-passin pass: \
 			-nokeys 2>&10 | \
-		perl -n -e 'if (!(/^Subject/i | /^Issuer/i | /^Bag/i | /^ /)) { print $_; }' >$2 2>/dev/null
+		perl -n -e 'if (!(/^Subject/i | /^Issuer/i | /^Bag/i | /^ /)) { print $_; }' >"$2" 2>/dev/null
 	fi
 }
 
@@ -128,7 +127,7 @@ p12tokey() {
 	if [ -f "$1" -a -f "$2" ]; then
 		KEYUPDT=$(stat --printf="%Y\n" "$2")
 	fi
-	if [ $P12UPDT -ge $KEYUPDT ]; then
+	if [ 1 -eq 1 -o $P12UPDT -ge $KEYUPDT ]; then
 		openssl pkcs12 \
 			-in "$1" \
 			-nocerts \
@@ -310,6 +309,45 @@ reindex() {
 				Y=$(openssl x509 -in "$G" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
 				STATUS=V
 				process pivi-gen3 V $Y $X
+			popd >/dev/null 2>&1
+		done
+
+		echo "Creating index for RSA 2048 PIV certs..."
+		for D in 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103
+		do
+			pushd ${D}_* >/dev/null 2>&1
+				pwd
+				F="3 - ICAM_PIV_Auth_SP_800-73-4.p12"
+				G=$(basename "$F" .p12).crt
+				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
+				X=$(openssl x509 -serial -subject -in "$G" -noout) 
+				Y=$(openssl x509 -in "$G" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
+				STATUS=V
+				process piv-rsa-2048 $STATUS $Y $X
+
+				F="4 - ICAM_PIV_Dig_Sig_SP_800-73-4.p12"
+				G=$(basename "$F" .p12).crt
+				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
+				X=$(openssl x509 -serial -subject -in '4 - ICAM_PIV_Dig_Sig_SP_800-73-4.crt' -noout)
+				Y=$(openssl x509 -in "$G" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
+				STATUS=V
+				process piv-rsa-2048 $STATUS $Y $X
+
+				F="5 - ICAM_PIV_Key_Mgmt_SP_800-73-4.p12"
+				G=$(basename "$F" .p12).crt
+				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
+				X=$(openssl x509 -serial -subject -in "$G" -noout)
+				Y=$(openssl x509 -in "$G" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
+				STATUS=V
+				process piv-rsa-2048 $STATUS $Y $X
+
+				F="6 - ICAM_PIV_Card_Auth_SP_800-73-4.p12"
+				G=$(basename "$F" .p12).crt
+				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
+				X=$(openssl x509 -serial -subject -in "$G" -noout)
+				Y=$(openssl x509 -in "$G" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
+				STATUS=V
+				process piv-rsa-2048 $STATUS $Y $X
 			popd >/dev/null 2>&1
 		done
 	popd 
@@ -530,15 +568,20 @@ cp -p $PIVGEN3P256_LOCAL $PIVGEN3P256_DEST
 # on the actual files, copy them to the destination so that OpenSSL finds
 # them.
 
-for F in $PIVGEN1_LOCAL $PIVGEN3_LOCAL $PIVIGEN1_LOCAL $PIVIGEN3_LOCAL $PIVIGEN3_LOCAL $PIVRSA2048_LOCAL $PIVGEN3P384_LOCAL $PIVGEN3P384_LOCAL $PIVGEN3P256_LOCAL
+
+mkunique $F PIVGEN1_LOCAL
+
+for F in $PIVGEN1_LOCAL $PIVGEN3_LOCAL $PIVIGEN1_LOCAL $PIVIGEN3_LOCAL $PIVIGEN3_LOCAL $PIVRSA2048_LOCAL $PIVGEN3P384_LOCAL $PIVGEN3P256_LOCAL
 do
-	makeuniq $F
 	cp -p $F data/database
 done
 
 # Start revoking certs that we need to be revoked.
 
 echo "Revoking known revoked certs..."
+## OCSP revoked signer with id-pkix-ocsp-nocheck NOT present using Gen3 CA
+mkunique $PIVGEN3_LOCAL
+cp -p $PIVGEN3_LOCAL data/dabase
 ## OCSP revoked signer with id-pkix-ocsp-nocheck present using Gen3 CA
 echo "OCSP revoked signer with id-pkix-ocsp-nocheck present using Gen3 CA..."
 SUBJ=ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Present_gen3 
@@ -548,9 +591,10 @@ CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardGen3Si
 revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN3CRL
 if [ $? -gt 0 ]; then exit 1; fi
 cp -p data/database/$(basename $PIVGEN3_LOCAL) .
-makeuniq $PIVGEN3_LOCAL
 
 ## OCSP revoked signer with id-pkix-ocsp-nocheck NOT present using Gen3 CA
+mkunique $PIVGEN3_LOCAL
+cp -p $PIVGEN3_LOCAL data/database
 echo "OCSP revoked signer with id-pkix-ocsp-nocheck NOT present using Gen3 CA..."
 SUBJ=ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Not_Present_gen3 
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3
@@ -559,9 +603,10 @@ CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardGen3Si
 revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN3CRL
 if [ $? -gt 0 ]; then exit 1; fi
 cp -p data/database/$(basename $PIVGEN3_LOCAL) .
-makeuniq $PIVGEN3_LOCAL
 
 ### Gen1-2 Content Signing Cert using Gen1-2 CA
+mkunique $PIVGEN1_LOCAL
+cp -p $PIVGEN1_LOCAL data/database
 echo "Gen1-2 Content Signing Cert using Gen1-2 CA..."
 SUBJ=ICAM_Test_Card_PIV_Revoked_Content_Signer_gen1-2
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2
@@ -570,9 +615,10 @@ CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardSignin
 revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN1CRL
 if [ $? -gt 0 ]; then exit 1; fi
 cp -p data/database/$(basename $PIVGEN1_LOCAL) .
-makeuniq $PIVGEN1_LOCAL
 
 ## Gen1-2 Card 24 Revoked PIV Auth using Gen1-2 CA 
+mkunique $PIVGEN1_LOCAL
+cp -p $PIVGEN1_LOCAL data/database
 echo "Gen1-2 Card 24 Revoked PIV Auth using Gen1-2 CA..."
 cp -p ../cards/ICAM_Card_Objects/24_Revoked_Certificates/3\ -\ ICAM_PIV_Auth_SP_800-73-4.crt data/pem/ICAM_Test_Card_24_PIV_Auth.crt
 cp -p ../cards/ICAM_Card_Objects/24_Revoked_Certificates/3\ -\ ICAM_PIV_Auth_SP_800-73-4.p12 data/ICAM_Test_Card_24_PIV_Auth.p12
@@ -584,9 +630,10 @@ revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN1CRL
 RETCODE=$?
 if [ $RETCODE -gt 0 ]; then echo "Revoke failed, returned $RETCODE"; exit 1; fi
 cp -p data/database/$(basename $PIVGEN1_LOCAL) .
-makeuniq $PIVGEN1_LOCAL
 
 ## Gen1-2 Card 24 Revoked PIV Card Auth using Gen1-2 CA 
+mkunique $PIVGEN1_LOCAL
+cp -p $PIVGEN1_LOCAL data/database
 echo "Gen1-2 Card 24 Revoked PIV Card Auth using Gen1-2 CA..."
 cp -p ../cards/ICAM_Card_Objects/24_Revoked_Certificates/6\ -\ ICAM_PIV_Card_Auth_SP_800-73-4.crt data/pem/ICAM_Test_Card_24_PIV_Card_Auth.crt
 cp -p ../cards/ICAM_Card_Objects/24_Revoked_Certificates/6\ -\ ICAM_PIV_Card_Auth_SP_800-73-4.p12 data/ICAM_Test_Card_24_PIV_Card_Auth.p12
@@ -597,9 +644,10 @@ CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardSignin
 revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN1CRL
 if [ $? -gt 0 ]; then exit 1; fi
 cp -p data/database/$(basename $PIVGEN1_LOCAL) .
-makeuniq $PIVGEN1_LOCAL
 
 ## Gen1-2 Revoked Content Signer using Gen1-2 CA
+mkunique $PIVGEN1_LOCAL
+cp -p $PIVGEN1_LOCAL data/database
 echo "Gen1-2 Revoked Content Signer using Gen1-2 CA..."
 SUBJ=ICAM_Test_Card_PIV_Revoked_Content_Signer_gen1-2
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2
@@ -608,7 +656,22 @@ CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardSignin
 revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN1CRL
 if [ $? -gt 0 ]; then exit 1; fi
 cp -p data/database/$(basename $PIVGEN1_LOCAL) .
-makeuniq $PIVGEN1_LOCAL
+
+echo -n "Revoke Test Certs: "
+read ans
+
+for F in 82 86 90 94 98 102
+do
+	cp -p ../cards/ICAM_Card_Objects/${F}_Test/3\ -\ ICAM_PIV_Auth_SP_800-73-4.crt data/pem/ICAM_Test_Card_${F}_PIV_Auth.crt
+	cp -p ../cards/ICAM_Card_Objects/${F}_Test/3\ -\ ICAM_PIV_Auth_SP_800-73-4.p12 data/pem/ICAM_Test_Card_${F}_PIV_Auth.p12
+	SUBJ=ICAM_Test_Card_${F}_PIV_Auth
+	ISSUER=ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3
+	CONFIG=${CWD}/icam-piv-rsa-2048-piv-auth.cnf
+	CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardRSA2048PIVSigningCA.crl
+	revoke $SUBJ $ISSUER $CONFIG pem $CRL 1
+	if [ $? -gt 0 ]; then exit 1; fi
+done
+cp -p data/database/$(basename $PIVRSA2048_LOCAL) .
 
 # End of CA work, now move back to local directory to archive it
 
@@ -667,7 +730,7 @@ chmod 644 aia/* crls/* sia/* roots/* bridge/*
 
 # Backup AIA, CRLs, and SIA
 tar cv --owner=root --group=root -f aiacrlsia.tar aia crls sia roots bridge
-rm -rf aia sia crls roots bridge
+#rm -rf aia sia crls roots bridge
 
 mv responder-certs.tar ../responder
 mv aiacrlsia.tar ../responder
