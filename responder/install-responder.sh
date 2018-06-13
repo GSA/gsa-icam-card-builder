@@ -2,6 +2,7 @@
 #
 # vim: set ts=2 nowrap nohlsearch
 #
+#
 # Copy this file to the directory on the VM where you've copied the
 # tar file, responder-certs.tar.  Then run it by typing "./install-responder.sh"
 
@@ -107,7 +108,7 @@ for F in \\
   ICAM_Test_Card_PIV_OCSP_Invalid_Sig_Signer_gen3.p12 \\
   ICAM_Test_Card_PIV-I_OCSP_Valid_Signer_gen3.p12 \\
   ICAM_Test_Card_PIV_OCSP_Valid_Signer_P384_gen3.p12 \\
-	ICAM_Test_Card_PIV_OCSP_RSA_2048_Valid_Signer_gen3.p12
+  ICAM_Test_Card_PIV_OCSP_RSA_2048_Valid_Signer_gen3.p12
 do
 		COUNT=\$(expr \$COUNT + 1)
 		case \$COUNT in
