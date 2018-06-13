@@ -44,6 +44,7 @@ WHERE="
 
    -b puts this script and the various OpenSSL commands into batch mode, requiring
    no input from the user.
+
    -c cakey the CA key length/type used to sign the request.  Default is \"rsa2048\".
 
    -e ECCalgorithm specifies the name of the ECC algorithm. Does not apply to 
@@ -277,7 +278,7 @@ pushd data
 			exit 10
 		fi
 	else
-		CADIR=".."
+		CADIR="."
 	fi
 
 	if [[ z$TYPE == "zpiv-auth"* ]] || [[ z$TYPE == "zpivi-auth"* ]]; then
@@ -344,6 +345,14 @@ pushd data
 	echo
 	echo "Issuing $TYPE cert to $SUBJ."
 
+	# Clean up from previous runs
+
+	rm -f $(basename csr/$EE_P12 .p12).csr
+	rm -f $(basename pem/$EE_P12 .p12).crt
+	rm -f $(basename pem/$EE_P12 .p12).private.pem
+	rm -f $(basename pem/$EE_P12 .p12).pem
+	rm -f $EE_P12
+
 	# Get the signer private and public keys
 
 	openssl pkcs12 \
@@ -366,14 +375,6 @@ pushd data
 	cat pem/$(basename $SCA_P12 .p12).private.pem \
 		pem/$(basename $SCA_P12 .p12).crt \
 		>pem/$(basename $SCA_P12 .p12).pem
-
-	# Clean up from previous runs
-
-	rm -f $(basename csr/$EE_P12 .p12).csr
-	rm -f $(basename pem/$EE_P12 .p12).private.pem
-	rm -f $(basename pem/$EE_P12 .p12).crt
-	rm -f $(basename pem/$EE_P12 .p12).pem
-	rm -f $EE_P12
 
 	if [ $MISMATCH -eq 0 ]; then
 		PRIVKEY=pem/$(basename $EE_P12 .p12).private.pem
@@ -438,6 +439,15 @@ pushd data
 
 	chmod 644 pem/$(basename $EE_P12 .p12).pem
 
+
+#openssl pkcs12 \
+#-export \
+#-name 'ICAM Test Card OCSP PIV RSA 2048 Valid Signer gen3' \
+#-descert \
+#-passout pass: \
+#-in pem/ICAM_Test_Card_OCSP_PIV_RSA_2048_Valid_Signer_gen3.pem -macalg sha256 \
+#-out ICAM_Test_Card_OCSP_PIV_RSA_2048_Valid_Signer_gen3.p12
+
 	if [ $WIN32 -eq 1 ]; then
 		openssl pkcs12 \
 			-export \
@@ -454,7 +464,7 @@ pushd data
 			-descert \
 			-passout pass: \
 			-in pem/$(basename $EE_P12 .p12).pem \
-			-macalg sha256
+			-macalg sha256 \
 			-out $EE_P12
 	fi
 

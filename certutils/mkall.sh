@@ -43,6 +43,13 @@ DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
 cp -p data/$SUBJ.p12 "$DEST"
 cp -p data/pem/$SUBJ.crt "$DEST"
 
+## Gen3 OCSP valid signer using RSA 2048 (RSA 2048 CA)
+SUBJ=ICAM_Test_Card_OCSP_PIV_RSA_2048_Valid_Signer_gen3
+sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3 -t icam-piv-ocsp-valid-rsa-2048 -r rsa2048 --cakey piv-rsa-2048 || exit $?
+DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
+cp -p data/$SUBJ.p12 "$DEST"
+cp -p data/pem/$SUBJ.crt "$DEST"
+
 ## Gen3 Secure Messaging Key Establishment using ECC P-256 (ECC P-384 CA)
 SUBJ=ICAM_Test_Card_PIV_ECC_Issued_P-256_SM_Certificate_Signer_2
 sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_P-384_Signing_CA_gold_gen3 -t piv-content-signer-gen3-p384 -e prime256v1 --cakey secp384r1 || exit $?
