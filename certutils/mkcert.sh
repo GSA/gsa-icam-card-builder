@@ -1,4 +1,4 @@
-#!/usr/local/bin/bash
+#!/bin/bash
 #
 # Usage: mkcert.sh 
 #   -s|--subject subjectDN 
@@ -8,6 +8,7 @@
 #       piv-key-hist1..20|pivi-key-hist1..20|
 #       piv-content-signer*|pivi-content-signer*>
 #       piv-ocsp*|pivi-ocsp*>
+#   [-a|--authority] 
 #   [-b|--batch] 
 #   [-c|--cakey rsa2048|secp384r1]
 #   [-e|--ecc prime256v1|secp384r1]
@@ -16,6 +17,8 @@
 #   [-r|--rsa 1024|2048|3072|4096]
 #   [-w|--win32] 
 #   [-x|--expires] 
+#   [-a|--authority] 
+#   [-m|--mismatch] 
 #
 WHERE="
   Where:
@@ -36,6 +39,9 @@ WHERE="
     pivi-dig-sig, piv-key-mgmt, pivi-key-mgmt, piv-key-hist1..20, pivi-key-hist1..20,
     piv-content-signer*, pivi-content-signer*, piv-ocsp*, or pivi-ocsp*.
 
+   -a authority is a directory containing .p12 files of issuing CAs.  The default is
+    current directory.
+
    -b puts this script and the various OpenSSL commands into batch mode, requiring
    no input from the user.
    -c cakey the CA key length/type used to sign the request.  Default is \"rsa2048\".
@@ -43,8 +49,9 @@ WHERE="
    -e ECCalgorithm specifies the name of the ECC algorithm. Does not apply to 
    RSA-based certs.
 
-   -n cardnumber is the card number which is used to locate the appropriate OpenSSL
+   -m means to purposely create a key missmatch using a roque version of OpenSSL
 
+   -n cardnumber is the card number which is used to locate the appropriate OpenSSL
    configuration file which should always end in \"c<cardnumber>.cnf\".  If you plan 
    to create your own configuration files, follow this naming convention: 
 
@@ -65,12 +72,14 @@ function usage() {
 	echo "      piv-key-mgmt|pivi-key-mgmt|piv-key-hist1..20|pivi-key-hist1..20"
 	echo "      piv-content-signer*|pivi-content-signer*|piv-ocsp*|pivi-ocsp*"
 	echo "OPTIONS:"
+	echo "  [-a authority]"
 	echo "  [-b]"
-	echo "  [-c rsa2048|secp384r1]"
-	echo "  [-e prime256v1|secp384r1]"
-	echo "  [-r 1024|2048|3072|4096]"
+	echo "  [-c {rsa2048|secp384r1}]"
+	echo "  [-e {prime256v1|secp384r1}]"
+	echo "  [-r {1024|2048|3072|4096}]"
 	echo "  [-p prefix]"
 	echo "  [-w]"
+	echo "  [-m]"
 	echo "$WHERE"
 	echo
 	echo "You executed " "$@"
@@ -127,17 +136,22 @@ CAKEY=default
 TYPE=piv-auth
 ENDDATE=
 CANAME=
+MISMATCH=0
 APPLE=$(expr $MACHTYPE : "^.*apple")
 if [ $APPLE -eq 0 ]; then
-	TEMP=`getopt -o bws:i:n:t:e:r:p:c:x: -l subject-cn:,issuer-cn:,number:,type:,ecc:,rsa:,prefix:,cakey:,expires: -n 'mkcert.sh' -- "$@"`
+	TEMP=`getopt -o bwms:i:n:t:a:e:r:p:c:x: -l subject-cn:,issuer-cn:,number:,type:,authority:,ecc:,rsa:,prefix:,cakey:,expires: -n 'mkcert.sh' -- "$@"`
 	eval set -- "$TEMP"
 else
-	TEMP=`getopt bws:i:n:t:e:r:p:c: -- "$@"`
+	TEMP=`getopt bwms:i:n:t:e:a:r:p:c: -- "$@"`
 fi
 
 # extract options and their arguments into variables.
 while true ; do
 	case "$1" in
+		-a|--authority) 
+			case "$2" in
+				*) CADIR=$2 ; shift 2 ;;
+			esac ;;
 		-b|--batch)
 			case "$2" in
 				*) BATCH=1 ; shift 1 ;;
@@ -145,6 +159,10 @@ while true ; do
 		-w|--win32)
 			case "$2" in
 				*) WIN32=1 ; shift 1 ;;
+			esac ;;
+		-m|--mismatch)
+			case "$2" in
+				*) MISMATCH=1 ; shift 1 ;;
 			esac ;;
 		-s|--subject-cn)
 			case "$2" in
@@ -170,8 +188,8 @@ while true ; do
 			esac ;;
 		-t|--type)
 			case "$2" in
-				piv-auth|piv-card-auth|pivi-auth|pivi-card-auth| \
-				piv-dig-sig|piv-key-mgmt|pivi-dig-sig|pivi-key-mgmt| \
+				piv-auth*|piv-card-auth*|pivi-auth*|pivi-card-auth*| \
+				piv-dig-sig*|piv-key-mgmt*|pivi-dig-sig*|pivi-key-mgmt*| \
 				piv-key-hist*|pivi-key-hist*| \
 				piv-*-signer*|pivi-*-signer*| \
 				piv-ocsp*|pivi-ocsp*) TYPE=$2 ; shift 2 ;;
@@ -245,199 +263,210 @@ if [ ! -f "$CNF" ]; then
 	exit 4
 fi
 
-if [ ! -d data ]; then
-	echo "Data directory 'data' does not exist.  Exiting."
-	exit 5
-fi
 
 mkdir -p data/pem || error mkdir $?
 mkdir -p data/database || error mkdir $?
 mkdir -p data/csr || error mkdir $?
 
-pushd data >/dev/null 2>&1
+pushd data 
 
-if [ z$TYPE == "zpiv-auth" -o z$TYPE == "zpivi-auth" ]; then
-	CN=$(grep CN_default "$CNF" | sed 's/^.*=\s*//g')
-	SUBJ="/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=$CN"
-	if [ z"$ECCALG" == "z" ]; then KEY=RSA; fi
-elif [ z$TYPE == "zpiv-card-auth" -o z$TYPE == "zpivi-card-auth" ]; then
-	SN=$(grep serialNumber_default "$CNF" | sed 's/^.*=\s*//g')
-	SUBJ="/C=US/O=U.S. Government/OU=ICAM Test Cards/serialNumber=$SN"
-	if [ z"$ECCALG" == "z" ]; then KEY=RSA; fi
-elif [ z$TYPE == "zpiv-dig-sig" -o z$TYPE == "zpivi-dig-sig" ]; then
-	CN=$(grep CN_default "$CNF" | sed 's/^.*=\s*//g')
-	SUBJ="/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=$CN"
-	if [ z"$ECCALG" == "z" ]; then KEY=RSA; fi
-elif [ z$TYPE == "zpiv-key-mgmt" -o z$TYPE == "zpivi-key-mgmt" ]; then
-	CN=$(grep CN_default "$CNF" | sed 's/^.*=\s*//g')
-	SUBJ="/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=$CN"
-	if [ z"$ECCALG" == "z" ]; then KEY=RSA; fi
-elif [[ z$TYPE == "zpiv-key-hist"* ]] || [[ z$TYPE* == "zpivi-key-hist"* ]]; then
-	CN=$(grep CN_default "$CNF" | sed 's/^.*=\s*//g')
-	SUBJ="/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=$CN"
-	if [ z"$ECCALG" == "z" ]; then KEY=RSA; fi
-elif [[ z$TYPE == "zpiv-content"* ]] || [[ z$TYPE* == "zpivi-content"* ]]; then
-	CN=$(echo $SUBJCN | sed 's/_/ /g')
-	SUBJ="/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=$CN"
-	if [ z"$ECCALG" == "z" ]; then KEY=RSA; fi
-elif [[ z$TYPE == "zpiv-ocsp"* ]] || [[ z$TYPE* == "zpivi-ocsp"* ]]; then
-	CN=$(echo $SUBJCN | sed 's/_/ /g')
-	SUBJ="/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=$CN"
-	if [ z"$ECCALG" == "z" ]; then KEY=RSA; fi
-else
-	usage 3
-fi
-
-if [ $BATCH -eq 0 ]; then
-	echo -n "Enter full DN [$SUBJ]: "
-	read NSUBJ
-	if [ "z$NSUBJ" != "z" ]; then
-		SUBJ=$NSUBJ
-	fi
-	ISSUE=0
-	while [ $ISSUE -eq 0 ]; do
-		echo -n "Issue $TYPE cert to $SUBJ? "
-		read ans
-		if [ "a$ans" == "an" -o "a$ans" == "aN" ]; then
-		    echo "Canceling."
-			exit 6
-		elif [ "a$ans" == "ay" -o "a$ans" == "aY" ]; then
-			ISSUE=1
+	if [ "z$CADIR" != "z" ]; then
+		if [ ! -d "$CADIR" ]; then
+			pwd
+			echo "$CADIR is not a directory"
+			exit 10
 		fi
-	done
-fi
+	else
+		CADIR=".."
+	fi
 
-export CN="$CN"
-export SN="$SN"
-EE_P12=$FCN.p12
-SCA_P12=$ISSUER.p12
-if [ $(expr "$FCN" : ".*PIV-I.*$") -ge 5 ]; then T=pivi; else T=piv; fi
-if [ $(expr "$CNF" : ".*gen3.*$") -ge 4 ]; then G=gen3; else G=gen1-2; fi
+	if [[ z$TYPE == "zpiv-auth"* ]] || [[ z$TYPE == "zpivi-auth"* ]]; then
+		CN=$(grep CN_default "$CNF" | sed 's/^.*=\s*//g')
+		SUBJ="/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=$CN"
+		if [ z"$ECCALG" == "z" ]; then KEY=RSA; fi
+	elif [[ z$TYPE == "zpiv-card-auth"* ]] || [[ z$TYPE == "zpivi-card-auth"* ]]; then
+		SN=$(grep serialNumber_default "$CNF" | sed 's/^.*=\s*//g')
+		SUBJ="/C=US/O=U.S. Government/OU=ICAM Test Cards/serialNumber=$SN"
+		if [ z"$ECCALG" == "z" ]; then KEY=RSA; fi
+	elif [[ z$TYPE == "zpiv-dig-sig"* ]] || [[ z$TYPE == "zpivi-dig-sig"* ]]; then
+		CN=$(grep CN_default "$CNF" | sed 's/^.*=\s*//g')
+		SUBJ="/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=$CN"
+		if [ z"$ECCALG" == "z" ]; then KEY=RSA; fi
+	elif [[ z$TYPE == "zpiv-key-mgmt"* ]] || [[ z$TYPE == "zpivi-key-mgmt"* ]]; then
+		CN=$(grep CN_default "$CNF" | sed 's/^.*=\s*//g')
+		SUBJ="/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=$CN"
+		if [ z"$ECCALG" == "z" ]; then KEY=RSA; fi
+	elif [[ z$TYPE == "zpiv-key-hist"* ]] || [[ z$TYPE* == "zpivi-key-hist"* ]]; then
+		CN=$(grep CN_default "$CNF" | sed 's/^.*=\s*//g')
+		SUBJ="/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=$CN"
+		if [ z"$ECCALG" == "z" ]; then KEY=RSA; fi
+	elif [[ z$TYPE == "zpiv-content"* ]] || [[ z$TYPE* == "zpivi-content"* ]]; then
+		CN=$(echo $SUBJCN | sed 's/_/ /g')
+		SUBJ="/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=$CN"
+		if [ z"$ECCALG" == "z" ]; then KEY=RSA; fi
+	elif [[ z$TYPE == "zpiv-ocsp"* ]] || [[ z$TYPE* == "zpivi-ocsp"* ]]; then
+		CN=$(echo $SUBJCN | sed 's/_/ /g')
+		SUBJ="/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=$CN"
+		if [ z"$ECCALG" == "z" ]; then KEY=RSA; fi
+	else
+		usage 3
+	fi
 
-NAME=$(basename $EE_P12 .p12 | sed 's/[&_]/ /g')
-echo
-echo "**************************** $NAME ******************************"
-echo
-echo "Issuing $TYPE cert to $SUBJ."
+	if [ $BATCH -eq 0 ]; then
+		echo -n "Enter full DN [$SUBJ]: "
+		read NSUBJ
+		if [ "z$NSUBJ" != "z" ]; then
+			SUBJ=$NSUBJ
+		fi
+		ISSUE=0
+		while [ $ISSUE -eq 0 ]; do
+			echo -n "Issue $TYPE cert to $SUBJ? "
+			read ans
+			if [ "a$ans" == "an" -o "a$ans" == "aN" ]; then
+			    echo "Canceling."
+				exit 6
+			elif [ "a$ans" == "ay" -o "a$ans" == "aY" ]; then
+				ISSUE=1
+			fi
+		done
+	fi
 
-# Get the signer private and public keys
+	export CN="$CN"
+	export SN="$SN"
+	EE_P12=$FCN.p12
+	SCA_P12=$CADIR/$ISSUER.p12
+	T=piv
+	G=rsa-2048
 
-openssl pkcs12 \
-	-in $SCA_P12 \
-	-nocerts \
-	-nodes \
-	-passin pass: \
-	-passout pass: \
-	-out pem/$(basename $SCA_P12 .p12).private.pem
+	NAME=$(basename $EE_P12 .p12 | sed 's/[&_]/ /g')
+	echo
+	echo "**************************** $NAME ******************************"
+	echo
+	echo "Issuing $TYPE cert to $SUBJ."
 
-openssl pkcs12 \
-	-in $SCA_P12 \
-	-clcerts \
-	-passin pass: \
-	-nokeys \
-	-out pem/$(basename $SCA_P12 .p12).crt
+	# Get the signer private and public keys
 
-# Create nice little PEM file for no reason
+	openssl pkcs12 \
+		-in $SCA_P12 \
+		-nocerts \
+		-nodes \
+		-passin pass: \
+		-passout pass: \
+		-out pem/$(basename $SCA_P12 .p12).private.pem
 
-cat pem/$(basename $SCA_P12 .p12).private.pem \
-	pem/$(basename $SCA_P12 .p12).crt \
-	>pem/$(basename $SCA_P12 .p12).pem
+	openssl pkcs12 \
+		-in $SCA_P12 \
+		-clcerts \
+		-passin pass: \
+		-nokeys \
+		-out pem/$(basename $SCA_P12 .p12).crt
 
-# Clean up from previous runs
+	# Create nice little PEM file for no reason
 
-rm -f $(basename csr/$EE_P12 .p12).csr
-rm -f $(basename pem/$EE_P12 .p12).private.pem
-rm -f $(basename pem/$EE_P12 .p12).crt
-rm -f $(basename pem/$EE_P12 .p12).pem
-rm -f $EE_P12
+	cat pem/$(basename $SCA_P12 .p12).private.pem \
+		pem/$(basename $SCA_P12 .p12).crt \
+		>pem/$(basename $SCA_P12 .p12).pem
 
-if [ z$KEY == "zECC" ]; then
-	openssl ecparam \
-		-out pem/$(basename $EE_P12 .p12).private.pem \
-		-name $ECCALG \
-		-genkey
-else
-	openssl genrsa \
-		-out pem/$(basename $EE_P12 .p12).private.pem \
+	# Clean up from previous runs
+
+	rm -f $(basename csr/$EE_P12 .p12).csr
+	rm -f $(basename pem/$EE_P12 .p12).private.pem
+	rm -f $(basename pem/$EE_P12 .p12).crt
+	rm -f $(basename pem/$EE_P12 .p12).pem
+	rm -f $EE_P12
+
+	if [ $MISMATCH -eq 0 ]; then
+		PRIVKEY=pem/$(basename $EE_P12 .p12).private.pem
+		PUBKEY=pem/$(basename $EE_P12 .p12).crt
+	else
+		PRIVKEY=pem/$(basename $EE_P12 .p12).private.pem
+		PUBKEY=../$(basename $EE_P12 .p12).crt
+	fi
+
+	if [ z$KEY == "zECC" ]; then
+		openssl ecparam \
+			-out pem/$(basename $EE_P12 .p12).private.pem \
+			-name $ECCALG \
+			-genkey
+	else
+		openssl genrsa \
+			-out pem/$(basename $EE_P12 .p12).private.pem \
 		$RSAALG
-fi
+	fi
 
-BATCHPARAM=""
+	BATCHPARAM=""
 
-if [ $BATCH -eq 1 ]; then
-	BATCHPARAM="-batch"
-fi
+	if [ $BATCH -eq 1 ]; then
+		BATCHPARAM="-batch"
+	fi
 
-openssl req \
-	-config "$CNF" \
-	$BATCHPARAM \
-	-new \
-	-sha256 \
-	-key pem/$(basename $EE_P12 .p12).private.pem \
-	-nodes \
-	-passin pass: \
-	-out csr/$(basename $EE_P12 .p12).csr
+	openssl req \
+		-config "$CNF" \
+		$BATCHPARAM \
+		-new \
+		-sha256 \
+		-key pem/$(basename $EE_P12 .p12).private.pem \
+		-nodes \
+		-passin pass: \
+		-out csr/$(basename $EE_P12 .p12).csr
 
-if [ $? -ne 0 ]; then
-	exit 7
-fi
+	if [ $? -ne 0 ]; then
+		exit 7
+	fi
 
-SERIAL=$(cat "database/${T}-${G}-serial")
+	openssl ca \
+		-config "$CNF" \
+		-name "ca_$CAKEY" \
+		-batch \
+		-notext \
+		-preserveDN \
+		-startdate $STARTDATE \
+		-enddate $ENDDATE \
+		-md sha256 \
+		-in csr/$(basename $EE_P12 .p12).csr \
+		-out pem/$(basename $EE_P12 .p12).crt
 
-openssl ca \
-	-config "$CNF" \
-	-name "ca_$CAKEY" \
-	-batch \
-	-notext \
-	-preserveDN \
-	-startdate $STARTDATE \
-	-enddate $ENDDATE \
-	-md sha256 \
-	-in csr/$(basename $EE_P12 .p12).csr \
-	-out pem/$(basename $EE_P12 .p12).crt
+	if [ $? -ne 0 ]; then
+		echo "Can't sign $(basename $EE_P12 .p12).csr"
+		exit 8
+	fi
 
-if [ $? -ne 0 ]; then
-	echo "Can't sign $(basename $EE_P12 .p12).csr"
-	exit 8
-fi
+	cat \
+		$PRIVKEY \
+		$PUBKEY \
+		>pem/$(basename $EE_P12 .p12).pem
 
-cat \
-	pem/$(basename $EE_P12 .p12).private.pem \
-	pem/$(basename $EE_P12 .p12).crt \
-	>pem/$(basename $EE_P12 .p12).pem
+	chmod 644 pem/$(basename $EE_P12 .p12).pem
 
-chmod 644 pem/$(basename $EE_P12 .p12).pem
+	if [ $WIN32 -eq 1 ]; then
+		openssl pkcs12 \
+			-export \
+			-name "$NAME" \
+			-passout pass: \
+			-in pem/$(basename $EE_P12 .p12).pem \
+			-keypbe PBE-SHA1-3DES \
+			-certpbe PBE-SHA1-3DES \
+			-out $EE_P12
+	else
+		openssl pkcs12 \
+			-export \
+			-name "$NAME" \
+			-descert \
+			-passout pass: \
+			-in pem/$(basename $EE_P12 .p12).pem \
+			-macalg sha256
+			-out $EE_P12
+	fi
 
-if [ $WIN32 -eq 1 ]; then
-	openssl pkcs12 \
-		-export \
-		-name "$NAME" \
-		-passout pass: \
-		-in pem/$(basename $EE_P12 .p12).pem \
-		-keypbe PBE-SHA1-3DES \
-		-certpbe PBE-SHA1-3DES \
-		-out $EE_P12
-else
-	openssl pkcs12 \
-		-export \
-		-name "$NAME" \
-		-descert \
-		-passout pass: \
-		-in pem/$(basename $EE_P12 .p12).pem \
-		-macalg sha256 \
-		-out $EE_P12
-fi
+	if [ $? -ne 0 ]; then
+		echo "Can't create $EE_P12"
+		exit 9
+	fi
 
-if [ $? -ne 0 ]; then
-	echo "Can't create $EE_P12"
-	exit 9
-fi
-
-rm -f pem/$(basename $SCA_P12 .p12).pem
-rm -f pem/$(basename $SCA_P12 .p12).private.pem
-rm -f pem/$(basename $EE_P12 .p12).pem
-rm -f pem/$(basename $EE_P12 .p12).private.pem
-rm -f $SERIAL.pem
-rm -rf csr
+	rm -f pem/$(basename $SCA_P12 .p12).pem
+	rm -f pem/$(basename $SCA_P12 .p12).private.pem
+	rm -f pem/$(basename $EE_P12 .p12).pem
+	rm -f pem/$(basename $EE_P12 .p12).private.pem
+	rm -rf csr
 
 popd >/dev/null 2>&1
