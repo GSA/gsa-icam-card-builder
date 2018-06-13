@@ -106,7 +106,8 @@ for F in \\
   ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Present_gen3.p12 \\
   ICAM_Test_Card_PIV_OCSP_Invalid_Sig_Signer_gen3.p12 \\
   ICAM_Test_Card_PIV-I_OCSP_Valid_Signer_gen3.p12 \\
-  ICAM_Test_Card_PIV_OCSP_Valid_Signer_P384_gen3.p12
+  ICAM_Test_Card_PIV_OCSP_Valid_Signer_P384_gen3.p12 \\
+	ICAM_Test_Card_PIV_OCSP_RSA_2048_Valid_Signer_gen3.p12
 do
 		COUNT=\$(expr \$COUNT + 1)
 		case \$COUNT in
@@ -118,6 +119,7 @@ do
 		6) N=ocspInvalidSig ;;
 		7) N=ocsp-pivi ;;
 		8) N=ocspGen3p384 ;;
+		9) N=ocspGen3rsa2048 ;;
 		esac
 
 		# Get the signer private and public keys
@@ -148,6 +150,7 @@ mv ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2.crt PIV_Signing_CA_gen1-2.crt
 mv ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt PIV_Signing_CA_gen3.crt
 mv ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.crt PIV-I_Signing_CA_gen3.crt
 mv ICAM_Test_Card_PIV_P-384_Signing_CA_-_gold_gen3.crt PIV_Signing_CA_gen3_p384.crt
+mv ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3 PIV_Signing_CA_gen3_rsa2048.crt
 # Uncomment these when we have responders for them
 #mv ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3.crt PIV_Signing_CA_gen3_rsa_2048.crt
 #mv ICAM_Test_Card_PIV_P-256_Signing_CA_gold_gen3.crt PIV_Signing_CA_gen3_p256.crt
@@ -203,6 +206,7 @@ grep -i ocspRevoked.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(
 grep -i ocspNocheckNotPresent.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
 grep -i ocsp-pivi.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
 grep -i ocspGen3p384.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
+grep -i ocsp-piv.apl-test.vendor-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
 
 if [ $GC -gt 0 ]; then
   cp -p /etc/hosts /etc/hosts.$$
@@ -217,6 +221,7 @@ if [ $GC -gt 0 ]; then
   echo "$IPADDR ocspNocheckNotPresent.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
   echo "$IPADDR ocsp-pivi.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
   echo "$IPADDR ocspGen3p384.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
+  echo "$IPADDR ocsp-piv.apl-test.vendor.fpki-lab.gov" >>/tmp/hosts
   /bin/mv /tmp/hosts /etc/hosts
 fi
 
@@ -240,6 +245,7 @@ firewall-cmd --permanent --zone=trusted --add-port=2564/tcp
 firewall-cmd --permanent --zone=trusted --add-port=2565/tcp
 firewall-cmd --permanent --zone=trusted --add-port=2566/tcp
 firewall-cmd --permanent --zone=trusted --add-port=2567/tcp
+firewall-cmd --permanent --zone=trusted --add-port=2568/tcp
 firewall-cmd --direct --permanent --add-rule ipv4 filter INPUT_direct 0 -p tcp --dport 80 -m state --state NEW -m recent --set
 firewall-cmd --direct --permanent --add-rule ipv4 filter INPUT_direct 1 -p tcp --dport 80 -m state --state NEW -m recent --update --seconds 60 --hitcount 150 -j DROP
 firewall-cmd --reload
@@ -261,7 +267,8 @@ for D in \
 	ocspNocheckNotPresent.apl-test.cite.fpki-lab.gov/logs \
 	ocspInvalidSig.apl-test.cite.fpki-lab.gov/logs \
 	ocsp-pivi.apl-test.cite.fpki-lab.gov/logs \
-	ocspGen3p384.apl-test.cite.fpki-lab.gov/logs
+	ocspGen3p384.apl-test.cite.fpki-lab.gov/logs \
+	ocsp-piv.apl-test.vendor.fpki-lab.gov/logs
 do
 	mkdir -p $D
 	chmod 755 $D
@@ -310,6 +317,7 @@ if [ x$OS == x"centos" ]; then
 	semanage port -a -t http_port_t -p tcp 2565
 	semanage port -a -t http_port_t -p tcp 2566
 	semanage port -a -t http_port_t -p tcp 2567
+	semanage port -a -t http_port_t -p tcp 2568
 fi
 
 # Remove the default web page
@@ -451,6 +459,20 @@ cat << %% >ocspGen3p384.apl-test.cite.fpki-lab.gov.conf
   RewriteCond %{CONTENT_TYPE} !^application/ocsp-request$
   RewriteRule ^/(.*) http://localhost:2567/ [P]
   ErrorLog /var/www/ocspGen3p384.apl-test.cite.fpki-lab.gov/logs/error.log
+  <Location "/">
+    AllowMethods POST
+  </Location>
+</VirtualHost>
+%%
+
+cat << %% >ocsp-piv.apl-test.vendor.fpki-lab.gov.conf
+<VirtualHost ocsp-piv.apl-vendor.cite.fpki-lab.gov:80>
+  ServerName ocsp-piv.apl-vendor.cite.fpki-lab.gov
+  DocumentRoot /dev/null
+  RewriteEngine on
+  RewriteCond %{CONTENT_TYPE} !^application/ocsp-request$
+  RewriteRule ^/(.*) http://localhost:2568/ [P]
+  ErrorLog /var/www/ocsp-piv.apl-test.vendor.fpki-lab.gov/logs/error.log
   <Location "/">
     AllowMethods POST
   </Location>
@@ -704,6 +726,7 @@ done
 echo \$! >/var/run/ocsp/ocsp-pivi.pid
 
 # ocspGen3p384.apl-test.cite.fpki-lab.gov -> http://localhost:2567
+
 (\\
 while true
 do
@@ -722,6 +745,27 @@ do
 done
 ) &
 echo \$! >/var/run/ocsp/ocspGen3p384.pid
+
+# ocsp-piv.apl-test.vendor.fpki-lab.gov -> http://localhost:2568
+
+(\\
+while true
+do
+  openssl ocsp \\
+  -index \$CADIR/piv-rsa-2048-index.txt \\
+  -port 2568 \\
+  -rsigner \$CADIR/ocspGen3rsa2048.crt \\
+  -rkey \$CADIR/ocspGen3rsa2048.key \\
+  -CA \$CADIR/PIV_Signing_CA_gen3_rsa2048.crt \\
+  -text \\
+  -out /var/log/ocspGen3rsa2048-log.txt >>/var/log/ocspGen3rsa2048-output 2>&1 &
+  PID=\$!
+  trap 'kill \$!; exit' 1 2 3 15
+  wait
+  sleep 60
+done
+) &
+echo \$! >/var/run/ocsp/ocspGen3rsa2048.pid
 
 sleep infinity
 %%
