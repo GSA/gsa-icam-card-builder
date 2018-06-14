@@ -509,6 +509,7 @@ CONTP12S="ICAM_Test_Card_PIV_Content_Signer_-_expired_gen1-2.p12 \
 	ICAM_Test_Card_PIV_Content_Signer_-_legacy_gold_gen1-2.p12 \
 	ICAM_Test_Card_PIV_Content_Signer_Expiring_-_gold_gen3.p12 \
 	ICAM_Test_Card_PIV_Content_Signer_RSA_2048_gen3.p12 \
+	ICAM_Test_Card_PIV_Content_Signer_RSA_2048_gen3_no_ocsp.p12 \
 	ICAM_Test_Card_PIV_ECC_Issued_P-256_SM_Certificate_Signer_2.p12 \
 	ICAM_Test_Card_PIV_ECC_Issued_P-384_SM_Certificate_Signer_3.p12 \
 	ICAM_Test_Card_PIV_ECC_Issued_P-256_Content_Signer_-_gold_gen3.p12 \
