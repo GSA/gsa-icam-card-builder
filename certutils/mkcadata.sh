@@ -660,7 +660,7 @@ revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN1CRL
 if [ $? -gt 0 ]; then exit 1; fi
 cp -p data/database/$(basename $PIVGEN1_LOCAL) .
 
-for F in 82 86 90 94 98 102
+for F in 83 87 91 95 99 103
 do
 	cp -p ../cards/ICAM_Card_Objects/${F}_Test/3\ -\ ICAM_PIV_Auth_SP_800-73-4.crt data/pem/ICAM_Test_Card_${F}_PIV_Auth.crt
 	cp -p ../cards/ICAM_Card_Objects/${F}_Test/3\ -\ ICAM_PIV_Auth_SP_800-73-4.p12 data/pem/ICAM_Test_Card_${F}_PIV_Auth.p12
