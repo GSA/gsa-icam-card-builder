@@ -369,13 +369,13 @@ cp -p ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/*.p12 data
 #RAF#renameIn "$DEST" 1 1
 #RAF#
 #RAF#
-#RAF### Gen3 Content Signer issued by RSA 2040 Signing CA
-#RAF#SUBJ=ICAM_Test_Card_PIV_RSA_2048_Content_Signer_-_gold_gen3 
-#RAF#sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3 -t piv-content-signer-rsa-2048 -r 2048 --cakey rsa2048 || exit $?
-#RAF#DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
-#RAF#cp -p data/$SUBJ.p12 "$DEST"
-#RAF#cp -p data/pem/$SUBJ.crt "$DEST"
-#RAF#
+## Gen3 Content Signer issued by RSA 2040 Signing CA
+SUBJ=ICAM_Test_Card_PIV_Content_Signer_RSA_2048_gen3 
+sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3 -t piv-content-signer-rsa-2048 -r 2048 --cakey rsa2048 || exit $?
+DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
+cp -p data/$SUBJ.p12 "$DEST"
+cp -p data/pem/$SUBJ.crt "$DEST"
+
 ## Gen3 OCSP valid signer using RSA 2048 (RSA 2048 CA)
 SUBJ=ICAM_Test_Card_PIV_OCSP_RSA_2048_Valid_Signer_gen3
 sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3 -t piv-ocsp-valid-rsa-2048 -r 2048 --cakey rsa2048 || exit $?

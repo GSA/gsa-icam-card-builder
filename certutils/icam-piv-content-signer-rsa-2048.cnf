@@ -60,6 +60,6 @@ authorityKeyIdentifier = keyid:issuer
 subjectKeyIdentifier = hash
 extendedKeyUsage = critical,2.16.840.1.101.3.6.7
 keyUsage = critical,digitalSignature
-authorityInfoAccess = caIssuers;URI:http://http.apl-test.cite.fpki-lab.gov/aia/certsIssuedToICAMTestCardRSA2048SigningCA.p7c
+authorityInfoAccess = caIssuers;URI:http://http.apl-test.cite.fpki-lab.gov/aia/certsIssuedToICAMTestCardRSA2048SigningCA.p7c, OCSP;URI:http://ocsp-piv.apl-test.vendor.fpki-lab.gov
 crlDistributionPoints = URI:http://http.apl-test.cite.fpki-lab.gov/crls/ICAMTestCardRSA2048PIVSigningCA.crl
 certificatePolicies = ia5org,2.16.840.1.101.3.2.1.48.86
