@@ -173,9 +173,11 @@ sub appendLrc($$) {
 	my @bitctrs = (0, 0, 0, 0);
 	my $i = 0;
 	my $lrc = 0;
+	my $tmp = 0;
 	map {
+		$tmp = $_ & 0x1f;
 		for ($i = 4; $i >= 1; $i--) {
-			if (($_ & (1 << $i)) != 0) {
+			if (($tmp & (1 << $i)) != 0) {
 				$bitctrs[$i - 1]++;
 			}
 		}
