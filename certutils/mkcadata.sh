@@ -574,6 +574,7 @@ mkunique $F PIVGEN1_LOCAL
 
 for F in $PIVGEN1_LOCAL $PIVGEN3_LOCAL $PIVIGEN1_LOCAL $PIVIGEN3_LOCAL $PIVIGEN3_LOCAL $PIVRSA2048_LOCAL $PIVGEN3P384_LOCAL $PIVGEN3P256_LOCAL
 do
+	mkunique $F
 	cp -p $F data/database
 done
 
@@ -657,9 +658,6 @@ CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardSignin
 revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN1CRL
 if [ $? -gt 0 ]; then exit 1; fi
 cp -p data/database/$(basename $PIVGEN1_LOCAL) .
-
-echo -n "Revoke Test Certs: "
-read ans
 
 for F in 82 86 90 94 98 102
 do
