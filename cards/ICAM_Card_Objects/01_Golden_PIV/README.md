@@ -1,5 +1,4 @@
-This utility allows you to personalize an ICAM test card with your own fingerprint for biometric testing purposes.  
-The basic steps are:
+The `myfinger.sh` utility in this directory allows you to personalize an ICAM test card with your own fingerprint for biometric testing purposes.  The basic steps are:
 
 1. Be sure to use an the unzipped release directory structure.  Don't do this in the source repository.
 
