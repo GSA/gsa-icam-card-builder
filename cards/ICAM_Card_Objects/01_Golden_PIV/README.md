@@ -15,9 +15,9 @@ The `myfinger.sh` utility in this directory allows you to personalize an ICAM te
 7. Use the test runner to run the last set of tools, Signed Objects against your PIV/CAC/TWIC/PIV-I.  Using the logs, drill
    into the fingerprint test log and locate the TLV data object beginning with `0xbc`.  Copy that string to the clipboard.
 
-8. Run `./myfinger.sh`.  You'll be prompted to paste your clipboard after pressing *<Enter>*
+8. Run `./myfinger.sh`.  You'll be prompted to paste your clipboard after pressing *\<Enter\>*
 
-9. Paste the TLV text into the terminal window when prompted.  Then press *<Enter>* and *<CTL-D>*.
+9. Paste the TLV text into the terminal window when prompted.  Then press *\<Enter\>* and *\<CTL-D\>*.
 
 10. Allow the script to merge your biometric data with the ICAM test card signature block, creating a new
 `9 - Fingerprints` file.
