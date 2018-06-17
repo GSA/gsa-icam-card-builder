@@ -1,3 +1,4 @@
 /distro/*
 /.DS_Store
 /.classpath
+/bin/*

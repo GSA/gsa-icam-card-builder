@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# finger.pl v1.7.4
+# finger.pl v1.7.7
 # vim: ts=2 nohlsearch nowrapscan
 #
 # Usage: ./finger.pl <File containing CBEFF in binary format> 
@@ -19,6 +19,10 @@ my $validtag;
 my $encoded;
 my @chars = ();
 my $charslen = 0;
+my $bdblen = 0;
+my $bdblen_counted = 0;
+my $sblen = 0;
+my $sblen_counted = 0;
 
 # Check args
 
@@ -62,31 +66,42 @@ $/ = $oldfs;
 my $i = 0;
 my $j = 0;
 my $len;
+my $cbeffsize = 0;
 my $container_flag = 0;
 my $cbhdrsize = 0;
 my $fmrsize = 0;
 #
 # Deal with TLV header, if present
 #
-if ($chars[$i] == 0x53) {
-	my ($tag, $length, @value) = tlvparse (\@chars);
-	@chars = @value;
+if ($chars[0] == 0x53) {
+	shift @chars; shift @chars; shift @chars; shift @chars; 
 	# Now, @chars should start with 0xBC
 }
 
+if ($chars[0] == 0xBC) {
+	shift @chars; shift @chars;
+	$cbeffsize = (($chars[0] << 8) | $chars[1]);
+	print "Stated CBEFF size: $cbeffsize\n";
+	shift @chars; shift @chars;
+} else {
+	print ">>> Error: Invalid CBEFF format <<<\n";
+	exit 1;
+}
+
 $charslen = scalar @chars;
-if ($chars[$i] == 0xBC) {
-	$container_flag = 1; 
-  $i++;
-	$i++;  # Skip (82)
-	print "CBEFF size: " . (($chars[$i++] << 8) | $chars[$i++]) . "\n";
+
+if ($chars[scalar @chars - 2] == 0xFE) {
+	print "File CBEFF size: " . scalar @chars - 2 . " (" . (($cbeffsize == scalar @chars -2) ? "good" : "bad") . ")\n";
+} else  {
+	print "File CBEFF size (no EDC): " . scalar @chars . " (" . (($cbeffsize == scalar @chars) ? "good" : "bad") . ")\n";
 }
 
 print "***** Standard Biometric Header *****\n";
 print "Patron Header Version................" . $chars[$i++] . "\n";
 print "SBH Security Options................." . $chars[$i++] . "\n";
-print "BDB Length..........................." . (($chars[$i++] << 24) | ($chars[$i++] << 16) | ($chars[$i++] << 8) | $chars[$i++]) . "\n"; 
-my $sblen = (($chars[$i++] << 8) | $chars[$i++]);
+$bdblen = (($chars[$i++] << 24) | ($chars[$i++] << 16) | ($chars[$i++] << 8) | $chars[$i++]);
+print "BDB Length..........................." . $bdblen . "\n"; 
+$sblen = (($chars[$i++] << 8) | $chars[$i++]);
 print "SB Length............................" . $sblen . "\n";
 print "BDB Format Owner....................." . (($chars[$i++] << 8) | $chars[$i++]) . "\n";
 print "BDB Format Type......................" . (($chars[$i++] << 8) | $chars[$i++]) . "\n";
@@ -121,7 +136,7 @@ for ($j = 0; $j < 25; $j++, $i++) {
 print " (". cook($raw) . ")\n\n";
 
 $i += 4;
-$cbhdrsize = ($container_flag == 1) ? $i - 4 : $i;
+$cbhdrsize = $i;
 
 print "***** Biometric Data Block *****\n";
 print "Format Identifier....................";
@@ -210,7 +225,9 @@ for ($j = 0; $j < $minutiae_count; $j++, $i += 6) {
 
 print "\n";
 
-$fmrsize = $i - $cbhdrsize;
+# 2-byte separator
+
+$i += 2;
 
 # Create a CBEFF header file
 
@@ -222,7 +239,7 @@ my $outname = basename("$ARGV[0]", ".bin") . ".cbeffhdr";
 open ($outfile, ">$outname") or die "$outname: $!";
 binmode $outfile;
 
-for ($j = ($container_flag == 1) ? 4 : 0; $j < $cbhdrsize + 4; $j++) {
+for ($j =  0; $j < $cbhdrsize; $j++) {
 	$unencoded .= sprintf "%02X", $chars[$j];
 	print $outfile chr($chars[$j]);
 }
@@ -238,18 +255,18 @@ $outname = basename("$ARGV[0]", ".bin") . ".fmr";
 open ($outfile, ">$outname") or die "$outname: $!";
 binmode $outfile;
 
-for ($j = $cbhdrsize + (($container_flag == 1) ? 4 : 0); $j < $i + 2; $j++) {
+for ($j = $cbhdrsize; $j < $i; $j++, $bdblen_counted++) {
 	$unencoded .= sprintf "%02X", $chars[$j];
 	print $outfile chr($chars[$j]);
 }
 close $outfile;
 
+if ($bdblen_counted != $bdblen) {
+	print ">>> Error: Actual BDB length ($bdblen_counted) doesn't match header ($bdblen) <<<\n";
+}
+
 $octets = pack ("H*", $unencoded);
 print MIME::Base64::encode($octets);
-
-# 2-byte separator
-
-$i += 2;
 
 print "***** Signature Block *****\n";
 $unencoded = "";
@@ -257,25 +274,25 @@ $unencoded = "";
 open ($outfile, ">" . basename("$ARGV[0]", ".bin") . ".cms") or die "$ARGV[0]" . ".cms $!";
 binmode $outfile;
 
-my $sblen_counted = 0;
-
 # Account for Error Detection tag, since we saw the 0xBC earlier
 # If the 0xBC exists, then expect to find the Error Detection Code 0xFE00
 
-my $nbytes = ($container_flag == 1) ? $charslen - 2 : $charslen + 0;
+my $lastidx = $charslen;
 
-for ( ; $i < $nbytes; $i++, $sblen_counted++) {
+if ($chars[$lastidx - 2] == 0xFE) { 
+		$lastidx -= 2;
+} else {
+		print ">>> Warning: No Error Detection Code <<<\n";
+}
+
+for ( ; $i < $lastidx; $i++, $sblen_counted++) {
 	$unencoded .= sprintf "%02X", $chars[$i];
 	print $outfile chr($chars[$i]);
 }
+close $outfile;
+
 if ($sblen_counted != $sblen) {
 	print ">>> Error: Actual SB length ($sblen_counted) doesn't match header ($sblen) <<<\n";
-}
-
-if ($container_flag == 1 && $i < scalar @chars) {
-	if ($chars[$i++] != 0xFE) {
-		print ">>> Warning: No Error Detection Code <<<\n";
-	}
 }
 
 $octets = pack ("H*", $unencoded);
