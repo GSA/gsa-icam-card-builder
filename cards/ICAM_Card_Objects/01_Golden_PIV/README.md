@@ -23,7 +23,7 @@ The `myfinger.sh` utility in this directory allows you to personalize an ICAM te
 `9 - Fingerprints` file.
   
 11. At this point the signature of the CBEFF is invalid because the data file contains other CBEFF fields that
-    are inconsistent with the signature.  This is corrected with the signing too.
+    are inconsistent with the signature.  This is corrected with the signing tool.
     
 12. The signing tool will start up, allowing you to sign the `9 - Fingerprints` file.  This will change the FASC-N to
     the appropriate ICAM test card FASC-N for the ICAM Test Card you are working with. Generally, you only need to do
