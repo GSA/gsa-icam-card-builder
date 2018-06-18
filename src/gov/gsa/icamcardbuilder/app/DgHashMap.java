@@ -5,7 +5,6 @@ import static gov.gsa.icamcardbuilder.app.Gui.logger;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.LinkedHashMap;
-import java.util.ListIterator;
 
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Sequence;
