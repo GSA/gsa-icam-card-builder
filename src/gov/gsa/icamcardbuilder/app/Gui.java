@@ -69,7 +69,7 @@ import javax.swing.JCheckBox;
 public class Gui extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	protected final static String version = "1.8.55";
+	protected final static String version = "1.8.56";
 	protected static String cardsDirectory = null;
 	private static String cardsDirectoryArg = null;
 	protected static boolean debug = true;
@@ -487,8 +487,8 @@ public class Gui extends JPanel {
 
 		openFile.setIcon(new ImageIcon(getClass().getResource("/resources/open.png")));
 		openFile.setMnemonic('p');
-		openFile.setText("Open Properties File");
-		openFile.setToolTipText("Open properties file");
+		openFile.setText("Open Properties File(s)");
+		openFile.setToolTipText("Open properties file(s)");
 		openFile.setInheritsPopupMenu(true);
 		openFile.addActionListener(new java.awt.event.ActionListener() {
 			@Override

@@ -383,8 +383,8 @@ public class Utils {
 		map.put(ContentSignerTool.cccApplicationsCardUrl, "Applications Card URL");
 		map.put(ContentSignerTool.cccPkcs15, "PKCS#15");
 		map.put(ContentSignerTool.cccRegisteredDataModelNumber, "Registered Data Model Number");
-		map.put(ContentSignerTool.issuerAsymmetricSignatureTag, "CHUID Signature");
-		map.put(ContentSignerTool.bufferLengthTag, "CHUID Buffer Length (deprecated)");
+		map.put(ContentSignerTool.chuidIssuerAsymmetricSignatureTag, "CHUID Signature");
+		map.put(ContentSignerTool.chuidBufferLengthTag, "CHUID Buffer Length (deprecated)");
 		map.put(ContentSignerTool.chuidFascnTag, "CHUID FASC-N");
 		map.put(ContentSignerTool.chuidGuidTag, "CHUID GUID");
 		map.put(ContentSignerTool.chuidExpirationDateTag, "CHUID Expiration Date");
