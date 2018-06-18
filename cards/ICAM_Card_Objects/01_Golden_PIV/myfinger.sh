@@ -78,7 +78,10 @@ finger.pl finger.bin
 echo -n "Press <ENTER> to use the Java Card Builder tool to sign \"9 - Fingerprints\".: "
 read ans
 
-pushd ../../src
-sh start-signer.sh &
+OPWD=$(pwd)
+
+pushd ../../../
+sh start-signer.sh $OPWD
+popd
 
 exit
