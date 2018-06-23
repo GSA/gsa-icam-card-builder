@@ -5,6 +5,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
+import javax.swing.WindowConstants;
+
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
@@ -26,7 +28,7 @@ public class SwingWorkerService {
 
 		// add a checkbox as well to proof the UI is still responsive
 		testFrame.getContentPane().add(new JCheckBox("Click me to " + "proof UI is responsive"), BorderLayout.NORTH);
-		testFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		testFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		return testFrame;
 	}
 
