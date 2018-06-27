@@ -383,9 +383,110 @@ cp -p ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/*.p12 data
 #RAF#cp -p data/$SUBJ.p12 "$DEST"
 #RAF#cp -p data/pem/$SUBJ.crt "$DEST"
 #RAF#
-## Gen3 Content Signer issued by RSA 2040 Signing CA (minus OSCP)
-SUBJ=ICAM_Test_Card_PIV_Content_Signer_RSA_2048_gen3_no_ocsp
-sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3 -t piv-content-signer-rsa-2048-no-ocsp -r 2048 --cakey rsa2048 || exit $?
-DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
-cp -p data/$SUBJ.p12 "$DEST"
-cp -p data/pem/$SUBJ.crt "$DEST"
+#RAF### Gen3 Content Signer issued by RSA 2040 Signing CA (minus OSCP)
+#RAF#SUBJ=ICAM_Test_Card_PIV_Content_Signer_RSA_2048_gen3_no_ocsp
+#RAF#sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3 -t piv-content-signer-rsa-2048-no-ocsp -r 2048 --cakey rsa2048 || exit $?
+#RAF#DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
+#RAF#cp -p data/$SUBJ.p12 "$DEST"
+#RAF#cp -p data/pem/$SUBJ.crt "$DEST"
+#############################################################################
+
+doit() {
+	
+	PIV_AUTH_P12_NAME="3 - ICAM_PIV_Auth_SP_800-73-4.p12"
+	PIV_AUTH_CERT_NAME="3 - ICAM_PIV_Auth_SP_800-73-4.crt"
+
+	DIG_SIG_P12_NAME="4 - ICAM_PIV_Dig_Sig_SP_800-73-4.p12"
+	DIG_SIG_CERT_NAME="4 - ICAM_PIV_Dig_Sig_SP_800-73-4.crt"
+
+	KEY_MGMT_P12_NAME="5 - ICAM_PIV_Key_Mgmt_SP_800-73-4.p12"
+	KEY_MGMT_CERT_NAME="5 - ICAM_PIV_Key_Mgmt_SP_800-73-4.crt"
+
+	CARD_AUTH_P12_NAME="6 - ICAM_PIV_Card_Auth_SP_800-73-4.p12"
+	CARD_AUTH_CERT_NAME="6 - ICAM_PIV_Card_Auth_SP_800-73-4.crt"
+
+
+	cp -p $1 $3
+	cp -p $2 $3
+
+	pushd $3
+
+	case $4 in
+		PIV_Auth)
+			set -x
+			mv $(basename $1) "$PIV_AUTH_P12_NAME"
+			mv $(basename $2) "$PIV_AUTH_CERT_NAME"
+			set +x
+			;;
+		PIV_Dig_Sig)
+			set -x
+			mv $(basename $1) "$DIG_SIG_P12_NAME"
+			mv $(basename $2) "$DIG_SIG_CERT_NAME"
+			set +x
+			;;
+		PIV_Key_Mgmt)
+			set -x
+			mv $(basename $1) "$KEY_MGMT_P12_NAME"
+			mv $(basename $2) "$KEY_MGMT_CERT_NAME"
+			set +x
+			;;
+		PIV_Card_Auth)
+			set -x
+			mv $(basename $1) "$CARD_AUTH_P12_NAME"
+			mv $(basename $2) "$CARD_AUTH_CERT_NAME"
+			set +x
+			;;
+	esac
+	popd
+}
+
+set -x
+
+## Card 39
+DEST="../cards/ICAM_Card_Objects/39_Golden_FIPS_201-2_Fed_PIV-I-X"
+rm -f ${DEST}/*.{p12,crt}
+if [ ! -f $DEST ]; then mkdir -p $DEST; fi
+SUBJ=JOHN_M._SMITH
+echo -n "1: "; read ans
+
+sh mkcert.sh -w -b -s $SUBJ -i ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3 -n 39 -t pivi-auth || exit $?
+doit data/$SUBJ.p12 data/pem/$SUBJ.crt $DEST PIV_Auth
+echo -n "2: "; read ans
+
+sh mkcert.sh -w -b -s $SUBJ -i ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3 -n 39 -t pivi-dig-sig || exit $?
+doit data/$SUBJ.p12 data/pem/$SUBJ.crt $DEST PIV_Dig_Sig
+sh mkcert.sh -w -b -s $SUBJ -i ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3 -n 39 -t pivi-key-mgmt || exit $?
+doit data/$SUBJ.p12 data/pem/$SUBJ.crt $DEST PIV_Key_Mgmt
+sh mkcert.sh -w -b -s $SUBJ -i ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3 -n 39 -t pivi-card-auth || exit $?
+doit data/$SUBJ.p12 data/pem/$SUBJ.crt $DEST PIV_Card_Auth
+
+## Card 54
+DEST="../cards/ICAM_Card_Objects/54_Golden_FIPS_201-2_NFI_PIV-I-X"
+rm -f ${DEST}/*.{p12,crt}
+if [ ! -f $DEST ]; then mkdir -p $DEST; fi
+SUBJ=JOHN_QUINCY_ADAMS_III
+
+sh mkcert.sh -w -b -s $SUBJ -i ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3 -n 54 -t pivi-auth || exit $?
+doit data/$SUBJ.p12 data/pem/$SUBJ.crt $DEST PIV_Auth
+sh mkcert.sh -w -b -s $SUBJ -i ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3 -n 54 -t pivi-dig-sig || exit $?
+doit data/$SUBJ.p12 data/pem/$SUBJ.crt $DEST PIV_Dig_Sig
+sh mkcert.sh -w -b -s $SUBJ -i ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3 -n 54 -t pivi-key-mgmt || exit $?
+doit data/$SUBJ.p12 data/pem/$SUBJ.crt $DEST PIV_Key_Mgmt
+sh mkcert.sh -w -b -s $SUBJ -i ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3 -n 54 -t pivi-card-auth || exit $?
+doit data/$SUBJ.p12 data/pem/$SUBJ.crt $DEST PIV_Card_Auth
+
+
+## Card 47
+DEST="../cards/ICAM_Card_Objects/47_Golden_FIPS_201-2_PIV_SAN_Order-X"
+rm -f ${DEST}/*.{p12,crt}
+if [ ! -f $DEST ]; then mkdir -p $DEST; fi
+SUBJ=COOKIE_WILLAMS
+
+sh mkcert.sh -w -b -s $SUBJ -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 47 -t piv-auth || exit $?
+doit data/$SUBJ.p12 data/pem/$SUBJ.crt $DEST PIV_Auth
+sh mkcert.sh -w -b -s $SUBJ -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 47 -t piv-dig-sig || exit $?
+doit data/$SUBJ.p12 data/pem/$SUBJ.crt $DEST PIV_Dig_Sig
+sh mkcert.sh -w -b -s $SUBJ -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 47 -t piv-key-mgmt || exit $?
+doit data/$SUBJ.p12 data/pem/$SUBJ.crt $DEST PIV_Key_Mgmt
+sh mkcert.sh -w -b -s $SUBJ -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 47 -t piv-card-auth || exit $?
+doit data/$SUBJ.p12 data/pem/$SUBJ.crt $DEST PIV_Card_Auth
