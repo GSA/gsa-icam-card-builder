@@ -39,7 +39,7 @@ public class CheckUnrestrictedCrypto {
 			System.out.println("Java native max key length: " + maxKeyLen + " (" + jceAlgs + " JCE ciphers)\n");
 			maxKeyLen = 0;
 			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding", "BC");
-			maxKeyLen = cipher.getMaxAllowedKeyLength("AES/CBC/PKCS5Padding");
+			maxKeyLen = Cipher.getMaxAllowedKeyLength("AES/CBC/PKCS5Padding");
 		} catch (Exception e) {
 			System.out.println(e.getLocalizedMessage() + "\n");
 			e.printStackTrace();

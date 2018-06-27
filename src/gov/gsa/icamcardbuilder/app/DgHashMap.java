@@ -5,7 +5,6 @@ import static gov.gsa.icamcardbuilder.app.Gui.logger;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.LinkedHashMap;
-import java.util.ListIterator;
 
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -80,7 +79,7 @@ public class DgHashMap {
 		if (dgHashArray != null) {
 			for (int i = 0; i < dgHashArray.length; i++) {
 				Byte dgNumber = (byte) dgHashArray[i].getDataGroupNumber();
-				this.dgHashMap.put((Integer) (int) dgNumber, dgHashArray[i]);
+				this.dgHashMap.put((int) dgNumber, dgHashArray[i]);
 			}
 		} else {
 			// Initialize the DG Map
@@ -106,7 +105,7 @@ public class DgHashMap {
 		if (this.dgMap != null) {
 			if (this.dgMap.containsContainerId(containerId)) {
 				dgNumber = this.dgMap.removeMapping(containerId);
-				this.dgHashMap.remove((Integer) (int) dgNumber);
+				this.dgHashMap.remove((int) dgNumber);
 			}
 		}
 
@@ -114,9 +113,9 @@ public class DgHashMap {
 		dgNumber = this.dgMap.addMapping(containerId);
 		// Create and add a DataGroupHash
 		DataGroupHash dgHash = new DataGroupHash(dgNumber, (new DEROctetString(hash)));
-		this.dgHashMap.put((Integer) (int) dgNumber, dgHash);
+		this.dgHashMap.put((int) dgNumber, dgHash);
 		logger.debug("Add DG Number " + dgNumber + " = "
-				+ Utils.bytesToHex(this.dgHashMap.get((Integer) (int) dgNumber).getDataGroupHashValue().getOctets()));
+				+ Utils.bytesToHex(this.dgHashMap.get((int) dgNumber).getDataGroupHashValue().getOctets()));
 		return dgNumber;
 	}
 
@@ -133,7 +132,7 @@ public class DgHashMap {
 		this.removeDgHash(containerId);
 		Byte dgNumber = this.addDgHash(containerId, hash);
 		logger.debug("Replace DG Number " + dgNumber + " = "
-				+ Utils.bytesToHex(this.dgHashMap.get((Integer) (int) dgNumber).getDataGroupHashValue().getOctets()));
+				+ Utils.bytesToHex(this.dgHashMap.get((int) dgNumber).getDataGroupHashValue().getOctets()));
 	}
 
 	/**
@@ -147,9 +146,9 @@ public class DgHashMap {
 		logger.debug(String.format("Remove DG hash for container %04X", desiredContainerId));
 		if (this.dgMap.containsContainerId(desiredContainerId)) {
 			Byte dgNumber = this.dgMap.removeMapping(desiredContainerId);
-			logger.debug(String.format("Remove DG mapping number = %2d:%s", dgNumber, Utils.bytesToHex(this.dgHashMap.get((Integer) (int) dgNumber).getDataGroupHashValue().getOctets())));
+			logger.debug(String.format("Remove DG mapping number = %2d:%s", dgNumber, Utils.bytesToHex(this.dgHashMap.get((int) dgNumber).getDataGroupHashValue().getOctets())));
 			if (dgNumber != null) {
-				result = dgHashMap.remove((Integer) (int) dgNumber);
+				result = dgHashMap.remove((int) dgNumber);
 			}
 			logger.debug(String .format("Remove result was %s", (result != null) ? "successfuil" : "unsuccessful"));
 		} else {
@@ -192,7 +191,7 @@ public class DgHashMap {
 				Byte dgNumber = this.dgMap.getDgNumber(k);
 				// If a mapping entry exists but there's no hash then then
 				// the mapping entry must be removed.
-				if (false == this.dgHashMap.containsKey((Integer) (int) dgNumber)) {
+				if (false == this.dgHashMap.containsKey((int) dgNumber)) {
 					logger.debug("Removing Container ID orphan " + k);
 					dgMap.removeMapping(k);
 				}

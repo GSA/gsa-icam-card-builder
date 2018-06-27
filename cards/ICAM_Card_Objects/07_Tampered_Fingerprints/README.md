@@ -1,7 +1,16 @@
 ## Tampered Fingerprint ##
 
-After signing the fingerprint object, run the script, "altercbeff.sh" which 
-will change a byte in the fingerprint CBEFF so that it doesn't match the CBEFF's
-signature.
+After signing the fingerprint object, run the script, `alterfps.sh` which 
+will change four bytes in the fingerprint CBEFF so that it doesn't match the CBEFF's signature.
 
-Alternatively, use a hex editor to change the bytes at offset 88-91 to 0xFFFFFFFF in the '9 - Fingerprints' file.
+```
+#!/bin/sh
+cp -p '9 - Fingerprints' finger.bin
+SIZE=$(stat --format="%s" finger.bin)
+dd if=finger.bin bs=1 count=500 of=p1 2>/dev/null
+echo -e -n "\\xff\\xff\\xff\\xff" >p2
+dd if=finger.bin bs=1 skip=504 of=p3 2>/dev/null
+cat p1 p2 p3 >p4
+mv p4 '9 - Fingerprints'
+rm -f p* finger.bin
+```

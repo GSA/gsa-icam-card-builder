@@ -3,8 +3,6 @@
 /der/
 /der/*
 *.pem
-!ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt
-!ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.p12
-!ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.crt
-!ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.p12
+!*Signing_CA*.crt
+!*Signing_CA*.p12
 /database/*.old

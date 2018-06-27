@@ -37,6 +37,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.WindowConstants;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.event.ChangeEvent;
@@ -69,7 +70,7 @@ import javax.swing.JCheckBox;
 public class Gui extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	protected final static String version = "1.8.54";
+	protected final static String version = "1.8.57";
 	protected static String cardsDirectory = null;
 	private static String cardsDirectoryArg = null;
 	protected static boolean debug = true;
@@ -487,8 +488,8 @@ public class Gui extends JPanel {
 
 		openFile.setIcon(new ImageIcon(getClass().getResource("/resources/open.png")));
 		openFile.setMnemonic('p');
-		openFile.setText("Open Properties File");
-		openFile.setToolTipText("Open properties file");
+		openFile.setText("Open Properties File(s)");
+		openFile.setToolTipText("Open properties file(s)");
 		openFile.setInheritsPopupMenu(true);
 		openFile.addActionListener(new java.awt.event.ActionListener() {
 			@Override
@@ -1091,7 +1092,7 @@ public class Gui extends JPanel {
 		// Create and set up the window.
 		frame = new JFrame("GSA ICAM Card Builder " + version);
 
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		URL iconURL = ClassLoader.getSystemResource("resources/icon.png");
 		ImageIcon icon = new ImageIcon(iconURL);
 		frame.setIconImage(icon.getImage());

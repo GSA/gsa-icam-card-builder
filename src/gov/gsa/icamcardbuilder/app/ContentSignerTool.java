@@ -103,8 +103,8 @@ public class ContentSignerTool {
 	protected static final int cccPkcs15 = 0xf4;
 	protected static final int cccRegisteredDataModelNumber = 0xf5;
 	protected static final int authenticationKeyMapTag = 0x3d;
-	protected static final int issuerAsymmetricSignatureTag = 0x3e;
-	protected static final int bufferLengthTag = 0xee;
+	protected static final int chuidIssuerAsymmetricSignatureTag = 0x3e;
+	protected static final int chuidBufferLengthTag = 0xee;
 	protected static final int chuidFascnTag = 0x30;
 	protected static final int chuidGuidTag = 0x34;
 	protected static final int chuidExpirationDateTag = 0x35;
@@ -344,7 +344,7 @@ public class ContentSignerTool {
 			containerBufferBytes = temp;
 			break;
 		case chuidFascnTag:
-		case bufferLengthTag:
+		case chuidBufferLengthTag:
 		case chuidGuidTag:
 		case chuidExpirationDateTag:
 		case cardholderUuidTag:
@@ -364,6 +364,7 @@ public class ContentSignerTool {
 					chuidValues.replace(chuidGuidTag, Utils.hexStringToByteArray(uuid));
 				else
 					chuidValues.put(chuidGuidTag, Utils.hexStringToByteArray(uuid));
+
 			} catch (InvalidDataFormatException e) {
 				System.out.println("InvalidDataFormatException handled\n");
 				Gui.progress.setValue(0);
@@ -400,9 +401,12 @@ public class ContentSignerTool {
 					chuidValues.replace(cardholderUuidTag, Utils.hexStringToByteArray(cardholderUuid));
 				else
 					chuidValues.put(cardholderUuidTag, Utils.hexStringToByteArray(cardholderUuid));
+				
+				if (chuidValues.containsKey(chuidBufferLengthTag)) 
+					chuidValues.remove(chuidBufferLengthTag);
 
-				if (chuidValues.containsKey(issuerAsymmetricSignatureTag))
-					chuidValues.remove(issuerAsymmetricSignatureTag);
+				if (chuidValues.containsKey(chuidIssuerAsymmetricSignatureTag))
+					chuidValues.remove(chuidIssuerAsymmetricSignatureTag);
 				
 				if (chuidValues.containsKey(errorDetectionCodeTag))
 					chuidValues.remove(errorDetectionCodeTag);
@@ -467,12 +471,6 @@ public class ContentSignerTool {
 			containerBufferBytes = writePiContainer(contentFile, contentBytes);
 			break;
 		case biometricObjectTag: // BiometricObject
-			LinkedHashMap<Integer, byte[]> cbeffValues;
-			if ((cbeffValues = getDoContents(contentFileBytes)) == null) {
-				System.out.println("Empty container\n");
-				Gui.progress.setValue(0);
-				return;
-			}
 	
 			// We do this fakery to get the size of the signature block, which
 			// is needed by CBEFF headers. Chicken/egg problem.
@@ -1050,7 +1048,7 @@ public class ContentSignerTool {
 		containerBuffer.put(contentBytes, 0, contentBytes.length - 2);
 
 		// Signature
-		containerBuffer.put((byte) issuerAsymmetricSignatureTag);
+		containerBuffer.put((byte) chuidIssuerAsymmetricSignatureTag);
 		containerBuffer.put((byte) 0x82);
 		containerBuffer.put((byte) (short) ((tag3ELen >>> 8) & 0xff));
 		containerBuffer.put((byte) (short) (tag3ELen & 0xff));
