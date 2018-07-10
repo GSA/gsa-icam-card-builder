@@ -263,16 +263,16 @@ for ( ; $chars[$i] != 0x30; $bdblen_counted++, $i++) {
 	$padding++;
 }
 
-if ($padding > 0) {
-	print ">>> Error: Found ($padding) bytes of extraneous padding <<<\n";
-}
-
 if ($bdblen_counted != $bdblen) {
 	print ">>> Error: Actual BDB length ($bdblen_counted) doesn't match header ($bdblen) <<<\n";
 }
 
 $octets = pack ("H*", $unencoded);
 print MIME::Base64::encode($octets);
+
+if ($padding > 0) {
+	print ">>> Error: Found ($padding) bytes of extraneous padding <<<\n";
+}
 
 print "***** Signature Block *****\n";
 $unencoded = "";
