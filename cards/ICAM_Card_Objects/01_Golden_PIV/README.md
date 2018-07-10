@@ -2,10 +2,10 @@ The `myfinger.sh` utility in this directory allows you to personalize an ICAM te
 
 1. Be sure to use an the unzipped release directory structure.  Don't do this in the source repository.
 
-2. Have Cygwin or Linux installed. Cygwin is prefered because *javaw* looks and feels nicer in a Windows environment. You
+2. Have Cygwin or Linux installed. Cygwin is preferred because *javaw* looks and feels nicer in a Windows environment. You
    can certainly use RedHat, CentOS, or Ubuntu, but Java's Swing widgets just don't have the same clean look and feel. 
    
-3. Have a PIV, TWIC, CAC or PIV-I card with your biometric stored in the Cardholder Fingeprints container.
+3. Have a PIV, TWIC, CAC or PIV-I card with your biometric stored in the Cardholder Fingerprints container.
 
 4. Have a tool such as the [NIST 85B Test Runner](https://csrc.nist.gov/CSRC/media/Projects/PIV/documents/install_SP800_73_4_tester_enc_CG.zip) 
    installed and working.
