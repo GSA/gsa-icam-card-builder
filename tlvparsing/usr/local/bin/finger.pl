@@ -66,6 +66,7 @@ $/ = $oldfs;
 my $i = 0;
 my $j = 0;
 my $len;
+my $bcsize = 0;
 my $cbeffsize = 0;
 my $container_flag = 0;
 my $cbhdrsize = 0;
@@ -74,7 +75,9 @@ my $fmrsize = 0;
 # Deal with TLV header, if present
 #
 if ($chars[0] == 0x53) {
-	shift @chars; shift @chars; shift @chars; shift @chars; 
+	shift @chars; shift @chars;
+	$bcsize = (($chars[0] << 8) | $chars[1]);
+	shift @chars; shift @chars; 
 	# Now, @chars should start with 0xBC
 }
 
@@ -103,6 +106,13 @@ $bdblen = (($chars[$i++] << 24) | ($chars[$i++] << 16) | ($chars[$i++] << 8) | $
 print "BDB Length..........................." . $bdblen . "\n"; 
 $sblen = (($chars[$i++] << 8) | $chars[$i++]);
 print "SB Length............................" . $sblen . "\n";
+
+my $testlen = 88 + $bdblen + $sblen;
+
+if ($testlen != $cbeffsize) {
+	print ">>> Error: HDR + BDB + SB len ($testlen) not equal to stated CBEFF size ($cbeffsize) <<<\n";
+}
+
 print "BDB Format Owner....................." . (($chars[$i++] << 8) | $chars[$i++]) . "\n";
 print "BDB Format Type......................" . (($chars[$i++] << 8) | $chars[$i++]) . "\n";
 printf "Biometric Creation Date..............%02d%02d%02d%02d%02d%02d%02d%c\n", $chars[$i++], $chars[$i++], $chars[$i++], $chars[$i++], $chars[$i++], $chars[$i++], $chars[$i++], $chars[$i++];
@@ -135,8 +145,14 @@ for ($j = 0; $j < 25; $j++, $i++) {
 
 print " (". cook($raw) . ")\n\n";
 
-$i += 4;
+if ($chars[$i++] != 0 || $chars[$i++] != 0 || $chars[$i++] != 0 || $chars[$i++] != 0) {
+	print ">>> Error: non-zero characters in separator <<<\n";
+}
+
 $cbhdrsize = $i;
+if ($cbhdrsize != 88) {
+	print ">>> Error: CBEFF header should be 88 bytes, not $cbhdrsize <<<\n";
+}
 
 print "***** Biometric Data Block *****\n";
 print "Format Identifier....................";
@@ -169,67 +185,42 @@ print "\n";
 
 my %fqh = ( 20 => "20", 40 => "40", 60 => "60", 80 => "80", 100 => "100", 254 => "254", 255 => "255" );
 
-printf "---- Finger View %d\n", (($chars[$i + 1] & 0xF0) >> 4);
-print "Finger Position......................" . $chars[$i++] . "\n";
-my $vn = (($chars[$i] & 0xF0) >> 4);
-print "View Number.........................." . $vn . "\n";
-print ">>> Error: View number should be 0 (not $vn) <<<\n" if ($vn != 0 && $nfv == 1);
-my $it = (($chars[$i++] & 0x0F) << 8);
-print "Impression type......................" . $it . "\n";
-print ">>> Error: Impression type should 0 or 2 (not $it) <<<\n" if ($it != 0 && $it != 2);
-my $fq = $chars[$i++];
-print "Finger Quality......................." . $fq . "\n";
-print ">>> Error: Finger quality should be 20, 40, 60, 80, 100, 254, or 255 (not $fq) <<<\n" if (!exists $fqh{$fq});
-my $minutiae_count = $chars[$i];
-print "Number of Minutiae..................." . $chars[$i++] . "\n";
+my $view;
+my $lfp = -1;
 
-print "\n*** Minutiae ***\n";
-my $min_type;
-for ($j = 0; $j < $minutiae_count; $j++, $i += 6) {
-	$min_type = (($chars[$i] & 0xC0) >> 6);
-	printf "%6s %3d %3d %3d %3d\n",
-		($min_type == 0) ? "Other" : ($min_type == 1) ? "Ridge" : "Bifur",
-		((($chars[$i] & ~0xC0) << 2) | ($chars[$i + 1])),
-		(($chars[$i + 2] << 8) | $chars[$i + 3]),
-		$chars[$i + 4],
-		$chars[$i + 5];
+for ($view = 0; $view < $nfv; $view++) {
+	printf "---- Finger View %d\n", (($chars[$i + 1] & 0xF0) >> 4);
+	print "Finger Position......................" . $chars[$i++] . "\n";
+	my $vn = (($chars[$i] & 0xF0) >> 4);
+	print "View Number.........................." . $vn . "\n";
+	print ">>> Warning: View number should be 0 (not $vn) <<<\n" if ($vn != 0);
+	my $it = (($chars[$i++] & 0x0F) << 8);
+	print "Impression type......................" . $it . "\n";
+	print ">>> Error: Impression type should 0 or 2 (not $it) <<<\n" if ($it != 0 && $it != 2);
+	my $fq = $chars[$i++];
+	print "Finger Quality......................." . $fq . "\n";
+	print ">>> Error: Finger quality should be 20, 40, 60, 80, 100, 254, or 255 (not $fq) <<<\n" if (!exists $fqh{$fq});
+	my $minutiae_count = $chars[$i];
+	print "Number of Minutiae..................." . $chars[$i++] . "\n";
+
+	print "\n*** Minutiae ***\n";
+	my $min_type;
+	for ($j = 0; $j < $minutiae_count; $j++, $i += 6) {
+		$min_type = (($chars[$i] & 0xC0) >> 6);
+		printf "%6s %3d %3d %3d %3d\n",
+			($min_type == 0) ? "Other" : ($min_type == 1) ? "Ridge" : "Bifur",
+			((($chars[$i] & ~0xC0) << 2) | ($chars[$i + 1])),
+			(($chars[$i + 2] << 8) | $chars[$i + 3]),
+			$chars[$i + 4],
+			$chars[$i + 5];
+	}
+
+	print "\n";
+	# 2-byte separator
+	$i += 2;
 }
 
-print "\n";
-
-$i += 2;
-printf "---- Finger View %d\n", (($chars[$i + 1] & 0xF0) >> 4);
-print "Finger Position......................" . $chars[$i++] . "\n";
-$vn = (($chars[$i] & 0xF0) >> 4);
-print "View Number.........................." . $vn . "\n";
-print ">>> Error: View number should be 0 (not $vn) <<<\n" if ($vn != 0 && $nfv == 1);
-$it = (($chars[$i++] & 0x0F) << 8);
-print "Impression type......................" . $it . "\n";
-print ">>> Error: Impression type should 0 or 2 (not $it) <<<\n" if ($it != 0 && $it != 2);
-$fq = $chars[$i++];
-print "Finger Quality......................." . $fq . "\n";
-print ">>> Error: Finger quality should be 20, 40, 60, 80, 100, 254, or 255 (not $fq) <<<\n" if (!exists $fqh{$fq});
-$minutiae_count = $chars[$i];
-print "Number of Minutiae..................." . $chars[$i++] . "\n";
-
-print "\n*** Minutiae ***\n";
-for ($j = 0; $j < $minutiae_count; $j++, $i += 6) {
-	$min_type = (($chars[$i] & 0xC0) >> 6);
-	printf "%6s %3d %3d %3d %3d\n",
-		($min_type == 0) ? "Other" : ($min_type == 1) ? "Ridge" : "Bifur",
-		((($chars[$i] & ~0xC0) << 2) | ($chars[$i + 1])),
-		(($chars[$i + 2] << 8) | $chars[$i + 3]),
-		$chars[$i + 4],
-		$chars[$i + 5];
-}
-
-print "\n";
-
-# 2-byte separator
-
-$i += 2;
-
-# Create a CBEFF header file
+# Create the CBEFF header file
 
 my $outfile;
 print "***** CBEFF Header *****\n";
@@ -260,6 +251,21 @@ for ($j = $cbhdrsize; $j < $i; $j++, $bdblen_counted++) {
 	print $outfile chr($chars[$j]);
 }
 close $outfile;
+
+# Some CMSs throw in some padding after the BDB. Since we are not
+# going by the stated data structure sizes (other than the 88 bytes
+# for the header), we will slog through the padding until the 
+# CMS starts.
+
+my $padding = 0;
+
+for ( ; $chars[$i] != 0x30; $bdblen_counted++, $i++) { 
+	$padding++;
+}
+
+if ($padding > 0) {
+	print ">>> Error: Found ($padding) bytes of extraneous padding <<<\n";
+}
 
 if ($bdblen_counted != $bdblen) {
 	print ">>> Error: Actual BDB length ($bdblen_counted) doesn't match header ($bdblen) <<<\n";
