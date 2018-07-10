@@ -754,7 +754,7 @@ do
   openssl ocsp \\
   -index \$CADIR/piv-rsa-2048-index.txt \\
   -port 2568 \\
-  -rsigner \$CADIR/ocspGen3rsa2048.crt \\
+  -rsigner \$CADIR ocspGen3rsa2048.crt \\
   -rkey \$CADIR/ocspGen3rsa2048.key \\
   -CA \$CADIR/PIV_Signing_CA_gen3_rsa2048.crt \\
   -text \\
