@@ -206,11 +206,12 @@ grep -i ocspRevoked.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(
 grep -i ocspNocheckNotPresent.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
 grep -i ocsp-pivi.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
 grep -i ocspGen3p384.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
-grep -i ocsp-piv.apl-test.vendor-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
+grep -i ocsp-piv.apl-test.fpki-lab.gov/ /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
 
 if [ $GC -gt 0 ]; then
   cp -p /etc/hosts /etc/hosts.$$
-  grep -v lab.gov /etc/hosts >/tmp/hosts
+  grep -v $IPADDR /etc/hosts >/tmp/hosts
+  grep -v lab.gov /etc/hosts >>/tmp/hosts
   echo "$IPADDR $HOSTNAME" >>/tmp/hosts
   echo "$IPADDR http.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
   echo "$IPADDR ocsp.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
@@ -221,7 +222,7 @@ if [ $GC -gt 0 ]; then
   echo "$IPADDR ocspNocheckNotPresent.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
   echo "$IPADDR ocsp-pivi.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
   echo "$IPADDR ocspGen3p384.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
-  echo "$IPADDR ocsp-piv.apl-test.vendor.fpki-lab.gov" >>/tmp/hosts
+  echo "$IPADDR ocsp-piv.apl-test.fpki-lab.gov" >>/tmp/hosts
   /bin/mv /tmp/hosts /etc/hosts
 fi
 
@@ -268,15 +269,15 @@ for D in \
 	ocspInvalidSig.apl-test.cite.fpki-lab.gov/logs \
 	ocsp-pivi.apl-test.cite.fpki-lab.gov/logs \
 	ocspGen3p384.apl-test.cite.fpki-lab.gov/logs \
-	ocsp-piv.apl-test.vendor.fpki-lab.gov/logs
+	ocsp-piv.apl-test.fpki-lab.gov/logs
 do
 	mkdir -p $D
 	chmod 755 $D
 	chmod 755 $(dirname $D)
-if [ x$OS == x"centos" ]; then
-	semanage fcontext -a -t httpd_sys_rw_content_t $D
-	restorecon -v $D
-fi
+	if [ x$OS == x"centos" ]; then
+		semanage fcontext -a -t httpd_sys_rw_content_t $D
+		restorecon -v $D
+	fi
 done
 
 if [ x$OS == x"centos" ]; then setsebool -P httpd_unified 1; fi
@@ -465,14 +466,14 @@ cat << %% >ocspGen3p384.apl-test.cite.fpki-lab.gov.conf
 </VirtualHost>
 %%
 
-cat << %% >ocsp-piv.apl-test.vendor.fpki-lab.gov.conf
-<VirtualHost ocsp-piv.apl-test.vendor.fpki-lab.gov:80>
-  ServerName ocsp-piv.apl-test.vendor.fpki-lab.gov
+cat << %% >ocsp-piv.apl-test.fpki-lab.gov.conf
+<VirtualHost ocsp-piv.apl-test.fpki-lab.gov:80>
+  ServerName ocsp-piv.apl-test.fpki-lab.gov.gov
   DocumentRoot /dev/null
   RewriteEngine on
   RewriteCond %{CONTENT_TYPE} !^application/ocsp-request$
   RewriteRule ^/(.*) http://localhost:2568/ [P]
-  ErrorLog /var/www/ocsp-piv.apl-test.vendor.fpki-lab.gov/logs/error.log
+  ErrorLog /var/www/ocsp-piv.apl-test.fpki-lab.gov/logs/error.log
   <Location "/">
     AllowMethods POST
   </Location>
@@ -746,7 +747,7 @@ done
 ) &
 echo \$! >/var/run/ocsp/ocspGen3p384.pid
 
-# ocsp-piv.apl-test.vendor.fpki-lab.gov -> http://localhost:2568
+# ocsp-piv.apl-test.fpki-lab.gov -> http://localhost:2568
 
 (\\
 while true
@@ -754,7 +755,7 @@ do
   openssl ocsp \\
   -index \$CADIR/piv-rsa-2048-index.txt \\
   -port 2568 \\
-  -rsigner \$CADIR ocspGen3rsa2048.crt \\
+  -rsigner \$CADIR/ocspGen3rsa2048.crt \\
   -rkey \$CADIR/ocspGen3rsa2048.key \\
   -CA \$CADIR/PIV_Signing_CA_gen3_rsa2048.crt \\
   -text \\
