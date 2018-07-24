@@ -124,29 +124,35 @@ case $VER in
 esac
 
 pushd ../cards/ICAM_Card_Objects >/dev/null 2>&1
-#	echo -n "Creating CHUID certs..."
-#	for D in $(ls -d 0* 1* 2* 3* 4* 5*)
-#	do
-#		pushd $D >/dev/null 2>&1
-#			if [ ! -f CHUID.crt ]; then
-#
-#				if [ -f "6 - CHUID Object" ]; then
-#					F="6 - CHUID Object"
-#				elif [ -f "8 - CHUID Object" ]; then
-#					F="8 - CHUID Object"
-#				fi
-#
-#				cp "$F" chuid.bin
-#				binchuid.pl chuid.bin >&10 2>&1
-#				dd if=chuid.Issuer_Signature.bin bs=1 skip=59 2>/dev/null | openssl x509 -inform der -outform pem -out CHUID.crt
-#			fi
-#			rm -f chuid.*
-#		popd >/dev/null 2>&1
-#	done
-#
+	echo "Creating CHUID certs..."
+	for D in $(ls -d 0?_* 1?_* 2?_* 3?_* 4?_* 5?_*)
+	do
+		pushd $D >/dev/null 2>&1
+
+			if [ -f "6 - CHUID Object" ]; then
+				F="6 - CHUID Object"
+			elif [ -f "8 - CHUID Object" ]; then
+				F="8 - CHUID Object"
+			fi
+
+		CHUID_UPDT=$(stat --printf="%Y\n" "$F")
+		CRT_UPDT=$(stat --printf="%Y\n" CHUID_Signer.crt)
+
+		if [ $CHUID_UPDT -gt $CRT_UPDT ]; then
+			cp "$F" chuid.bin
+			binchuid.pl chuid.bin >&10 2>&1
+			dd if=chuid.Issuer_Signature.bin bs=1 skip=59 2>/dev/null | openssl x509 -inform der -outform pem -out CHUID_Signer.crt
+			rm -f chuid.*
+			echo "$D...updated"	
+		else
+			echo "$D...skipped"	
+		fi
+		popd >/dev/null 2>&1
+	done
+
 	echo "done."
 
-	for D in $(ls -d 0* 1* 2* 3* 4* 5*)
+	for D in $(ls -d 0?_* 1?_* 2?_* 3?_* 4?_* 5?_*)
 	do
 		pushd $D >/dev/null 2>&1
 			echo "Testing certs in $D..."
