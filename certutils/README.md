@@ -220,7 +220,7 @@ initial policy set.*
 |Digital Signature|2.16.840.1.101.3.2.1.48.251|2.16.840.1.101.3.2.1.48.4|
 |Content Signing|2.16.840.1.101.3.2.1.48.252|2.16.840.1.101.3.2.1.48.80*|
 
-\* Earlier ICAM test cards 1-24 directly assert these policies which was incorrect.  Any ICAM Test Cards encoded after May 2018 assert policy OIDs in arc 2.16.840.1.101.3.2.1.48.248-252.
+\* Earlier ICAM test cards 1-24 directly assert these policies which was incorrect.  Any ICAM Test Cards encoded after May 2018 assert issuer policy OIDs in arc 2.16.840.1.101.3.2.1.48.248-252.
 
 The normative reference for these policies can be found at [FPKI CITE](https://www.idmanagement.gov/wp-content/uploads/sites/1171/uploads/fpki-cite-participation-guide.pdf).
 
