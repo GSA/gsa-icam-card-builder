@@ -56,7 +56,6 @@ prepreq() {
 				;;
 		esac
  		ocsp "$CA_CERT" "$EE_CERT" "$URI"
-		sleep 0.1
  	fi
 }
 
