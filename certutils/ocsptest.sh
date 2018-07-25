@@ -46,13 +46,17 @@ prepreq() {
 				CA_CERT=../ICAM_CA_and_Signer/ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.crt
 				;;
 			http://ocspGen3p384.apl-test.cite.fpki-lab.gov)
-			CA_CERT=../ICAM_CA_and_Signer/ICAM_Test_Card_PIV_P-384_Signing_CA_-_gold_gen3.crt
+				CA_CERT=../ICAM_CA_and_Signer/ICAM_Test_Card_PIV_P-384_Signing_CA_-_gold_gen3.crt
+				;;
+			http://ocsp-piv.apl-test.fpki-lab.gov)
+				CA_CERT=../ICAM_CA_and_Signer/ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3.crt
 				;;
 			*)
 				echo "Cannot get issuer for $EE_CERT"
 				;;
 		esac
  		ocsp "$CA_CERT" "$EE_CERT" "$URI"
+		sleep 0.1
  	fi
 }
 
@@ -152,21 +156,21 @@ pushd ../cards/ICAM_Card_Objects >/dev/null 2>&1
 
 	echo "done."
 
-	for D in $(ls -d 0?_* 1?_* 2?_* 3?_* 4?_* 5?_*)
-	do
-		pushd $D >/dev/null 2>&1
-			echo "Testing certs in $D..."
-			find . -type f -name '*.crt' -print0 | 
-			while IFS= read -r -d '' file; do
-				F=$(printf '%s\n' "$file")
-				prepreq "$F"
-			done
-			echo "*********************************************************"
-		popd >/dev/null 2>&1
-	done
+#	for D in $(ls -d 0?_* 1?_* 2?_* 3?_* 4?_* 5?_*)
+#	do
+#		pushd $D >/dev/null 2>&1
+#			echo "Testing certs in $D..."
+#			find . -type f -name '*.crt' -print0 | 
+#			while IFS= read -r -d '' file; do
+#				F=$(printf '%s\n' "$file")
+#				prepreq "$F"
+#			done
+#			echo "*********************************************************"
+#		popd >/dev/null 2>&1
+#	done
 	pushd ICAM_CA_and_Signer >/dev/null 2>&1
 		echo "Testing certs in ICAM_CA_and_Signer..."
-		find . -type f -name '*.crt' -a \( -name '*Content_Signer*' -o -name '*SM_Cert*' \) -print0 |
+		find . -type f -name '*.crt' -a ! -name '*no_ocsp*' -a \( -name '*Content_Signer*' -o -name '*SM_Cert*' \) -print0 |
 		while IFS= read -r -d '' file; do
 			F=$(printf '%s\n' "$file")
 			prepreq "$F"
