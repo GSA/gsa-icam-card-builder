@@ -190,7 +190,7 @@ The certificate policies OIDS for FIPS 201-2 PIV cards that this project uses ar
 below.  They use the NIST test OIDs that are designated to mimic production OIDs.
 Validation systems should configure their initial policy sets as follows:
 
-#### PIV Card Certificate Policy Test OIDs
+#### PIV Card Certificate Policy Test OIDs<a name="piv_test_oids"></a>
 |Certificate Name|EE Certificate Policy OID|
 |----------------|-------------------------|
 |PIV Authentication|2.16.840.1.101.3.2.1.48.11|
@@ -203,7 +203,7 @@ Validation systems should configure their initial policy sets as follows:
 
 \* Older ICAM Test Cards 1-24 erroneously use 2.16.840.1.101.3.2.1.48.9 as the content signing certificate OID. This was corrected for ICAM Test Cards re-encoded in May 2018.
 
-#### PIV-I Card Certificate Policy Test OIDs
+#### PIV-I Card Certificate Policy Test OIDs<a name="pivi_test_oids"></a>
 The certificate policies for PIV-I cards that this project uses are below.  With 
 PIV-I cards, the certificate policies on the certificates must correctly map
 to an initial policy on the validation system.  The PIV-I Signing CA cert contains
@@ -216,9 +216,11 @@ initial policy set.*
 |----------------|-------------------------|------------------------|
 |Authentication|2.16.840.1.101.3.2.1.48.248|2.16.840.1.101.3.2.1.48.78*|
 |Card Authentication|2.16.840.1.101.3.2.1.48.249|2.16.840.1.101.3.2.1.48.79*|
+|Card Authentication EKU KPID|2.16.840.1.101.3.6.8|
 |Key Management|2.16.840.1.101.3.2.1.48.250|2.16.840.1.101.3.2.1.48.3|
 |Digital Signature|2.16.840.1.101.3.2.1.48.251|2.16.840.1.101.3.2.1.48.4|
 |Content Signing|2.16.840.1.101.3.2.1.48.252|2.16.840.1.101.3.2.1.48.80*|
+|Content Signing EKU KPID|2.16.840.1.101.3.8.7|
 
 \* Earlier ICAM test cards 1-24 directly assert these policies which was incorrect.  Any ICAM Test Cards encoded after May 2018 assert issuer policy OIDs in arc 2.16.840.1.101.3.2.1.48.248-252.
 
@@ -228,7 +230,7 @@ The normative reference for these policies can be found at [FPKI CITE](https://w
 The certificate policy OIDs used by the Federal Government are found
 on Federally-issued PIV cards.
 
-#### PIV Card Certificate Policy OIDs
+#### PIV Card Certificate Policy OIDs<a name="piv_production_oids"></a>
 |Certificate Name|EE Certificate Policy OID|
 |----------------|-------------------------|
 |PIV Authentication|2.16.840.1.101.3.2.1.3.13|
@@ -244,7 +246,7 @@ on Federally-issued PIV cards.
 2.16.840.1.101.3.2.1.3.7 (id-fpki-common-hardware)
 2.16.840.1.101.3.2.1.3.16 (id-fpki-common-High)
 
-#### PIV-I Card Certificate Policy OIDs
+#### PIV-I Card Certificate Policy OIDs<a name="pivi_production_oids"></a>
 Certificate policies for PIV-I cards are below.  With PIV-I cards, the 
 certificate policies on the certificates must correctly map to an 
 initial policy on the relying party validation system.  The PIV-I 
