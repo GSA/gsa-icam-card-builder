@@ -2,8 +2,8 @@ V	321230235959Z		600000000000000000CA	unknown	/C=US/O=U.S. Government/OU=ICAM Te
 V	201202000000Z		600000000000000000CB	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV Content Signer Expiring - gold gen3
 V	321230235959Z		600000000000000000CD	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV OCSP Valid Signer gen3
 V	171202000000Z		600000000000000000CE	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV OCSP Expired Signer gen3
-R	321230235959Z	180725005627Z,cessationOfOperation	600000000000000000CF	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV OCSP Revoked Signer No Check Present gen3
-R	321230235959Z	180725005627Z,cessationOfOperation	600000000000000000D0	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV OCSP Revoked Signer No Check Not Present gen3
+R	321230235959Z	180725013305Z,cessationOfOperation	600000000000000000CF	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV OCSP Revoked Signer No Check Present gen3
+R	321230235959Z	180725013305Z,cessationOfOperation	600000000000000000D0	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV OCSP Revoked Signer No Check Not Present gen3
 V	321230235959Z		600000000000000000D1	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV OCSP Invalid Sig Signer gen3
 V	321201235959Z		600000000000000000D2	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV Auth SP 800-73-4 Missing DO
 V	321201235959Z		600000000000000000D3	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/serialNumber=D13810D828AF2C108428ADA1685828AF08108428A93810C3E7
