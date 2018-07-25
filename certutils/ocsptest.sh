@@ -156,18 +156,18 @@ pushd ../cards/ICAM_Card_Objects >/dev/null 2>&1
 
 	echo "done."
 
-#	for D in $(ls -d 0?_* 1?_* 2?_* 3?_* 4?_* 5?_*)
-#	do
-#		pushd $D >/dev/null 2>&1
-#			echo "Testing certs in $D..."
-#			find . -type f -name '*.crt' -print0 | 
-#			while IFS= read -r -d '' file; do
-#				F=$(printf '%s\n' "$file")
-#				prepreq "$F"
-#			done
-#			echo "*********************************************************"
-#		popd >/dev/null 2>&1
-#	done
+	for D in $(ls -d 0?_* 1?_* 2?_* 3?_* 4?_* 5?_*)
+	do
+		pushd $D >/dev/null 2>&1
+			echo "Testing certs in $D..."
+			find . -type f -name '*.crt' -print0 | 
+			while IFS= read -r -d '' file; do
+				F=$(printf '%s\n' "$file")
+				prepreq "$F"
+			done
+			echo "*********************************************************"
+		popd >/dev/null 2>&1
+	done
 	pushd ICAM_CA_and_Signer >/dev/null 2>&1
 		echo "Testing certs in ICAM_CA_and_Signer..."
 		find . -type f -name '*.crt' -a ! -name '*no_ocsp*' -a \( -name '*Content_Signer*' -o -name '*SM_Cert*' \) -print0 |
