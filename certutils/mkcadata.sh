@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # vim: set ts=2 nowrap
 #
@@ -449,11 +449,11 @@ debug_output()
 	MAJ=$(expr $VERSION : "^\(.\).*$")
 	MIN=$(expr $VERSION : "^..\(.\).*$")
 	if [ $MAJ -ge 4 -a $MIN -ge 1 ]; then
-		exec 10>>"$1"
+		exec 10>|"$1"
 		BASH_XTRACEFD=10
 		set -x
 	else
-		exec 2>>"$1"
+		exec 2>|"$1"
 		set -x
 	fi
 }
