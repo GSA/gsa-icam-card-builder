@@ -2,7 +2,7 @@
 
 # Tests all of the EE certs
 
-trap 'echo "Cancelled by keyboard interrupt."; exit 0' 2 3
+trap 'echo "Cancelled by keyboard interrupt."; cd $OPWD; rm -f CAFile.pem; exit 0' 2 3
 
 ocsp() {
 	CA_CERT="$1"
@@ -66,13 +66,16 @@ debug_output()
 	MAJ=$(expr $VERSION : "^\(.\).*$")
 	MIN=$(expr $VERSION : "^..\(.\).*$")
 	if [ $MAJ -ge 4 -a $MIN -ge 1 ]; then
-		exec 10>>"$1"
+		exec 10>|"$1"
 		BASH_XTRACEFD=10
 		set -x
 	else
-		exec 2>>"$1"
+		exec 2>|"$1"
 		set -x
 	fi
+	echo "--------------------------------------------------" >>$1
+	DATE=$(date)
+	echo "--------------------------------------------------" >>$1
 }
 
 debug_output /tmp/$(basename $0 .sh).log
@@ -127,29 +130,32 @@ case $VER in
 esac
 
 pushd ../cards/ICAM_Card_Objects >/dev/null 2>&1
-	echo "Creating CHUID certs..."
+	echo "Creating CHUID_Signer certs..."
 	for D in $(ls -d 0?_* 1?_* 2?_* 3?_* 4?_* 5?_*)
 	do
 		pushd $D >/dev/null 2>&1
-
 			if [ -f "6 - CHUID Object" ]; then
 				F="6 - CHUID Object"
 			elif [ -f "8 - CHUID Object" ]; then
 				F="8 - CHUID Object"
 			fi
 
-		CHUID_UPDT=$(stat --printf="%Y\n" "$F")
-		CRT_UPDT=$(stat --printf="%Y\n" CHUID_Signer.crt)
+			CHUID_UPDT=$(stat --printf="%Y\n" "$F" 2>/dev/null)
+			CRT_UPDT=$(stat --printf="%Y\n" CHUID_Signer.crt 2>/dev/null)
 
-		if [ $CHUID_UPDT -gt $CRT_UPDT ]; then
-			cp "$F" chuid.bin
-			binchuid.pl chuid.bin >&10 2>&1
-			dd if=chuid.Issuer_Signature.bin bs=1 skip=59 2>/dev/null | openssl x509 -inform der -outform pem -out CHUID_Signer.crt
-			rm -f chuid.*
-			echo "$D...updated"	
-		else
-			echo "$D...skipped"	
-		fi
+			if [ z$CHUID_UPDT != "z" ]; then
+				if [ z$CRT_UPDT == "z" ] || [ $CHUID_UPDT -gt $CRT_UPDT ]; then
+					cp "$F" chuid.bin
+					binchuid.pl chuid.bin >&10 2>&1
+					dd if=chuid.Issuer_Signature.bin bs=1 skip=59 2>/dev/null | openssl x509 -inform der -outform pem -out CHUID_Signer.crt
+					rm -f chuid.*
+					echo "$D...updated"	
+				else
+					echo "$D...skipped"	
+				fi
+			else				
+				echo "$D...skipped (no CHUID object!)"	
+			fi
 		popd >/dev/null 2>&1
 	done
 
