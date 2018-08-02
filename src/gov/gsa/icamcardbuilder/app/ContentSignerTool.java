@@ -82,6 +82,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.Store;
 
+import gov.gsa.icamcardbuilder.app.PivContainers;
 import gov.gsa.icamcardbuilder.app.Utils;
 
 public class ContentSignerTool {
