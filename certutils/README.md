@@ -228,7 +228,9 @@ The normative reference for these policies can be found at [FPKI CITE](https://w
 
 ### Production PIV and PIV-I Card Certificate Policy OIDs
 The certificate policy OIDs used by the Federal Government are found
-on Federally-issued PIV cards.
+on Federally-issued PIV cards. The certificate bundles and CRLs needed
+in your computer's trust store in order to validate PIV cards can be
+downloaded from [Federal Public Key Infrastructure Guides->Certificates and CRLs](https://fpki.idmanagement.gov/crls/).
 
 #### PIV Card Certificate Policy OIDs<a name="piv_production_oids"></a>
 |Certificate Name|EE Certificate Policy OID|
