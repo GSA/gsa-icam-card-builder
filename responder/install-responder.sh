@@ -341,6 +341,10 @@ if [ $CRLHOST -eq 1 ]; then
     ExpiresActive on
     ExpiresDefault "access plus 5 seconds"
   </IfModule>
+  <FilesMatch "\.(crl|p7c|cer|crt)$">
+    RequestHeader unset If-Modified-Since
+    RequestHeader unset If-None-Match
+  </FilesMatch>
   <Directory "/var/www/http.apl-test.cite.fpki-lab.gov">
     Options +Indexes
     IndexIgnore logs
