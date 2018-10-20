@@ -551,7 +551,7 @@ ServerName http.apl-test.cite.fpki-lab.gov
 d
 .-1
 a
-ServerRoot "/etc/apache2"
+ServerRoot "/etc/$HTTPD"
 .
 w
 q
