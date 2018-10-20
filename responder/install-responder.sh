@@ -536,6 +536,8 @@ if [ z$OS == z"ubuntu" ]; then # Ubuntu only
 	cp $CONF2 $CONF2.$$
 	grep -v ServerName $CONF2 >/tmp/$(basename $CONF2)
 	ed /tmp/$(basename $CONF2) << %%
+1
+# This is the main Apache server configuration file.  It contains the
 /# Global configuration
 a
 #
@@ -543,6 +545,12 @@ a
 #
 ServerName http.apl-test.cite.fpki-lab.gov
 #
+.
+1
+/#.*ServerRoot\s\+
+d
+a
+ServerRoot "/etc/apache2"
 .
 w
 q
