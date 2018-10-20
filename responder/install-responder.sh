@@ -256,7 +256,7 @@ firewall-cmd --reload
 $INSTALLER install $HTTPD -y
 
 if [ x$OS == x"ubuntu" ]; then
-	a2enmod rewrite allowmethods proxy proxy_http
+	a2enmod rewrite allowmethods proxy proxy_http headers
 fi
 
 cd /var/www/ || (echo "Failed to access /var/www"; exit 1)
