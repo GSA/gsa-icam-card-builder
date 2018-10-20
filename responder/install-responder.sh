@@ -549,6 +549,7 @@ ServerName http.apl-test.cite.fpki-lab.gov
 1
 /#.*ServerRoot\s\+
 d
+.-1
 a
 ServerRoot "/etc/apache2"
 .
