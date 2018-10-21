@@ -1,7 +1,6 @@
 #!/bin/bash
 #
-# vim: set ts=2 nowrap nohlsearch
-#
+# vim: ts=2 expandtab:
 #
 # Copy this file to the directory on the VM where you've copied the
 # tar file, responder-certs.tar.  Then run it by typing "./install-responder.sh"
@@ -13,32 +12,32 @@ trap 'echo -e "\x0a**** Caught keyboard signaal *****"; exit 2' 2 3 15
 timer() {
   SECS=120
   while [ $SECS -gt 0 ]; do
-		if [ $SECS -ge 100 ]; then
-		  echo -n "$SECS seconds."; echo -n $'\b\b\b\b\b\b\b\b\b\b\b\b'
-		elif [ $SECS -ge 10 ]; then
-		  echo -n "$SECS seconds."; echo -n $'\b\b\b\b\b\b\b\b\b\b\b'
-		else
-		  echo -n "$SECS seconds."; echo -n $'\b\b\b\b\b\b\b\b\b\b'
-		fi
-		sleep 1
-		SECS=$(expr $SECS - 1)
+    if [ $SECS -ge 100 ]; then
+      echo -n "$SECS seconds."; echo -n $'\b\b\b\b\b\b\b\b\b\b\b\b'
+    elif [ $SECS -ge 10 ]; then
+      echo -n "$SECS seconds."; echo -n $'\b\b\b\b\b\b\b\b\b\b\b'
+    else
+      echo -n "$SECS seconds."; echo -n $'\b\b\b\b\b\b\b\b\b\b'
+    fi
+    sleep 1
+    SECS=$(expr $SECS - 1)
   done
 }
 
 debug_output()
 {
-	export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
-	VERSION=$(/bin/bash --version | grep ", version" | sed 's/^.*version //g; s/^\(...\).*$/\1/g')
-	MAJ=$(expr $VERSION : "^\(.\).*$")
-	MIN=$(expr $VERSION : "^..\(.\).*$")
-	if [ $MAJ -ge 4 -a $MIN -ge 1 ]; then
-		exec 10>|"$1"
-		BASH_XTRACEFD=10
-		set -x
-	else
-		exec 2>|"$1"
-		set -x
-	fi
+  export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
+  VERSION=$(/bin/bash --version | grep ", version" | sed 's/^.*version //g; s/^\(...\).*$/\1/g')
+  MAJ=$(expr $VERSION : "^\(.\).*$")
+  MIN=$(expr $VERSION : "^..\(.\).*$")
+  if [ $MAJ -ge 4 -a $MIN -ge 1 ]; then
+    exec 10>|"$1"
+    BASH_XTRACEFD=10
+    set -x
+  else
+    exec 2>|"$1"
+    set -x
+  fi
 }
 
 ## Start ##
@@ -46,10 +45,10 @@ debug_output()
 debug_output /tmp/$(basename $0 .sh).log
 
 if [ $# -eq 1 -a x$1 == x"-d" ]; then 
-	echo "Certificates and revocation data update."
-	DATAONLY=1
+  echo "Certificates and revocation data update."
+  DATAONLY=1
 else
-	DATAONLY=0
+  DATAONLY=0
 fi
 
 OS=centos
@@ -65,17 +64,17 @@ RESULT=$?
 
 # Change top-level HTTPD directory to apache2 and a few other things if on Ubuntu
 if [ $RESULT -eq 0 ]; then 
-	OS=ubuntu
-	HTTPD=apache2
-	CONF1=/etc/$HTTPD/sites-available/000-default.conf
-	CONF2=/etc/$HTTPD/$HTTPD.conf
-	PKIDIR=/etc/ssl/CA
+  OS=ubuntu
+  HTTPD=apache2
+  CONF1=/etc/$HTTPD/sites-available/000-default.conf
+  CONF2=/etc/$HTTPD/$HTTPD.conf
+  PKIDIR=/etc/ssl/CA
 fi
 
 if [ x$OS == x"ubuntu" ]; then
-	INSTALLER=apt-get
-	IPTABLES=iptables
-	SYSTEMD_DIR=/lib/systemd/system
+  INSTALLER=apt-get
+  IPTABLES=iptables
+  SYSTEMD_DIR=/lib/systemd/system
 fi
 
 CRLHOST=1 # Change to zero if not hosting CRL/AIA/SIA on this VM
@@ -110,37 +109,37 @@ for F in \\
   ICAM_Test_Card_PIV_OCSP_Valid_Signer_P384_gen3.p12 \\
   ICAM_Test_Card_PIV_OCSP_RSA_2048_Valid_Signer_gen3.p12
 do
-		COUNT=\$(expr \$COUNT + 1)
-		case \$COUNT in
-		1) N=ocsp ;;
-		2) N=ocspGen3 ;;
-		3) N=ocspExpired ;;
-		4) N=ocspNocheckNotPresent ;;
-		5) N=ocspRevoked ;;
-		6) N=ocspInvalidSig ;;
-		7) N=ocsp-pivi ;;
-		8) N=ocspGen3p384 ;;
-		9) N=ocspGen3rsa2048 ;;
-		esac
+    COUNT=\$(expr \$COUNT + 1)
+    case \$COUNT in
+    1) N=ocsp ;;
+    2) N=ocspGen3 ;;
+    3) N=ocspExpired ;;
+    4) N=ocspNocheckNotPresent ;;
+    5) N=ocspRevoked ;;
+    6) N=ocspInvalidSig ;;
+    7) N=ocsp-pivi ;;
+    8) N=ocspGen3p384 ;;
+    9) N=ocspGen3rsa2048 ;;
+    esac
 
-		# Get the signer private and public keys
+    # Get the signer private and public keys
 
-		openssl pkcs12 \\
-		-in \$F \\
-		-nocerts \\
-		-nodes \\
-		-passin pass: \\
-		-passout pass: \\
-		-out \$(basename \$N .p12).key
+    openssl pkcs12 \\
+    -in \$F \\
+    -nocerts \\
+    -nodes \\
+    -passin pass: \\
+    -passout pass: \\
+    -out \$(basename \$N .p12).key
 
-		openssl pkcs12 \\
-		-in \$F \\
-		-clcerts \\
-		-passin pass: \\
-		-nokeys \\
-		-out \$(basename \$N .p12).crt
+    openssl pkcs12 \\
+    -in \$F \\
+    -clcerts \\
+    -passin pass: \\
+    -nokeys \\
+    -out \$(basename \$N .p12).crt
  
-		/bin/rm \$F
+    /bin/rm \$F
 done
 %%
 
@@ -161,11 +160,11 @@ systemctl stop $HTTPD.service
 
 if [ $DATAONLY -eq 1 -a $CRLHOST -eq 1 ]; then
   if [ -d /var/www/http.apl-test.cite.fpki-lab.gov ]; then
-		pushd /var/www/http.apl-test.cite.fpki-lab.gov >/dev/null 2>&1
-		if [ -f $CWD/aiacrlsia.tar ]; then
-		  tar xv --no-same-owner --no-same-permissions -f $CWD/aiacrlsia.tar
-		fi
-		popd >/dev/null 2>&1
+    pushd /var/www/http.apl-test.cite.fpki-lab.gov >/dev/null 2>&1
+    if [ -f $CWD/aiacrlsia.tar ]; then
+      tar xv --no-same-owner --no-same-permissions -f $CWD/aiacrlsia.tar
+    fi
+    popd >/dev/null 2>&1
   fi
   
   echo -n "Data has been updated. The serivces will restart in "; timer
@@ -261,42 +260,42 @@ fi
 
 cd /var/www/ || (echo "Failed to access /var/www"; exit 1)
 for D in \
-	ocsp.apl-test.cite.fpki-lab.gov/logs \
-	ocspGen3.apl-test.cite.fpki-lab.gov/logs \
-	ocspExpired.apl-test.cite.fpki-lab.gov/logs \
-	ocspRevoked.apl-test.cite.fpki-lab.gov/logs \
-	ocspNocheckNotPresent.apl-test.cite.fpki-lab.gov/logs \
-	ocspInvalidSig.apl-test.cite.fpki-lab.gov/logs \
-	ocsp-pivi.apl-test.cite.fpki-lab.gov/logs \
-	ocspGen3p384.apl-test.cite.fpki-lab.gov/logs \
-	ocsp-piv.apl-test.fpki-lab.gov/logs
+  ocsp.apl-test.cite.fpki-lab.gov/logs \
+  ocspGen3.apl-test.cite.fpki-lab.gov/logs \
+  ocspExpired.apl-test.cite.fpki-lab.gov/logs \
+  ocspRevoked.apl-test.cite.fpki-lab.gov/logs \
+  ocspNocheckNotPresent.apl-test.cite.fpki-lab.gov/logs \
+  ocspInvalidSig.apl-test.cite.fpki-lab.gov/logs \
+  ocsp-pivi.apl-test.cite.fpki-lab.gov/logs \
+  ocspGen3p384.apl-test.cite.fpki-lab.gov/logs \
+  ocsp-piv.apl-test.fpki-lab.gov/logs
 do
-	mkdir -p $D
-	chmod 755 $D
-	chmod 755 $(dirname $D)
-	if [ x$OS == x"centos" ]; then
-		semanage fcontext -a -t httpd_sys_rw_content_t $D
-		restorecon -v $D
-	fi
+  mkdir -p $D
+  chmod 755 $D
+  chmod 755 $(dirname $D)
+  if [ x$OS == x"centos" ]; then
+    semanage fcontext -a -t httpd_sys_rw_content_t $D
+    restorecon -v $D
+  fi
 done
 
 if [ x$OS == x"centos" ]; then setsebool -P httpd_unified 1; fi
 
 if [ $CRLHOST -eq 1 ]; then
-	mkdir -p http.apl-test.cite.fpki-lab.gov
-	mkdir -p http.apl-test.cite.fpki-lab.gov/aia
-	mkdir -p http.apl-test.cite.fpki-lab.gov/sia
-	mkdir -p http.apl-test.cite.fpki-lab.gov/crls
-	mkdir -p http.apl-test.cite.fpki-lab.gov/roots
-	mkdir -p http.apl-test.cite.fpki-lab.gov/logs
-	pushd http.apl-test.cite.fpki-lab.gov >/dev/null 2>&1
-		if [ -f $CWD/aiacrlsia.tar ]; then
-		  tar xv --no-same-owner --no-same-permissions -f $CWD/aiacrlsia.tar
-			for D in aia crls sia roots; do
-				chmod 644 $D/*
-				chmod 755 $D
-			done
-		fi
+  mkdir -p http.apl-test.cite.fpki-lab.gov
+  mkdir -p http.apl-test.cite.fpki-lab.gov/aia
+  mkdir -p http.apl-test.cite.fpki-lab.gov/sia
+  mkdir -p http.apl-test.cite.fpki-lab.gov/crls
+  mkdir -p http.apl-test.cite.fpki-lab.gov/roots
+  mkdir -p http.apl-test.cite.fpki-lab.gov/logs
+  pushd http.apl-test.cite.fpki-lab.gov >/dev/null 2>&1
+    if [ -f $CWD/aiacrlsia.tar ]; then
+      tar xv --no-same-owner --no-same-permissions -f $CWD/aiacrlsia.tar
+      for D in aia crls sia roots; do
+        chmod 644 $D/*
+        chmod 755 $D
+      done
+    fi
   popd >/dev/null 2>&1
 fi
 
@@ -310,15 +309,15 @@ Disallow: /
 # SELinux:
 
 if [ x$OS == x"centos" ]; then
-	semanage port -a -t http_port_t -p tcp 2560
-	semanage port -a -t http_port_t -p tcp 2561
-	semanage port -a -t http_port_t -p tcp 2562
-	semanage port -a -t http_port_t -p tcp 2563
-	semanage port -a -t http_port_t -p tcp 2564
-	semanage port -a -t http_port_t -p tcp 2565
-	semanage port -a -t http_port_t -p tcp 2566
-	semanage port -a -t http_port_t -p tcp 2567
-	semanage port -a -t http_port_t -p tcp 2568
+  semanage port -a -t http_port_t -p tcp 2560
+  semanage port -a -t http_port_t -p tcp 2561
+  semanage port -a -t http_port_t -p tcp 2562
+  semanage port -a -t http_port_t -p tcp 2563
+  semanage port -a -t http_port_t -p tcp 2564
+  semanage port -a -t http_port_t -p tcp 2565
+  semanage port -a -t http_port_t -p tcp 2566
+  semanage port -a -t http_port_t -p tcp 2567
+  semanage port -a -t http_port_t -p tcp 2568
 fi
 
 # Remove the default web page
@@ -488,9 +487,9 @@ cd ../sites-enabled
 
 for F in $(ls /etc/$HTTPD/sites-available/*.conf)
 do
-	if [ ! -L $(basename $F) ]; then
-		ln -s $F .
-	fi
+  if [ ! -L $(basename $F) ]; then
+    ln -s $F .
+  fi
 done
 
 # Edit main $HTTPD.conf file
@@ -499,43 +498,43 @@ echo "Editing $CONF1..."
 
 # Edit $CONF1
 # Change #ServerName to:
-#		http.apl-test.cite.fpki-lab.gov
+#    http.apl-test.cite.fpki-lab.gov
 # Add to end: 
-#		IncludeOptional sites-enabled/*.conf
+#    IncludeOptional sites-enabled/*.conf
 # For Ubuntu, edit the main conf file
 
 grep "^.*ServerName.*:80" $CONF1 >/dev/null 2>&1
 if [ $? -eq 0 ]; then
-	/bin/cp -p $CONF1 $CONF1.$$
-	cat $CONF1 | sed 's!^.*#ServerName.*:80!ServerName http.apl-test.cite.fpki-lab.gov:80!g' >/tmp/$(basename $CONF1)
-	if [ $? -eq 0 ]; then
-		/bin/mv /tmp/$(basename $CONF1) $CONF1
-	else
-		echo "Failed to update ServerName"
-	fi
+  /bin/cp -p $CONF1 $CONF1.$$
+  cat $CONF1 | sed 's!^.*#ServerName.*:80!ServerName http.apl-test.cite.fpki-lab.gov:80!g' >/tmp/$(basename $CONF1)
+  if [ $? -eq 0 ]; then
+    /bin/mv /tmp/$(basename $CONF1) $CONF1
+  else
+    echo "Failed to update ServerName"
+  fi
 fi
 grep "^.*DocumentRoot.*/" $CONF1 >/dev/null 2>&1
 if [ $? -eq 0 ]; then
-	/bin/cp -p $CONF1 $CONF1.$$
-	cat $CONF1 | sed 's!^.*DocumentRoot.*".*$!DocumentRoot /var/www/http.apl-test.cite.fpki-lab.gov!g' >/tmp/$(basename $CONF1)
-	if [ $? -eq 0 ]; then
-		/bin/mv /tmp/$(basename $CONF1) $CONF1
-	else
-		echo "Failed to update DocumentRoot"
-	fi
+  /bin/cp -p $CONF1 $CONF1.$$
+  cat $CONF1 | sed 's!^.*DocumentRoot.*".*$!DocumentRoot /var/www/http.apl-test.cite.fpki-lab.gov!g' >/tmp/$(basename $CONF1)
+  if [ $? -eq 0 ]; then
+    /bin/mv /tmp/$(basename $CONF1) $CONF1
+  else
+    echo "Failed to update DocumentRoot"
+  fi
 fi
 
 if [ z$HTTPD == z"httpd" ]; then # CentOS only
-	grep "^.*IncludeOptional sites-enabled/" $CONF1 >/dev/null 2>&1
-	if [ $? -eq 1 ]; then
-		echo "IncludeOptional sites-enabled/*.conf" >>$CONF1
-	fi
+  grep "^.*IncludeOptional sites-enabled/" $CONF1 >/dev/null 2>&1
+  if [ $? -eq 1 ]; then
+    echo "IncludeOptional sites-enabled/*.conf" >>$CONF1
+  fi
 fi
 
 if [ z$OS == z"ubuntu" ]; then # Ubuntu only
-	cp $CONF2 $CONF2.$$
-	grep -v ServerName $CONF2 >/tmp/$(basename $CONF2)
-	ed /tmp/$(basename $CONF2) << %%
+  cp $CONF2 $CONF2.$$
+  grep -v ServerName $CONF2 >/tmp/$(basename $CONF2)
+  ed -v /tmp/$(basename $CONF2) << %%
 1
 # This is the main Apache server configuration file.  It contains the
 /# Global configuration
@@ -569,8 +568,8 @@ systemctl enable $HTTPD.service
 
 systemctl start $HTTPD.service
 if [ $? -ne 0 ]; then
-	echo "Failed to start $HTTPD service. Exiting."
-	exit 1
+  echo "Failed to start $HTTPD service. Exiting."
+  exit 1
 fi
 
 # OSCP
@@ -808,22 +807,22 @@ systemctl daemon-reload
 systemctl enable ocspd.service
 systemctl start ocspd.service
 if [ $? -ne 0 ]; then
-	echo "Failed to start ocspd service. Exiting."
-	exit 1
+  echo "Failed to start ocspd service. Exiting."
+  exit 1
 fi
 
 systemctl status $HTTPD >/dev/null 2>&1
 if [ $? -eq 0 ]; then
-	echo "$HTTPD service successfully started"
+  echo "$HTTPD service successfully started"
 else
-	echo "$HTTPD service failed to start"
+  echo "$HTTPD service failed to start"
 fi
 
 systemctl status ocspd >/dev/null 2>&1
 if [ $? -eq 0 ]; then
-	echo "ocspd service successfully started"
+  echo "ocspd service successfully started"
 else
-	echo "ocspd service failed to start"
+  echo "ocspd service failed to start"
 fi
 
 exit 0
