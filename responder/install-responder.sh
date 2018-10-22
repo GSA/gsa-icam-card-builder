@@ -247,7 +247,7 @@ $INSTALLER install ufw
 ufw --force enable
 ufw default deny incoming
 ufw default allow outgoing
-ufw allow ssh
+ufw allow 22
 ufw allow in on eth0 to any port 80
 ufw allow in on lo to any port 2560:2568 proto tcp
 ufw enable
