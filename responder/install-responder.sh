@@ -277,6 +277,7 @@ do
   chmod 755 $D
   chmod 755 $(dirname $D)
   if [ x$OS == x"centos" ]; then
+    yum update "libsepol*" "policycoreutils*"
     semanage fcontext -a -t httpd_sys_rw_content_t $D
     restorecon -v $D
   fi
