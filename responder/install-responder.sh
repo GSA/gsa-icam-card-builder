@@ -72,7 +72,7 @@ if [ $RESULT -eq 0 ]; then
 fi
 
 if [ x$OS == x"ubuntu" ]; then
-  INSTALLER=apt-get
+  INSTALLER=apt
   IPTABLES=iptables
   SYSTEMD_DIR=/lib/systemd/system
 fi
@@ -225,30 +225,31 @@ if [ $GC -gt 0 ]; then
   /bin/mv /tmp/hosts /etc/hosts
 fi
 
-# Firewall:
+# Uncomplicated Firewall:
 
 systemctl status firewalld.service >/dev/null 2>&1
-if [ $? -ne 0 ]; then
-  $INSTALLER install firewalld -y
-  systemctl start firewalld.service
+if [ $? -eq 0 ]; then
+  systemctl stop firewalld
+  if [ x$OS == x"ubuntu" ]; then
+    $INSTALLER remove firewalld
+    $INSTALLER purge firewalld
+  else
+    $INSTALLER remove firewalld
+    $INSTALLER install -y epel-release
+    $INSTALLER install -y ufw
+  fi
 fi
 
 $INSTALLER install $IPTABLES -y
+$INSTALLER install ufw
 
-firewall-cmd --permanent --zone=trusted --add-port=80/tcp
-firewall-cmd --permanent --zone=trusted --add-interface=lo
-firewall-cmd --permanent --zone=trusted --add-port=2560/tcp
-firewall-cmd --permanent --zone=trusted --add-port=2561/tcp
-firewall-cmd --permanent --zone=trusted --add-port=2562/tcp
-firewall-cmd --permanent --zone=trusted --add-port=2563/tcp
-firewall-cmd --permanent --zone=trusted --add-port=2564/tcp
-firewall-cmd --permanent --zone=trusted --add-port=2565/tcp
-firewall-cmd --permanent --zone=trusted --add-port=2566/tcp
-firewall-cmd --permanent --zone=trusted --add-port=2567/tcp
-firewall-cmd --permanent --zone=trusted --add-port=2568/tcp
-firewall-cmd --direct --permanent --add-rule ipv4 filter INPUT_direct 0 -p tcp --dport 80 -m state --state NEW -m recent --set
-firewall-cmd --direct --permanent --add-rule ipv4 filter INPUT_direct 1 -p tcp --dport 80 -m state --state NEW -m recent --update --seconds 60 --hitcount 150 -j DROP
-firewall-cmd --reload
+ufw default deny incoming
+ufw default allow outgoing
+ufw allow ssh
+ufw allow 80
+ufw allow in on lo to 2560:2568
+ufw enable
+ufw status numbered
 
 # $HTTP, openssl
 
