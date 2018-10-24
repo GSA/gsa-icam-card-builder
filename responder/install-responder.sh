@@ -184,10 +184,14 @@ fi
 
 # General:
 
+if [ $CRLHOST -eq 1 ]; then
+  echo http.apl-test.cite.fpki-lab.gov >/etc/hostname
+  hostname -b http.apl-test.cite.fpki-lab.gov
+fi
+
 # Hosts file aliases. x.x.x.x is the NAT'd IP address of the box. The rest are aliases
 # recognized by Apache2.
 
-IPADDR=$(ifconfig -a | grep "inet " | head -n1 | awk '{ print $2 }')
 IPADDR=$(ip addr show | grep "inet " | grep -v 127.0.0 | sed 's/^.*inet //g; s!/.*$!!')
 HOSTNAME=$(hostname)
 
@@ -196,7 +200,7 @@ grep $IPADDR /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
 grep $HOSTNAME /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
 
 if [ $CRLHOST -eq 1 ]; then
-  grep http.apl-test.cite.fpki-lab.gov /etc/host >/dev/null 2>&1; GC=$(expr $? + $GC)
+  grep http.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
 fi
 grep -i ocsp.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
 grep -i ocspGen3.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
