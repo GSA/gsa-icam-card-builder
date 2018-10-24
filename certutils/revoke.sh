@@ -13,10 +13,11 @@ revoke() {
 	SRCDIR=$4
 	CRL=$5
 	REVOKE=$6
+  END=$([ $7 ] && echo $7 || echo "2032-12-30")
 	BN=$(basename $CRL)
 	CN=$(echo $SUBJ | sed 's/_/ /g')
 	export CN
-	DAYS=$(( ($(date '+%s' -d "2032-12-30") - $(date '+%s')) / 86400 ))
+	DAYS=$(( ($(date '+%s' -d "$END") - $(date '+%s')) / 86400 ))
 	pushd data >/dev/null 2>&1
 		# Get EE serial number
 		SERIAL=$(openssl x509 -in $SRCDIR/$SUBJ.crt -serial -noout | sed 's/^.*=//g')

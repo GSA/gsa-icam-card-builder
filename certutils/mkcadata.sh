@@ -594,7 +594,8 @@ SUBJ=ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Present_gen3
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3
 CONFIG=${CWD}/icam-piv-ocsp-revoked-nocheck-not-present.cnf
 CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardGen3SigningCA.crl
-revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN3CRL
+END=$(date -d"$(openssl x509 -in data/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt -enddate -noout | sed s/^.*=//g)" +%Y-%m-%d)
+revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN3CRL $END
 if [ $? -gt 0 ]; then exit 1; fi
 cp -p data/database/$(basename $PIVGEN3_LOCAL) .
 
@@ -606,7 +607,8 @@ SUBJ=ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Not_Present_gen3
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3
 CONFIG=${CWD}/icam-piv-ocsp-revoked-nocheck-present.cnf
 CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardGen3SigningCA.crl
-revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN3CRL
+END=$(date -d"$(openssl x509 -in data/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt -enddate -noout | sed s/^.*=//g)" +%Y-%m-%d)
+revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN3CRL $END
 if [ $? -gt 0 ]; then exit 1; fi
 cp -p data/database/$(basename $PIVGEN3_LOCAL) .
 
@@ -618,7 +620,8 @@ SUBJ=ICAM_Test_Card_PIV_Revoked_Content_Signer_gen1-2
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2
 CONFIG=${CWD}/icam-piv-revoked-ee-gen1-2.cnf
 CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardSigningCA.crl
-revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN1CRL
+END=$(date -d"$(openssl x509 -in data/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2.crt -enddate -noout | sed s/^.*=//g)" +%Y-%m-%d)
+revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN1CRL $END
 if [ $? -gt 0 ]; then exit 1; fi
 cp -p data/database/$(basename $PIVGEN1_LOCAL) .
 
@@ -632,7 +635,8 @@ SUBJ=ICAM_Test_Card_24_PIV_Auth
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2
 CONFIG=${CWD}/icam-piv-revoked-ee-gen1-2.cnf
 CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardSigningCA.crl
-revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN1CRL
+END=$(date -d"$(openssl x509 -in data/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2.crt -enddate -noout | sed s/^.*=//g)" +%Y-%m-%d)
+revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN1CRL $END
 RETCODE=$?
 if [ $RETCODE -gt 0 ]; then echo "Revoke failed, returned $RETCODE"; exit 1; fi
 cp -p data/database/$(basename $PIVGEN1_LOCAL) .
@@ -647,7 +651,8 @@ SUBJ=ICAM_Test_Card_24_PIV_Card_Auth
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2
 CONFIG=${CWD}/icam-piv-revoked-ee-gen1-2.cnf
 CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardSigningCA.crl
-revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN1CRL
+END=$(date -d"$(openssl x509 -in data/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2.crt -enddate -noout | sed s/^.*=//g)" +%Y-%m-%d)
+revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN1CRL $END
 if [ $? -gt 0 ]; then exit 1; fi
 cp -p data/database/$(basename $PIVGEN1_LOCAL) .
 
@@ -659,7 +664,8 @@ SUBJ=ICAM_Test_Card_PIV_Revoked_Content_Signer_gen1-2
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2
 CONFIG=${CWD}/icam-piv-revoked-ee-gen1-2.cnf
 CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardSigningCA.crl
-revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN1CRL
+END=$(date -d"$(openssl x509 -in data/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2.crt -enddate -noout | sed s/^.*=//g)" +%Y-%m-%d)
+revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN1CRL $END
 if [ $? -gt 0 ]; then exit 1; fi
 cp -p data/database/$(basename $PIVGEN1_LOCAL) .
 
