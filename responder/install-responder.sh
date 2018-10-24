@@ -7,7 +7,7 @@
 
 # Usage: -d option will just install data
 
-trap 'echo -e "\x0a**** Caught keyboard signaal *****"; exit 2' 2 3 15
+trap 'echo -e "\x0a**** Caught keyboard signal ****"; exit 2' 2 3 15
 
 timer() {
   SECS=120
@@ -68,6 +68,7 @@ if [ $RESULT -eq 0 ]; then
   HTTPD=apache2
   CONF1=/etc/$HTTPD/sites-available/000-default.conf
   CONF2=/etc/$HTTPD/$HTTPD.conf
+  CONF3=/etc/$HTTPD/conf-available/security.conf
   PKIDIR=/etc/ssl/CA
 fi
 
@@ -244,11 +245,34 @@ $INSTALLER install $IPTABLES -y
 $INSTALLER source gufw
 $INSTALLER install ufw
 
+IFACE=
+
+for I in $(ifconfig -a | egrep -v "^lo|^\s+" | sed 's/://g' | awk '{ printf "%s", $1 }'); do
+  ping -c 1 -w 1 -I $I 8.8.8.8 >/dev/null 2>&1
+  if [ $? -eq 0 ]; then 
+    IFACE=$I 
+    break
+  fi
+done
+if [ z$IFACE == "z" ]; then
+  echo "No external interface found. Correct and restart installation."
+  exit 1
+else
+  echo "Using interface \"$IFACE\" for inbound firewall rules"
+fi
+
 ufw --force enable
+
+ufw status | grep "80 on"  >/dev/null 2>&1
+if [ $? -eq 0 ]; then
+  ufw delete $(ufw status numbered | grep "80 on" | sed 's/\[//g; s/\].*$//g;s/\s\+//g')
+  ufw delete $(ufw status numbered | grep "80 (v6) on" | sed 's/\[//g; s/\].*$//g;s/\s\+//g')
+fi
+
 ufw default deny incoming
 ufw default allow outgoing
 ufw allow 22
-ufw allow in on eth0 to any port 80
+ufw allow in on $IFACE to any port 80
 ufw allow in on lo to any port 2560:2568 proto tcp
 ufw enable
 ufw status numbered
@@ -258,7 +282,7 @@ ufw status numbered
 $INSTALLER install $HTTPD -y
 
 if [ x$OS == x"ubuntu" ]; then
-	a2enmod rewrite allowmethods proxy proxy_http headers
+  a2enmod rewrite allowmethods proxy proxy_http headers
 fi
 
 cd /var/www/ || (echo "Failed to access /var/www"; exit 1)
@@ -537,20 +561,16 @@ fi
 
 if [ z$OS == z"ubuntu" ]; then # Ubuntu only
   cp $CONF2 $CONF2.$$
-  grep -v ServerName $CONF2 >/tmp/$(basename $CONF2)
+  egrep -v '^#{0,}\s{0,}ServerName' $CONF2 >/tmp/$(basename $CONF2)
   ed -v /tmp/$(basename $CONF2) << %%
 1
-# This is the main Apache server configuration file.  It contains the
 /# Global configuration
 a
 #
-# Added by install-responder.sh
-#
 ServerName http.apl-test.cite.fpki-lab.gov
-#
 .
 1
-/#.*ServerRoot\s\+
+/^#\{0,\}\s\{0,\}ServerRoot\s\+
 d
 .-1
 a
@@ -560,8 +580,28 @@ w
 q
 %%
 
-if [ $? -eq 0 ]; then cp -p /tmp/$(basename $CONF2) $CONF2; fi
+  if [ $? -eq 0 ]; then cp -p /tmp/$(basename $CONF2) $CONF2; fi
+  
+  # ServerTokens
 
+  cp $CONF3 $CONF3.$$
+  egrep '^#\s{0,}ServerTokens\s{0,}$' $CONF3 >/dev/null 2>&1
+  if [ $? -eq 0 ]; then
+    egrep -v '^#{0,}\s{0,}ServerTokens\s{1,}[A-Za-z]|^#{0,}\s{0,}ServerSignature\s{0,}[A-Za-z]' $CONF3 >/tmp/$(basename $CONF3)
+    ed -v /tmp/$(basename $CONF3) << %%
+1
+/^#\s\{0,\}ServerTokens\s\{0,\}$
+.+1
+/^\s\{0,\}$
+a
+ServerTokens Prod
+ServerSignature Off
+.
+w
+q
+%%
+    if [ $? -eq 0 ]; then cp -p /tmp/$(basename $CONF3) $CONF3; fi
+  fi
 fi
 
 # Start up at boot
