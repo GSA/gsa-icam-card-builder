@@ -184,41 +184,31 @@ fi
 
 # General:
 
+OHOSTNAME=$(hostname)
+export HOSTNAME=http.apl-test.cite.fpki-lab.gov
+
 if [ $CRLHOST -eq 1 ]; then
-  echo http.apl-test.cite.fpki-lab.gov >/etc/hostname
-  hostname -b http.apl-test.cite.fpki-lab.gov
+  hostname -b $HOSTNAME
+  echo $HOSTNAME >/etc/hostname
 fi
 
 # Hosts file aliases. x.x.x.x is the NAT'd IP address of the box. The rest are aliases
 # recognized by Apache2.
 
 IPADDR=$(ip addr show | grep "inet " | grep -v 127.0.0 | sed 's/^.*inet //g; s!/.*$!!')
-HOSTNAME=$(hostname)
 
 GC=0
 grep $IPADDR /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
 grep $HOSTNAME /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
 
 if [ $CRLHOST -eq 1 ]; then
-  grep http.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
+  grep fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
 fi
-grep -i ocsp.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
-grep -i ocspGen3.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
-grep -i ocspExpired.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
-grep -i ocspInvalidSig.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1 >/dev/null 2>&1; GC=$(expr $? + $GC)
-grep -i ocspRevoked.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
-grep -i ocspNocheckNotPresent.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
-grep -i ocsp-pivi.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
-grep -i ocspGen3p384.apl-test.cite.fpki-lab.gov /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
-grep -i ocsp-piv.apl-test.fpki-lab.gov/ /etc/hosts >/dev/null 2>&1; GC=$(expr $? + $GC)
 
 if [ $GC -gt 0 ]; then
   cp -p /etc/hosts /etc/hosts.$$
-  grep -v $IPADDR /etc/hosts >/tmp/hosts
-  grep -v $HOSTNAME /etc/hosts >>/tmp/hosts
-  grep -v lab.gov /etc/hosts >>/tmp/hosts
+  egrep -v "127.0.0.1|$IPADDR|$HOSTNAME|$OHOSTNAME|fpki-lab.gov" /etc/hosts >/tmp/hosts
   echo "$IPADDR $HOSTNAME" >>/tmp/hosts
-  echo "$IPADDR http.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
   echo "$IPADDR ocsp.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
   echo "$IPADDR ocspGen3.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
   echo "$IPADDR ocspExpired.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
