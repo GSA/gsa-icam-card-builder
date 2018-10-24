@@ -211,6 +211,7 @@ grep -i ocsp-piv.apl-test.fpki-lab.gov/ /etc/hosts >/dev/null 2>&1; GC=$(expr $?
 if [ $GC -gt 0 ]; then
   cp -p /etc/hosts /etc/hosts.$$
   grep -v $IPADDR /etc/hosts >/tmp/hosts
+  grep -v $HOSTNAME /etc/hosts >>/tmp/hosts
   grep -v lab.gov /etc/hosts >>/tmp/hosts
   echo "$IPADDR $HOSTNAME" >>/tmp/hosts
   echo "$IPADDR http.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
