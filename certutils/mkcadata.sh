@@ -763,12 +763,12 @@ rm -f *.p12 *.crt
 echo "Making Fault Bridge Trust Anchor bundles..."
 pushd ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/roots >/dev/null 2>&1
   sh mkrcap7c.sh
-popd
+popd >/dev/null 2>&1
 
 echo "Making Fault Bridge Bridge CA bundles..."
 pushd ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/bridge >/dev/null 2>&1
   sh mkbcap7c.sh
-popd
+popd >/dev/null 2>&1
 
 cp -pr ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/{aia,sia,crls,roots,bridge} .
 
