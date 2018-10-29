@@ -770,6 +770,12 @@ pushd ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/bridge >/dev/null 2>&1
   sh mkbcap7c.sh
 popd >/dev/null 2>&1
 
+echo "Moving and creating CRLDP for OCSP response signers..."
+pushd ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls >/dev/null 2>&1
+  mv ICAMTestCardGen3SigningCA.crl ICAMTestCardGen3SigningCA-link.crl
+  ln -s ICAMTestCardGen3SigningCA-link.crl ICAMTestCardGen3SigningCA.crl
+popd >/dev/null 2>&1
+
 cp -pr ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/{aia,sia,crls,roots,bridge} .
 
 chmod 755 aia crls sia roots bridge

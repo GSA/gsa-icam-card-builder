@@ -63,5 +63,5 @@ noCheck = ignored
 extendedKeyUsage=critical,OCSPSigning
 keyUsage = critical,digitalSignature
 authorityInfoAccess = caIssuers;URI:http://http.apl-test.cite.fpki-lab.gov/aia/certsIssuedToICAMTestCardSigningCA.p7c
-crlDistributionPoints = URI:http://http.apl-test.cite.fpki-lab.gov/crls/ICAMTestCardGen3SigningCA.crl
+crlDistributionPoints = URI:http://http.apl-test.cite.fpki-lab.gov/crls/ICAMTestCardGen3SigningCA-link.crl
 certificatePolicies=critical,ia5org,2.16.840.1.101.3.2.1.48.11,2.16.840.1.101.3.2.1.48.13,2.16.840.1.101.3.2.1.48.9,2.16.840.1.101.3.2.1.48.86
