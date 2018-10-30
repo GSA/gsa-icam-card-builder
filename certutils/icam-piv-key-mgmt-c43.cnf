@@ -58,7 +58,6 @@ authorityKeyIdentifier = keyid:issuer
 subjectKeyIdentifier = hash
 keyUsage = critical, keyEncipherment
 authorityInfoAccess = caIssuers;URI:http://http.apl-test.cite.fpki-lab.gov/aia/certsIssuedToICAMTestCardSigningCA.p7c, OCSP;URI:http://ocspRevoked.apl-test.cite.fpki-lab.gov
-crlDistributionPoints = URI:http://http.apl-test.cite.fpki-lab.gov/crls/ICAMTestCardGen3SigningCA.crl
 certificatePolicies=ia5org,2.16.840.1.101.3.2.1.48.9
 subjectAltName = @subjectAltName_sect
 

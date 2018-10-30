@@ -534,10 +534,9 @@ OCSPP12S="ICAM_Test_Card_PIV_OCSP_Expired_Signer_gen3.p12 \
 
 CERTLIST=""
 
-if [ $# -eq 1 -a r$1 == r"-r" ]; then
-	rm -f $PIVGEN1_LOCAL $PIVGEN3_LOCAL $PIVIGEN3_LOCAL $PIVGEN3P384_LOCAL $PIVGEN3P256_LOCAL
-	reindex
-fi
+rm -f $PIVGEN1_LOCAL $PIVGEN3_LOCAL $PIVIGEN3_LOCAL $PIVGEN3P384_LOCAL $PIVGEN3P256_LOCAL
+
+reindex
 
 for F in $OCSPP12S $SIGNCAP12S
 do
@@ -583,6 +582,14 @@ do
 done
 
 # Start revoking certs that we need to be revoked.
+
+G3CRLL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardGen3SigningCA-link.crl
+G3CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardGen3SigningCA.crl
+
+if [ -f $G3CRLL ]; then
+  rm -f $G3CRL
+    mv $G3CRLL $G3CRL
+fi
 
 echo "Revoking known revoked certs..."
 ## OCSP revoked signer with id-pkix-ocsp-nocheck NOT present using Gen3 CA
@@ -772,6 +779,7 @@ popd >/dev/null 2>&1
 
 echo "Moving and creating CRLDP for OCSP response signers..."
 pushd ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls >/dev/null 2>&1
+  rm -f ICAMTestCardGen3SigningCA-link.crl
   mv ICAMTestCardGen3SigningCA.crl ICAMTestCardGen3SigningCA-link.crl
   ln -s ICAMTestCardGen3SigningCA-link.crl ICAMTestCardGen3SigningCA.crl
 popd >/dev/null 2>&1

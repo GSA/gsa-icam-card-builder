@@ -58,7 +58,6 @@ subjectKeyIdentifier = hash
 keyUsage = critical, digitalSignature
 extendedKeyUsage = critical,2.16.840.1.101.3.6.8
 authorityInfoAccess = caIssuers;URI:http://http.apl-test.cite.fpki-lab.gov/aia/certsIssuedToICAMTestCardSigningCA.p7c, OCSP;URI:http://ocspExpired.apl-test.cite.fpki-lab.gov
-crlDistributionPoints = URI:http://http.apl-test.cite.fpki-lab.gov/crls/ICAMTestCardGen3SigningCA.crl
 2.16.840.1.101.3.6.9.1 = DER:01:01:00
 certificatePolicies = ia5org,2.16.840.1.101.3.2.1.48.13
 subjectAltName = @subjectAltName_sect
