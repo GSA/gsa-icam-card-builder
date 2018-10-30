@@ -455,24 +455,24 @@ renameIn "$DEST" 1 1
 #cp -p data/pem/$SUBJ.crt "$DEST"
 
 ## Gen3 OCSP revoked signer with id-pkix-ocsp-nocheck present using RSA 2048 (Gen 3 PIV Signing CA)
-#SUBJ=ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Present_gen3 
-#sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -t piv-ocsp-revoked-nocheck-present -r 2048 --cakey rsa2048 || exit $?
-#DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
-#cp -p data/$SUBJ.p12 "$DEST"
-#cp -p data/pem/$SUBJ.crt "$DEST"
+SUBJ=ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Present_gen3 
+sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -t piv-ocsp-revoked-nocheck-present -r 2048 --cakey rsa2048 || exit $?
+DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
+cp -p data/$SUBJ.p12 "$DEST"
+cp -p data/pem/$SUBJ.crt "$DEST"
 
 ## Gen3 OCSP revoked signer with id-pkix-ocsp-nocheck NOT present using RSA 2048 (Gen 3 PIV Signing CA)
-#SUBJ=ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Not_Present_gen3 
-#sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -t piv-ocsp-revoked-nocheck-not-present -r 2048 --cakey rsa2048 || exit $?
-#DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
-#cp -p data/$SUBJ.p12 "$DEST"
-#cp -p data/pem/$SUBJ.crt "$DEST"
+SUBJ=ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Not_Present_gen3 
+sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -t piv-ocsp-revoked-nocheck-not-present -r 2048 --cakey rsa2048 || exit $?
+DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
+cp -p data/$SUBJ.p12 "$DEST"
+cp -p data/pem/$SUBJ.crt "$DEST"
 
 ## Gen3 OCSP invalid signature using RSA 2048 (Gen 3 PIV Signing CA)
-#SUBJ=ICAM_Test_Card_PIV_OCSP_Invalid_Sig_Signer_gen3
-#NAME=$(echo $SUBJ | sed 's/[&_]/ /g')
-#sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -t piv-ocsp-invalid-sig -r 2048 --cakey rsa2048 || exit $?
-#
+SUBJ=ICAM_Test_Card_PIV_OCSP_Invalid_Sig_Signer_gen3
+NAME=$(echo $SUBJ | sed 's/[&_]/ /g')
+sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -t piv-ocsp-invalid-sig -r 2048 --cakey rsa2048 || exit $?
+
 ## Extract private/publilc keys from the .p12
 #openssl pkcs12 -in data/$SUBJ.p12 -nocerts -nodes -passin pass: -passout pass: -out data/pem/$SUBJ.private.pem 
 #openssl pkcs12 -in data/$SUBJ.p12 -clcerts -passin pass: -nokeys -out data/pem/$SUBJ.crt

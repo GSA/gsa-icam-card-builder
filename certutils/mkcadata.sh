@@ -583,14 +583,6 @@ done
 
 # Start revoking certs that we need to be revoked.
 
-G3CRLL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardGen3SigningCA-link.crl
-G3CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardGen3SigningCA.crl
-
-if [ -f $G3CRLL ]; then
-  rm -f $G3CRL
-    mv $G3CRLL $G3CRL
-fi
-
 echo "Revoking known revoked certs..."
 ## OCSP revoked signer with id-pkix-ocsp-nocheck NOT present using Gen3 CA
 mkunique $PIVGEN3_LOCAL
@@ -600,7 +592,7 @@ echo "OCSP revoked signer with id-pkix-ocsp-nocheck present using Gen3 CA..."
 SUBJ=ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Present_gen3 
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3
 CONFIG=${CWD}/icam-piv-ocsp-revoked-nocheck-not-present.cnf
-CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardGen3SigningCA.crl
+CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardGen3SigningCA-ocsp.crl
 END=$(date -d"$(openssl x509 -in data/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt -enddate -noout | sed s/^.*=//g)" +%Y-%m-%d)
 revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN3CRL $END
 if [ $? -gt 0 ]; then exit 1; fi
@@ -613,7 +605,7 @@ echo "OCSP revoked signer with id-pkix-ocsp-nocheck NOT present using Gen3 CA...
 SUBJ=ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Not_Present_gen3 
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3
 CONFIG=${CWD}/icam-piv-ocsp-revoked-nocheck-present.cnf
-CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardGen3SigningCA.crl
+CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardGen3SigningCA-ocsp.crl
 END=$(date -d"$(openssl x509 -in data/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt -enddate -noout | sed s/^.*=//g)" +%Y-%m-%d)
 revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN3CRL $END
 if [ $? -gt 0 ]; then exit 1; fi
@@ -775,13 +767,6 @@ popd >/dev/null 2>&1
 echo "Making Fault Bridge Bridge CA bundles..."
 pushd ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/bridge >/dev/null 2>&1
   sh mkbcap7c.sh
-popd >/dev/null 2>&1
-
-echo "Moving and creating CRLDP for OCSP response signers..."
-pushd ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls >/dev/null 2>&1
-  rm -f ICAMTestCardGen3SigningCA-link.crl
-  mv ICAMTestCardGen3SigningCA.crl ICAMTestCardGen3SigningCA-link.crl
-  ln -s ICAMTestCardGen3SigningCA-link.crl ICAMTestCardGen3SigningCA.crl
 popd >/dev/null 2>&1
 
 cp -pr ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/{aia,sia,crls,roots,bridge} .
