@@ -776,7 +776,7 @@ chmod 644 aia/* crls/* sia/* roots/* bridge/*
 
 # Backup AIA, CRLs, and SIA
 tar cv --owner=root --group=root -f aiacrlsia.tar aia crls sia roots bridge
-#rm -rf aia sia crls roots bridge
+rm -rf aia sia crls roots bridge
 
 mv responder-certs.tar ../responder
 mv aiacrlsia.tar ../responder

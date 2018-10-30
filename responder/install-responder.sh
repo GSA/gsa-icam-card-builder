@@ -103,8 +103,8 @@ for F in \\
   ICAM_Test_Card_PIV_OCSP_Valid_Signer_gen1-2.p12 \\
   ICAM_Test_Card_PIV_OCSP_Valid_Signer_gen3.p12 \\
   ICAM_Test_Card_PIV_OCSP_Expired_Signer_gen3.p12 \\
-  ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Not_Present_gen3.p12 \\
   ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Present_gen3.p12 \\
+  ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Not_Present_gen3.p12 \\
   ICAM_Test_Card_PIV_OCSP_Invalid_Sig_Signer_gen3.p12 \\
   ICAM_Test_Card_PIV-I_OCSP_Valid_Signer_gen3.p12 \\
   ICAM_Test_Card_PIV_OCSP_Valid_Signer_P384_gen3.p12 \\
@@ -115,8 +115,8 @@ do
     1) N=ocsp ;;
     2) N=ocspGen3 ;;
     3) N=ocspExpired ;;
-    4) N=ocspNocheckNotPresent ;;
-    5) N=ocspRevoked ;;
+    4) N=ocspRevoked ;;
+    5) N=ocspNocheckNotPresent ;;
     6) N=ocspInvalidSig ;;
     7) N=ocsp-pivi ;;
     8) N=ocspGen3p384 ;;
