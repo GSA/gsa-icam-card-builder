@@ -2,6 +2,24 @@
 #
 # Just uncomment everything between ## Card to make a single card.
 #
+debug_output()
+{
+	export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
+	VERSION=$(/bin/bash --version | grep ", version" | sed 's/^.*version //g; s/^\(...\).*$/\1/g')
+	MAJ=$(expr $VERSION : "^\(.\).*$")
+	MIN=$(expr $VERSION : "^..\(.\).*$")
+	if [ $MAJ -ge 4 -a $MIN -ge 1 ]; then
+		exec 10>|"$1"
+		BASH_XTRACEFD=10
+		set -x
+	else
+		exec 2>|"$1"
+		set -x
+	fi
+}
+
+debug_output /tmp/$(basename $0 .sh).log
+
 . ./rename.sh
 . ./revoke.sh
 
@@ -368,6 +386,45 @@ cp -p ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/*.p12 data
 #cp -p data/pem/ICAM_*_$T.crt "$DEST"
 #renameIn "$DEST" 1 1
 
+## Card 42
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Auth_SP_800-73-4_OCSP_Expired -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 42 -t piv-auth || exit $?
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Dig_Sig_SP_800-73-4_OCSP_Expired -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 42 -t piv-dig-sig || exit $?
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Key_Mgmt_SP_800-73-4_OCSP_Expired -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 42 -t piv-key-mgmt || exit $?
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Card_Auth_SP_800-73-4_OCSP_Expired -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 42 -t piv-card-auth || exit $?
+DEST="../cards/ICAM_Card_Objects/42_OCSP_Expired"
+cp -p data/ICAM_Test_Card_PIV_*SP_800-73-4_OCSP_Expired.p12 "$DEST"
+cp -p data/pem/ICAM_Test_Card_PIV_*SP_800-73-4_OCSP_Expired.crt "$DEST"
+renameIn "$DEST" 1 1
+
+## Card 43
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Auth_SP_800-73-4_OCSP_Revoked_NOCHECK -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 43 -t piv-auth || exit $?
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Dig_Sig_SP_800-73-4_OCSP_Revoked_NOCHECK -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 43 -t piv-dig-sig || exit $?
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Key_Mgmt_SP_800-73-4_OCSP_Revoked_NOCHECK -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 43 -t piv-key-mgmt || exit $?
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Card_Auth_SP_800-73-4_OCSP_Revoked_NOCHECK -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 43 -t piv-card-auth || exit $?
+DEST="../cards/ICAM_Card_Objects/43_OCSP_revoked_w_nocheck"
+cp -p data/ICAM_Test_Card_PIV_*SP_800-73-4_OCSP_Revoked_NOCHECK.p12 "$DEST"
+cp -p data/pem/ICAM_Test_Card_PIV_*SP_800-73-4_OCSP_Revoked_NOCHECK.crt "$DEST"
+renameIn "$DEST" 1 1
+
+## Card 44
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Auth_SP_800-73-4_OCSP_Revoked_WO_NOCHECK -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 44 -t piv-auth || exit $?
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Dig_Sig_SP_800-73-4_OCSP_Revoked_WO_NOCHECK -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 44 -t piv-dig-sig || exit $?
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Key_Mgmt_SP_800-73-4_OCSP_Revoked_WO_NOCHECK -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 44 -t piv-key-mgmt || exit $?
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Card_Auth_SP_800-73-4_OCSP_Revoked_WO_NOCHECK -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 44 -t piv-card-auth || exit $?
+DEST="../cards/ICAM_Card_Objects/44_OCSP_revoked_wo_nocheck"
+cp -p data/ICAM_Test_Card_PIV_*SP_800-73-4_OCSP_Revoked_WO_NOCHECK.p12 "$DEST"
+cp -p data/pem/ICAM_Test_Card_PIV_*SP_800-73-4_OCSP_Revoked_WO_NOCHECK.crt "$DEST"
+renameIn "$DEST" 1 1
+
+## Card 45
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Auth_SP_800-73-4_OCSP_Invalid_Signature -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 45 -t piv-auth || exit $?
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Dig_Sig_SP_800-73-4_OCSP_Invalid_Signature -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 45 -t piv-dig-sig || exit $?
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Key_Mgmt_SP_800-73-4_OCSP_Invalid_Signature -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 45 -t piv-key-mgmt || exit $?
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Card_Auth_SP_800-73-4_OCSP_Invalid_Signature -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 45 -t piv-card-auth || exit $?
+DEST="../cards/ICAM_Card_Objects/45_OCSP_Invalid_Signature"
+cp -p data/ICAM_Test_Card_PIV_*SP_800-73-4_OCSP_Invalid_Signature.p12 "$DEST"
+cp -p data/pem/ICAM_Test_Card_PIV_*SP_800-73-4_OCSP_Invalid_Signature.crt "$DEST"
+renameIn "$DEST" 1 1
 
 ## Gen3 Content Signer issued by RSA 2040 Signing CA
 #SUBJ=ICAM_Test_Card_PIV_Content_Signer_RSA_2048_gen3 
@@ -389,8 +446,6 @@ cp -p ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/*.p12 data
 #DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
 #cp -p data/$SUBJ.p12 "$DEST"
 #cp -p data/pem/$SUBJ.crt "$DEST"
-
-
 
 ## Gen3 OCSP expired signer using RSA 2048 (Gen 3 PIV Signing CA)
 #SUBJ=ICAM_Test_Card_PIV_OCSP_Expired_Signer_gen3 
@@ -414,35 +469,31 @@ cp -p ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/*.p12 data
 #cp -p data/pem/$SUBJ.crt "$DEST"
 
 ## Gen3 OCSP invalid signature using RSA 2048 (Gen 3 PIV Signing CA)
-SUBJ=ICAM_Test_Card_PIV_OCSP_Invalid_Sig_Signer_gen3
-NAME=$(echo $SUBJ | sed 's/[&_]/ /g')
-sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -t piv-ocsp-invalid-sig -r 2048 --cakey rsa2048 || exit $?
-
-# Extract private/publilc keys from the .p12
-openssl pkcs12 -in data/$SUBJ.p12 -nocerts -nodes -passin pass: -passout pass: -out data/pem/$SUBJ.private.pem 
-openssl pkcs12 -in data/$SUBJ.p12 -clcerts -passin pass: -nokeys -out data/pem/$SUBJ.crt
-
-# Manipulate the cert
-SIZE=$(du -b data/pem/$SUBJ.crt | awk '{ print $1 }')
-P1=$(expr $SIZE - 60)
-P3=$(expr $P1 + 4)
-dd if=data/pem/$SUBJ.crt bs=1 count=$P1 >/tmp/p1
-echo -n -e "\x41\x42\x43\x44" >/tmp/p2
-dd if=data/pem/$SUBJ.crt bs=1 skip=$P3 >/tmp/p3
-cat /tmp/p1 /tmp/p2 /tmp/p3 >data/pem/$SUBJ.crt
-cat data/pem/$SUBJ.private.pem data/pem/$SUBJ.crt >data/pem/$SUBJ.combined.pem
-
-# Put the .p12 back together
-openssl pkcs12 -export -name "$NAME" -passout pass: -in data/pem/$SUBJ.combined.pem -macalg sha256 -out data/$SUBJ.p12
-DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
-cp -p data/$SUBJ.p12 "$DEST"
-cp -p data/pem/$SUBJ.crt "$DEST"
-rm -f data/pem/$SUBJ.combined.pem
-rm -f data/pem/$SUBJ.private.pem
-
-
-
-
+#SUBJ=ICAM_Test_Card_PIV_OCSP_Invalid_Sig_Signer_gen3
+#NAME=$(echo $SUBJ | sed 's/[&_]/ /g')
+#sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -t piv-ocsp-invalid-sig -r 2048 --cakey rsa2048 || exit $?
+#
+## Extract private/publilc keys from the .p12
+#openssl pkcs12 -in data/$SUBJ.p12 -nocerts -nodes -passin pass: -passout pass: -out data/pem/$SUBJ.private.pem 
+#openssl pkcs12 -in data/$SUBJ.p12 -clcerts -passin pass: -nokeys -out data/pem/$SUBJ.crt
+#
+## Manipulate the cert
+#SIZE=$(du -b data/pem/$SUBJ.crt | awk '{ print $1 }')
+#P1=$(expr $SIZE - 60)
+#P3=$(expr $P1 + 4)
+#dd if=data/pem/$SUBJ.crt bs=1 count=$P1 >/tmp/p1
+#echo -n -e "\x41\x42\x43\x44" >/tmp/p2
+#dd if=data/pem/$SUBJ.crt bs=1 skip=$P3 >/tmp/p3
+#cat /tmp/p1 /tmp/p2 /tmp/p3 >data/pem/$SUBJ.crt
+#cat data/pem/$SUBJ.private.pem data/pem/$SUBJ.crt >data/pem/$SUBJ.combined.pem
+#
+## Put the .p12 back together
+#openssl pkcs12 -export -name "$NAME" -passout pass: -in data/pem/$SUBJ.combined.pem -macalg sha256 -out data/$SUBJ.p12
+#DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
+#cp -p data/$SUBJ.p12 "$DEST"
+#cp -p data/pem/$SUBJ.crt "$DEST"
+#rm -f data/pem/$SUBJ.combined.pem
+#rm -f data/pem/$SUBJ.private.pem
 
 ######################## Special cards for X ########################
 
