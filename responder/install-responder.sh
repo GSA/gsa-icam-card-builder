@@ -207,7 +207,7 @@ fi
 
 if [ $GC -gt 0 ]; then
   cp -p /etc/hosts /etc/hosts.$$
-  egrep -v "127.0.0.1|$IPADDR|$HOSTNAME|$OHOSTNAME|fpki-lab.gov" /etc/hosts >/tmp/hosts
+  egrep -v "^\slocalhost|^127.0.0.1|127.0.1.1|$IPADDR|$HOSTNAME|$OHOSTNAME|fpki-lab.gov" /etc/hosts >/tmp/hosts
   echo "$IPADDR $HOSTNAME" >>/tmp/hosts
   echo "$IPADDR ocsp.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
   echo "$IPADDR ocspGen3.apl-test.cite.fpki-lab.gov" >>/tmp/hosts
