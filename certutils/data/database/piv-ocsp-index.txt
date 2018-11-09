@@ -1,0 +1,4 @@
+V	171202000000Z		90000000000000000001	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV OCSP Expired Signer gen3
+R	321230235959Z	181109181451Z,cessationOfOperation	90000000000000000002	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV OCSP Revoked Signer No Check Present gen3
+R	321230235959Z	181109181451Z,cessationOfOperation	90000000000000000003	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV OCSP Revoked Signer No Check Not Present gen3
+V	321230235959Z		90000000000000000004	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV OCSP Invalid Sig Signer gen3
