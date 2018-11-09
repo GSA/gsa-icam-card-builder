@@ -18,6 +18,7 @@ PIV_GEN3_RSA2048=3FDC04DB5C26E9A7FA60C2205982130B0E4AEA45
 PIV_GEN1_2=0A657668E6A866BB506AB5BB2B0F91D621EEA2D1
 PIV_GEN3=0C703BB5460F1B743D0762F30AD090AC7AE33E84
 PIVI_GEN3=20DC6669B935ACCCEDDBB43A6C5C6950BE69AB31
+PIV_OCSP=DE124A33B7C8C4E6224754CE785A892C8894681C
 
 mkunique() {
 	SRC=$1
@@ -97,6 +98,8 @@ process() {
 		DEST=$PIVIGEN1_LOCAL ;;
 	pivi-gen3) 
 		DEST=$PIVIGEN3_LOCAL ;;
+	piv-ocsp) 
+		DEST=$PIVOCSP_LOCAL ;;
 	*)
 		echo "Unknown destination: [$GEN]"
 		exit 1
@@ -406,6 +409,10 @@ reindex() {
 					T=piv
 					G=gen1-2
 					;;
+				$PIV_OCSP)
+					T=piv
+					G=ocsp
+					;;
 				*) 
 					echo "Unknown CA $AKID for $F"
 					continue
@@ -462,6 +469,7 @@ debug_output /tmp/$(basename $0 .sh).log
 
 export GEN1CRL=1
 export GEN3CRL=1
+export OCSPCRL=1
 
 CWD=$(pwd)
 PIVGEN1_DEST=$CWD/data/database/piv-gen1-2-index.txt
@@ -471,6 +479,7 @@ PIVIGEN3_DEST=$CWD/data/database/pivi-gen3-index.txt
 PIVRSA2048_DEST=$CWD/data/database/piv-rsa-2048-index.txt
 PIVGEN3P384_DEST=$CWD/data/database/piv-gen3-p384-index.txt
 PIVGEN3P256_DEST=$CWD/data/database/piv-gen3-p256-index.txt
+PIVOCSP_DEST=$CWD/data/database/piv-ocsp-index.txt
 LEGACY_DEST=$CWD/data/database/legacy-index.txt
 
 PIVGEN1_LOCAL=$CWD/piv-gen1-2-index.txt
@@ -480,6 +489,7 @@ PIVIGEN3_LOCAL=$CWD/pivi-gen3-index.txt
 PIVRSA2048_LOCAL=$CWD/piv-rsa-2048-index.txt
 PIVGEN3P384_LOCAL=$CWD/piv-gen3-p384-index.txt
 PIVGEN3P256_LOCAL=$CWD/piv-gen3-p256-index.txt
+PIVOCSP_LOCAL=$CWD/piv-ocsp-index.txt
 LEGACY_LOCAL=$CWD/legacy-index.txt
 
 cp $PIVGEN1_DEST $PIVGEN1_LOCAL
@@ -489,6 +499,7 @@ cp $PIVIGEN3_DEST $PIVIGEN3_LOCAL
 cp $PIVRSA2048_DEST $PIVRSA2048_LOCAL
 cp $PIVGEN3P384_DEST $PIVGEN3P384_LOCAL
 cp $PIVGEN3P256_DEST $PIVGEN3P256_LOCAL
+cp $PIVOCSP_DEST $PIVOCSP_LOCAL
 cp $LEGACY_DEST $LEGACY_LOCAL
 
 cp -p ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/*.crt data/pem
@@ -501,7 +512,8 @@ SIGNCAP12S="ICAM_Test_Card_PIV_P-256_Signing_CA_-_gold_gen3.p12 \
 	ICAM_Test_Card_PIV_Signing_CA_-_expired_gen1-2.p12 \
 	ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2.p12 \
 	ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.p12 \
-	ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.p12"
+	ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.p12 \
+  ICAM_Test_Card_OCSP_Response_Signer_CA.p12"
 
 CONTP12S="ICAM_Test_Card_PIV_Content_Signer_-_expired_gen1-2.p12 \
 	ICAM_Test_Card_PIV_Content_Signer_-_gold_gen1-2.p12 \
@@ -534,7 +546,7 @@ OCSPP12S="ICAM_Test_Card_PIV_OCSP_Expired_Signer_gen3.p12 \
 
 CERTLIST=""
 
-rm -f $PIVGEN1_LOCAL $PIVGEN3_LOCAL $PIVIGEN3_LOCAL $PIVGEN3P384_LOCAL $PIVGEN3P256_LOCAL
+rm -f $PIVGEN1_LOCAL $PIVGEN3_LOCAL $PIVIGEN3_LOCAL $PIVGEN3P384_LOCAL $PIVGEN3P256_LOCAL $PIVOCSP_LOCAL
 
 reindex
 
@@ -554,6 +566,7 @@ done
 /bin/mv $PIVRSA2048_DEST $PIVRSA2048_DEST.old 2>/dev/null
 /bin/mv $PIVGEN3P384_DEST $PIVGEN3P384_DEST.old 2>/dev/null
 /bin/mv $PIVGEN3P256_DEST $PIVGEN3P256_DEST.old 2>/dev/null
+/bin/mv $PIVOCSP_DEST $PIVOCSP_DEST.old 2>/dev/null
 
 # Move our "rebuilt" version into place
 
@@ -566,16 +579,16 @@ cp -p $PIVRSA2048_LOCAL $PIVRSA2048_DEST
 cp -p $PIVGEN3P384_LOCAL $PIVGEN3P384_DEST
 cp -p $PIVGEN3P384_LOCAL $PIVGEN3P384_DEST
 cp -p $PIVGEN3P256_LOCAL $PIVGEN3P256_DEST
+cp -p $PIVOCSP_LOCAL $PIVOCSP_DEST
 
 # Create indices with unique serial numbers.  First, remove all duplicate
 # serial numbers from the database files. Since the .cnf files operate
 # on the actual files, copy them to the destination so that OpenSSL finds
 # them.
 
-
 mkunique $F PIVGEN1_LOCAL
 
-for F in $PIVGEN1_LOCAL $PIVGEN3_LOCAL $PIVIGEN1_LOCAL $PIVIGEN3_LOCAL $PIVIGEN3_LOCAL $PIVRSA2048_LOCAL $PIVGEN3P384_LOCAL $PIVGEN3P256_LOCAL
+for F in $PIVGEN1_LOCAL $PIVGEN3_LOCAL $PIVIGEN1_LOCAL $PIVIGEN3_LOCAL $PIVIGEN3_LOCAL $PIVRSA2048_LOCAL $PIVGEN3P384_LOCAL $PIVGEN3P256_LOCAL $PIVOCSP_LOCAL
 do
 	mkunique $F
 	cp -p $F data/database
@@ -584,43 +597,41 @@ done
 # Start revoking certs that we need to be revoked.
 
 echo "Revoking known revoked certs..."
-## OCSP revoked signer with id-pkix-ocsp-nocheck NOT present using Gen3 CA
-mkunique $PIVGEN3_LOCAL
-cp -p $PIVGEN3_LOCAL data/dabase
-## OCSP revoked signer with id-pkix-ocsp-nocheck present using Gen3 CA
-echo "OCSP revoked signer with id-pkix-ocsp-nocheck present using Gen3 CA..."
+## OCSP revoked signer with id-pkix-ocsp-nocheck present using OCSP CA
+mkunique $PIVOCSP_LOCAL
+cp -p $PIVOCSP_LOCAL data/database
+echo "OCSP revoked signer with id-pkix-ocsp-nocheck present using OCSP CA..."
 SUBJ=ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Present_gen3 
-ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3
+ISSUER=ICAM_Test_Card_OCSP_Response_Signer_CA
 CONFIG=${CWD}/icam-piv-ocsp-revoked-nocheck-not-present.cnf
-CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardGen3SigningCA-ocsp.crl
-END=$(date -d"$(openssl x509 -in data/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt -enddate -noout | sed s/^.*=//g)" +%Y-%m-%d)
-revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN3CRL $END
+CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardOCSPResponsSignerCA.crl
+END=$(date -d"$(openssl x509 -in data/pem/ICAM_Test_Card_OCSP_Response_Signer_CA.crt -enddate -noout | sed s/^.*=//g)" +%Y-%m-%d)
+revoke $SUBJ $ISSUER $CONFIG pem $CRL $OCSPCRL $END
 if [ $? -gt 0 ]; then exit 1; fi
-cp -p data/database/$(basename $PIVGEN3_LOCAL) .
+cp -p data/database/$(basename $PIVOCSP_LOCAL) .
 
-## OCSP revoked signer with id-pkix-ocsp-nocheck NOT present using Gen3 CA
-mkunique $PIVGEN3_LOCAL
-cp -p $PIVGEN3_LOCAL data/database
-echo "OCSP revoked signer with id-pkix-ocsp-nocheck NOT present using Gen3 CA..."
+## OCSP revoked signer with id-pkix-ocsp-nocheck NOT present using OCSP CA
+mkunique $PIVOCSP_LOCAL
+cp -p $PIVOCSP_LOCAL data/database
+echo "OCSP revoked signer with id-pkix-ocsp-nocheck NOT present using OCSP CA..."
 SUBJ=ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Not_Present_gen3 
-ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3
+ISSUER=ICAM_Test_Card_OCSP_Response_Signer_CA
 CONFIG=${CWD}/icam-piv-ocsp-revoked-nocheck-present.cnf
-CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardGen3SigningCA-ocsp.crl
-END=$(date -d"$(openssl x509 -in data/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt -enddate -noout | sed s/^.*=//g)" +%Y-%m-%d)
-revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN3CRL $END
+CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardOCSPResponsSignerCA.crl
+END=$(date -d"$(openssl x509 -in data/pem/ICAM_Test_Card_OCSP_Response_Signer_CA.crt -enddate -noout | sed s/^.*=//g)" +%Y-%m-%d)
+revoke $SUBJ $ISSUER $CONFIG pem $CRL $OCSPCRL $END
 if [ $? -gt 0 ]; then exit 1; fi
-cp -p data/database/$(basename $PIVGEN3_LOCAL) .
-
+cp -p data/database/$(basename $PIVOCSP_LOCAL) .
 
 ## Empty CRL for Gen3 CA
 mkunique $PIVGEN3_LOCAL
 cp -p $PIVGEN3_LOCAL data/database
 echo "Empty Gen3 CA CRL..."
+#
 SUBJ=""
-
 export CN="ICAM Test Card Signing CA"
+#
 grep ^V data/database/piv-gen3-index.txt | head -n 1 >data/database/piv-gen3-empty-index.txt
-
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3
 CONFIG=${CWD}/icam-piv-signing-ca-gen3-empty.cnf
 CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardGen3SigningCA.crl
@@ -736,6 +747,7 @@ cp -p $PIVIGEN3_DEST $PIVIGEN3_LOCAL
 cp -p $PIVRSA2048_DEST $PIVRSA2048_LOCAL
 cp -p $PIVGEN3P384_DEST $PIVGEN3P384_LOCAL
 cp -p $PIVGEN3P256_DEST $PIVGEN3P256_LOCAL
+cp -p $PIVOCSP_DEST $PIVOCSP_LOCAL
 cp -p $LEGACY_DEST $LEGACY_LOCAL
 
 for F in $PIVGEN1_DEST $PIVGEN3_DEST $PIVIGEN1_DEST $PIVIGEN3_DEST $PIVRSA2048_DEST $PIVGEN3P384_DEST $PIVGEN3P256_DEST
@@ -754,6 +766,7 @@ tar cv --owner=root --group=root -f responder-certs.tar \
 	$(basename $PIVRSA2048_LOCAL) \
 	$(basename $PIVGEN3P384_LOCAL) \
 	$(basename $PIVGEN3P256_LOCAL) \
+	$(basename $PIVOCSP_LOCAL) \
 	$(basename $LEGACY_LOCAL) \
 	$(basename ${PIVGEN1_LOCAL}.attr) \
 	$(basename ${PIVGEN3_LOCAL}.attr) \
@@ -761,7 +774,8 @@ tar cv --owner=root --group=root -f responder-certs.tar \
 	$(basename ${PIVIGEN3_LOCAL}.attr) \
 	$(basename ${PIVRSA2048_LOCAL}.attr) \
 	$(basename ${PIVGEN3P384_LOCAL}.attr) \
-	$(basename ${PIVGEN3P256_LOCAL}.attr)
+	$(basename ${PIVGEN3P256_LOCAL}.attr) \
+	$(basename ${PIVOCSP_LOCAL}.attr)
 
 rm -f $OCSPP12S $SIGNP12S $CERTLIST
 rm -f $PIVGEN1_LOCAL ${PIVGEN1_LOCAL}.attr
@@ -771,6 +785,7 @@ rm -f $PIVIGEN3_LOCAL ${PIVIGEN3_LOCAL}.attr
 rm -f $PIVRSA2048_LOCAL ${PIVRSA2048_LOCAL}.attr
 rm -f $PIVGEN3P384_LOCAL ${PIVGEN3P384_LOCAL}.attr
 rm -f $PIVGEN3P256_LOCAL ${PIVGEN3P256_LOCAL}.attr
+rm -f $PIVOCSP_LOCAL ${PIVOCSP_LOCAL}.attr
 rm -f $LEGACY_LOCAL ${LEGACY_LOCAL}.attr
 rm -f data/pem/*.private.pem
 rm -f *.p12 *.crt
