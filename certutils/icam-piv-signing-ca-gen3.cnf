@@ -9,8 +9,44 @@ nameDistinguisher = 0.2.262.1.10.7.20
 id-kp-eapOverPPP = 1.3.6.1.5.5.7.3.13
 id-kp-eapOverLAN = 1.3.6.1.5.5.7.3.14
 
+
+[ default]
+dir = .
+new_certs_dir = $dir
+database = ${dir}/database/piv-gen3-index.txt 
+serial = ${dir}/database/piv-gen3-serial
+unique_subject = no
+name_opt = utf8
+default_days = 3650 
+default_md = sha256
+policy = policy_match
+
+[ ca ]
+default_ca = gen3_ca
+
+[ gen3_ca ]
+private_key = ${dir}/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.private.pem 
+certificate = ${dir}/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt 
+crl_extensions = crl_ext
+string_mask = nombstr
+
+[ crl_ext ]
+authorityKeyIdentifier=keyid:always,issuer:always
+
+[ req_distinguished_name ]
+C = Country Name
+C_default = US
+O = Organization
+O_default = U.S. Government 
+OU = Organizational Unit
+OU_default = ICAM Test Cards
+CN = Common Name
+CN_default = $ENV::CN
+emailAddress = E-Mail Address
+emailAddress_default = icam.test.cards@gsa.gov
+
 [ req ]
-default_bits = 1024
+default_bits = 2048
 default_keyfile = privkey.pem
 distinguished_name = xca_dn
 x509_extensions = xca_extensions
