@@ -1,0 +1,43 @@
+[ default]
+dir = .
+new_certs_dir = $dir
+database = ${dir}/database/piv-gen3-empty-index.txt 
+unique_subject = no
+name_opt = utf8
+default_days = 3650 
+default_md = sha256
+serial = ${dir}/database/piv-gen3-empty-serial
+policy = policy_match
+
+[ ca ]
+default_ca = ca_gen3_empty
+
+[ ca_gen3_empty ]
+private_key = ${dir}/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.private.pem 
+certificate = ${dir}/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt 
+crl_extensions = crl_ext
+string_mask = nombstr
+
+[ crl_ext ]
+authorityKeyIdentifier=keyid:always,issuer:always
+
+[ req_distinguished_name ]
+C = Country Name
+C_default = US
+O = Organization
+O_default = U.S. Government 
+OU = Organizational Unit
+OU_default = ICAM Test Cards
+CN = Common Name
+CN_default = $ENV::CN
+emailAddress = E-Mail Address
+emailAddress_default = icam.test.cards@gsa.gov
+
+[ xca_dn ]
+0.C=US
+1.O=U.S. Government
+2.OU=ICAM Test Cards
+3.CN=ICAM Test Card Signing CA
+
+[ xca_extensions ]
+authorityKeyIdentifier=keyid
