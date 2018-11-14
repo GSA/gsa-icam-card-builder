@@ -619,8 +619,6 @@ echo "Empty Gen3 CA CRL..."
 SUBJ=""
 
 export CN="ICAM Test Card Signing CA"
-grep ^V data/database/piv-gen3-index.txt | head -n 1 >data/database/piv-gen3-index.txt
-
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3
 CONFIG=${CWD}/icam-piv-signing-ca-gen3.cnf
 CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardGen3SigningCA.crl
