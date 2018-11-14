@@ -584,14 +584,13 @@ done
 # Start revoking certs that we need to be revoked.
 
 echo "Revoking known revoked certs..."
-## OCSP revoked signer with id-pkix-ocsp-nocheck NOT present using Gen3 CA
-mkunique $PIVGEN3_LOCAL
-cp -p $PIVGEN3_LOCAL data/dabase
 ## OCSP revoked signer with id-pkix-ocsp-nocheck present using Gen3 CA
+mkunique $PIVGEN3_LOCAL
+cp -p $PIVGEN3_LOCAL data/database
 echo "OCSP revoked signer with id-pkix-ocsp-nocheck present using Gen3 CA..."
 SUBJ=ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Present_gen3 
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3
-CONFIG=${CWD}/icam-piv-ocsp-revoked-nocheck-not-present.cnf
+CONFIG=${CWD}/icam-piv-ocsp-revoked-nocheck-present.cnf
 CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardGen3SigningCA-ocsp.crl
 END=$(date -d"$(openssl x509 -in data/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt -enddate -noout | sed s/^.*=//g)" +%Y-%m-%d)
 revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN3CRL $END
@@ -604,7 +603,7 @@ cp -p $PIVGEN3_LOCAL data/database
 echo "OCSP revoked signer with id-pkix-ocsp-nocheck NOT present using Gen3 CA..."
 SUBJ=ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Not_Present_gen3 
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3
-CONFIG=${CWD}/icam-piv-ocsp-revoked-nocheck-present.cnf
+CONFIG=${CWD}/icam-piv-ocsp-revoked-nocheck-not-present.cnf
 CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardGen3SigningCA-ocsp.crl
 END=$(date -d"$(openssl x509 -in data/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt -enddate -noout | sed s/^.*=//g)" +%Y-%m-%d)
 revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN3CRL $END
@@ -615,12 +614,14 @@ cp -p data/database/$(basename $PIVGEN3_LOCAL) .
 ## Empty CRL for Gen3 CA
 mkunique $PIVGEN3_LOCAL
 cp -p $PIVGEN3_LOCAL data/database
+
+grep ^V $PIVGEN3_LOCAL | head -n 1 > data/database/piv-gen3-empty-index.txt
 echo "Empty Gen3 CA CRL..."
 SUBJ=""
 
 export CN="ICAM Test Card Signing CA"
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3
-CONFIG=${CWD}/icam-piv-signing-ca-gen3.cnf
+CONFIG=${CWD}/icam-piv-signing-ca-gen3-empty.cnf
 CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardGen3SigningCA.crl
 END=$(date -d"$(openssl x509 -in data/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt -enddate -noout | sed s/^.*=//g)" +%Y-%m-%d)
 revoke "$SUBJ" $ISSUER $CONFIG pem $CRL $GEN3CRL $END
