@@ -744,7 +744,7 @@ do
 done
 
 tar cv --owner=root --group=root -f responder-certs.tar \
-	$SIGNP12S \
+	$SIGNCAP12S \
 	$OCSPP12S \
 	$CERTLIST \
 	$(basename $PIVGEN1_LOCAL) \
