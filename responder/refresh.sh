@@ -97,7 +97,6 @@ ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3
 CRL=ICAMTestCardGen3SigningCA.crl
 refresh $ISSUER $CONFIG piv_gen3_empty $TMP $CRL $END
 if [ $? -gt 0 ]; then exit $?; fi
-exit
 
 # OCSP CRL by Gen3 CA
 echo "OCSP signer CRL signed by Gen3 signing CA..."
