@@ -160,7 +160,7 @@ mv ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3.crt PIV_Signing_CA_gen3_rs
 crontab -u root -l | grep -v refresh.sh >/tmp/crontab.$$
 ed /tmp/crontab.$$ <<%%
 a
-30 2 * * * $PKIDIR/refresh.sh >>/var/log/refresh.log 2>&1
+30 2 * * * ( cd $PKIDIR; ./refresh.sh >>/var/log/refresh.log 2>&1 )
 .
 w
 q
