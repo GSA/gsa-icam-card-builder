@@ -155,6 +155,20 @@ mv ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3.crt PIV_Signing_CA_gen3_rs
 # Uncomment these when we have responders for them
 #mv ICAM_Test_Card_PIV_P-256_Signing_CA_gold_gen3.crt PIV_Signing_CA_gen3_p256.crt
 
+# Install refresher
+
+crontab -u root -l | grep -v refresh.sh >/tmp/crontab.$$
+ed /tmp/crontab.$$ <<%%
+a
+30 2 * * * $PKIDIR/refresh.sh >>/var/log/refresh.log >&1
+.
+w
+q
+%%
+crontab -u root /tmp/crontab.$$
+
+# Services
+
 systemctl stop ocspd.service
 systemctl disable ocspd.service
 systemctl stop $HTTPD.service
