@@ -106,7 +106,6 @@ ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3
 refresh $ISSUER $CONFIG piv_gen3 $TMP $CRL $END
 if [ $? -gt 0 ]; then exit $?; fi
 
-
 # Gen1-2 Content Signing Cert using Gen1-2 CA
 echo "Gen1-2 CRL using Gen1-2 signing CA..."
 export CN="ICAM Test Card Signing CA"
