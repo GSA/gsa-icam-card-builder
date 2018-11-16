@@ -438,6 +438,7 @@ reindex() {
 			if [ ! -f "$K" ]; then p12tokey "$C" "$K"; fi
 			if [ -z "$CERTLIST" ]; then CERTLIST=$(basename $F); else CERTLIST="${CERTLIST} $(basename $F)"; fi
 			cp -p $F ..
+      cp -p $C ..
 		done
 	popd >/dev/null 2>&1
 }
@@ -571,9 +572,6 @@ cp -p $PIVGEN3P256_LOCAL $PIVGEN3P256_DEST
 # serial numbers from the database files. Since the .cnf files operate
 # on the actual files, copy them to the destination so that OpenSSL finds
 # them.
-
-
-mkunique $F PIVGEN1_LOCAL
 
 for F in $PIVGEN1_LOCAL $PIVGEN3_LOCAL $PIVIGEN1_LOCAL $PIVIGEN3_LOCAL $PIVIGEN3_LOCAL $PIVRSA2048_LOCAL $PIVGEN3P384_LOCAL $PIVGEN3P256_LOCAL
 do
@@ -773,7 +771,7 @@ rm -f $PIVGEN3P384_LOCAL ${PIVGEN3P384_LOCAL}.attr
 rm -f $PIVGEN3P256_LOCAL ${PIVGEN3P256_LOCAL}.attr
 rm -f $LEGACY_LOCAL ${LEGACY_LOCAL}.attr
 rm -f data/pem/*.private.pem
-rm -f *.p12 *.crt
+#rm -f *.p12 *.crt
 
 # AIA, SIA, CRLs roots
 
