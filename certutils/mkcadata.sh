@@ -743,7 +743,13 @@ do
 	cp -p ${F}.attr .
 done
 
+cp -p ../responder/refresh.{sh,cnf} .
+chmod 755 refresh.sh
+chmod 644 refresh.cnf
+
 tar cv --owner=root --group=root -f responder-certs.tar \
+  refresh.sh \
+  refresh.cnf \
 	$SIGNCAP12S \
 	$OCSPP12S \
 	$CERTLIST \
@@ -773,8 +779,7 @@ rm -f $PIVGEN3P384_LOCAL ${PIVGEN3P384_LOCAL}.attr
 rm -f $PIVGEN3P256_LOCAL ${PIVGEN3P256_LOCAL}.attr
 rm -f $LEGACY_LOCAL ${LEGACY_LOCAL}.attr
 rm -f data/pem/*.private.pem
-#rm -f *.p12 *.crt
-
+rm -f *.p12 *.crt refresh.{sh,cnf}
 # AIA, SIA, CRLs roots
 
 echo "Making Fault Bridge Trust Anchor bundles..."
@@ -794,7 +799,7 @@ chmod 644 aia/* crls/* sia/* roots/* bridge/*
 
 # Backup AIA, CRLs, and SIA
 tar cv --owner=root --group=root -f aiacrlsia.tar aia crls sia roots bridge
-rm -rf aia sia crls roots bridge
+rm -rf aia sia crls roots bridge 
 
 mv responder-certs.tar ../responder
 mv aiacrlsia.tar ../responder
