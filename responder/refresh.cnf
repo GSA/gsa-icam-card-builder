@@ -1,0 +1,73 @@
+[ default]
+dir = .
+unique_subject = no
+name_opt = utf8
+default_days = 3650 
+default_md = sha256
+policy = policy_match
+
+[ ca ]
+default_days = 3650 
+
+[ ca_piv_gen3_empty ]
+private_key = ${dir}/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.private.pem 
+certificate = ${dir}/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt 
+database = ${dir}/piv-gen3-empty-index.txt 
+crlnumber = ${dir}/piv-gen3-empty-crlnumber.txt
+crl_extensions = crl_ext
+string_mask = nombstr
+
+[ ca_piv_gen3 ]
+private_key = ${dir}/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.private.pem 
+certificate = ${dir}/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt 
+database = ${dir}/piv-gen3-index.txt 
+crlnumber = ${dir}/piv-gen3-crlnumber.txt 
+crl_extensions = crl_ext
+string_mask = nombstr
+
+[ ca_piv_gen1_2 ]
+private_key = ${dir}/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2.private.pem 
+certificate = ${dir}/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2.crt 
+database = ${dir}/piv-gen1-2-index.txt 
+crlnumber = ${dir}/piv-gen1-2-crlnumber.txt 
+crl_extensions = crl_ext
+string_mask = nombstr
+
+[ ca_pivi_gen3 ]
+private_key = ${dir}/ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.private.pem 
+certificate = ${dir}/ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.crt 
+database = ${dir}/pivi-gen3-index.txt 
+crlnumber = ${dir}/pivi-gen3-crlnumber.txt 
+crl_extensions = crl_ext
+string_mask = nombstr
+
+[ ca_piv_gen1_3_root ]
+private_key = ${dir}/ICAM_Test_Card_PIV_Root_CA_-_gold_gen1-3.private.pem
+certificate = ${dir}/ICAM_Test_Card_PIV_Root_CA_-_gold_gen1-3.crt
+database = ${dir}/piv-gen1-3-root-empty-index.txt 
+crlnumber = ${dir}/piv-gen1-3-root-empty-crlnumber.txt 
+crl_extensions = crl_ext
+string_mask = nombstr
+
+[ ca_pivi_gen3_root ]
+private_key = ${dir}/ICAM_Test_Card_PIV-I_Root_CA_-_gold_gen3.private.pem
+certificate = ${dir}/ICAM_Test_Card_PIV-I_Root_CA_-_gold_gen3.crt
+database = ${dir}/pivi-gen3-root-empty-index.txt 
+crlnumber = ${dir}/pivi-gen3-root-empty-crlnumber.txt 
+crl_extensions = crl_ext
+string_mask = nombstr
+
+[ crl_ext ]
+authorityKeyIdentifier=keyid:always,issuer:always
+
+[ req_distinguished_name ]
+C = Country Name
+C_default = US
+O = Organization
+O_default = U.S. Government 
+OU = Organizational Unit
+OU_default = ICAM Test Cards
+CN = Common Name
+CN_default = $ENV::CN
+emailAddress = E-Mail Address
+emailAddress_default = icam.test.cards@gsa.gov
