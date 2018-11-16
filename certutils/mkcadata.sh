@@ -496,7 +496,9 @@ cp -p ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/*.crt data/pem
 cp -p ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/*.p12 data
 rm -f /tmp/hashes.txt
 
-SIGNCAP12S="ICAM_Test_Card_PIV_P-256_Signing_CA_-_gold_gen3.p12 \
+SIGNCAP12S="ICAM_Test_Card_PIV_Root_CA_-_gold_gen1-3.p12 \
+  ICAM_Test_Card_PIV-I_Root_CA_-_gold_gen3.p12 \
+  ICAM_Test_Card_PIV_P-256_Signing_CA_-_gold_gen3.p12 \
 	ICAM_Test_Card_PIV_P-384_Signing_CA_-_gold_gen3.p12 \
 	ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3.p12 \
 	ICAM_Test_Card_PIV_Signing_CA_-_expired_gen1-2.p12 \
