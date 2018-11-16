@@ -33,8 +33,8 @@ refresh() {
     openssl crl -inform p -in $BN.pem -outform der -out $CRL
     if [ $? -ne 0 ]; then popd >/dev/null 2>&1; return 5; fi
 
-#    rm -f $BN.pem
-#    rm -f $ISSUER.private.pem $ISSUER.crt
+    rm -f $BN.pem
+    rm -f $ISSUER.private.pem $ISSUER.crt
   popd >/dev/null 2>&1
   return 0
 }
@@ -142,6 +142,7 @@ if [ $? -gt 0 ]; then exit $?; fi
 
 pushd $TMP >/dev/null 2>&1
   tar cvf  ../crls.tar *.crl
+  mv *-crlnumber.txt ..
 popd >/dev/null 2>&1
 
 cd /var/www/http.apl-test.cite.fpki-lab.gov/crls
