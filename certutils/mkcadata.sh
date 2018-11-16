@@ -747,9 +747,12 @@ cp -p ../responder/refresh.{sh,cnf} .
 chmod 755 refresh.sh
 chmod 644 refresh.cnf
 
+cp -p ../responder/*-crlnumber.txt .
+
 tar cv --owner=root --group=root -f responder-certs.tar \
   refresh.sh \
   refresh.cnf \
+  *-crlnumber.txt \
 	$SIGNCAP12S \
 	$OCSPP12S \
 	$CERTLIST \
@@ -780,6 +783,8 @@ rm -f $PIVGEN3P256_LOCAL ${PIVGEN3P256_LOCAL}.attr
 rm -f $LEGACY_LOCAL ${LEGACY_LOCAL}.attr
 rm -f data/pem/*.private.pem
 rm -f *.p12 *.crt refresh.{sh,cnf}
+rm -f *-crlnumber.txt
+
 # AIA, SIA, CRLs roots
 
 echo "Making Fault Bridge Trust Anchor bundles..."
