@@ -656,6 +656,7 @@ do
   -rsigner \$CADIR/ocsp.crt \\
   -rkey \$CADIR/ocsp.key \\
   -CA \$CADIR/PIV_Signing_CA_gen1-2.crt \\
+  -nmin 5 \\
   -text \\
   -out /var/log/ocsp-log.txt >>/var/log/ocsp-output 2>&1 &
   PID=\$!
@@ -676,6 +677,7 @@ do
   -rsigner \$CADIR/ocspGen3.crt \\
   -rkey \$CADIR/ocspGen3.key \\
   -CA \$CADIR/PIV_Signing_CA_gen3.crt \\
+  -nmin 5 \\
   -text \\
   -out /var/log/ocspGen3-log.txt >>/var/log/ocspGen3-output 2>&1 &
   PID=\$!
@@ -697,6 +699,7 @@ do
   -rsigner \$CADIR/ocspExpired.crt \\
   -rkey \$CADIR/ocspExpired.key \\
   -CA \$CADIR/PIV_Signing_CA_gen3.crt \\
+  -nmin 5 \\
   -text \\
   -out /var/log/ocspExpired-log.txt >>/var/log/ocspExpired-output 2>&1 &
   PID=\$!
@@ -718,6 +721,7 @@ do
   -rsigner \$CADIR/ocspInvalidSig.crt \\
   -rkey \$CADIR/ocspInvalidSig.key \\
   -CA \$CADIR/PIV_Signing_CA_gen3.crt \\
+  -nmin 5 \\
   -text \\
   -out /var/log/ocspInvalidSig-log.txt >>/var/log/ocspInvalidSig-output 2>&1 &
   PID=\$!
@@ -739,6 +743,7 @@ do
   -rsigner \$CADIR/ocspRevoked.crt \\
   -rkey \$CADIR/ocspRevoked.key \\
   -CA \$CADIR/PIV_Signing_CA_gen3.crt \\
+  -nmin 5 \\
   -text \\
   -out /var/log/ocspRevoked-log.txt >>/var/log/ocspRevoked-output 2>&1 &
   PID=\$!
@@ -760,6 +765,7 @@ do
   -rsigner \$CADIR/ocspNocheckNotPresent.crt \\
   -rkey \$CADIR/ocspNocheckNotPresent.key \\
   -CA \$CADIR/PIV_Signing_CA_gen3.crt \\
+  -nmin 5 \\
   -text \\
   -out /var/log/ocspNocheckNotPresent-log.txt >>/var/log/ocspNocheckNotPresent-output 2>&1 &
   PID=\$!
@@ -781,6 +787,7 @@ do
   -rsigner \$CADIR/ocsp-pivi.crt \\
   -rkey \$CADIR/ocsp-pivi.key \\
   -CA \$CADIR/PIV-I_Signing_CA_gen3.crt \\
+  -nmin 5 \\
   -text \\
   -out /var/log/ocsp-pivi-log.txt >>/var/log/ocsp-pivi-output 2>&1 &
   PID=\$!
@@ -802,6 +809,7 @@ do
   -rsigner \$CADIR/ocspGen3p384.crt \\
   -rkey \$CADIR/ocspGen3p384.key \\
   -CA \$CADIR/PIV_Signing_CA_gen3_p384.crt \\
+  -nmin 5 \\
   -text \\
   -out /var/log/ocspGen3p384-log.txt >>/var/log/ocspGen3p384-output 2>&1 &
   PID=\$!
@@ -823,6 +831,7 @@ do
   -rsigner \$CADIR/ocspGen3rsa2048.crt \\
   -rkey \$CADIR/ocspGen3rsa2048.key \\
   -CA \$CADIR/PIV_Signing_CA_gen3_rsa2048.crt \\
+  -nmin 5 \\
   -text \\
   -out /var/log/ocspGen3rsa2048-log.txt >>/var/log/ocspGen3rsa2048-output 2>&1 &
   PID=\$!
