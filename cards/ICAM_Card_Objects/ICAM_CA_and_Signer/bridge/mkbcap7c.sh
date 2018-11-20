@@ -22,7 +22,7 @@ echo "ln -s ../aia/certsIssuedToICAMTestCardBridgeCA.p7c Intermediate_Bridge_Cer
 # Create the command to populate the certsIssuedToICAMTestCardRootCA.p7c file like this:
 #
 
-echo "openssl crl2pkcs7 -nocrl -outform der -out ../aia/certsIssuedToICAMTestCardRootCA.p7c -certfile 99_ICAM_Test_Card_Bridge_CA_to_ICAM_Test_Card_Root_CA.crt" >>/tmp/t.$$.sh
+echo "openssl crl2pkcs7 -nocrl -outform der -out ../aia/certsIssuedToICAMTestCardRootCA.p7c -certfile 99_ICAM_Test_Card_Bridge_CA_to_ICAM_Test_Card_Root_CA.crt -certfile ../roots/00_ICAM_Test_Card_Root_CA.crt" >>/tmp/t.$$.sh
 
 sh /tmp/t.$$.sh
 rm -f /tmp/t.$$.sh
