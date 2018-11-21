@@ -156,17 +156,22 @@ Note that `aiacrlsia.tar` and `responder-certs.tar` are copied to the
 [responder](https://github.com/GSA/gsa-icam-card-builder/tree/master/responder)
 directory.
 
-When invoked with the `-r` option, it rebuilds all of the database files for each CA.
-This  overrides the incrementatal OpenSSL CA database interaction that happens new certs 
-are generated.  Instead, it operates on a premise that the certs in the cards directories 
+`mkcadata.sh` rebuilds all of the database files for each CA. This  overrides the
+normal incrementatal OpenSSL CA database interaction that happens when new certs 
+are generated.  `mkcadata.sh` operates on a premise that the certs in the `card`s directories 
 are authoritative and that you know what you want on your cards.  CA database files with
-serial numbers and certificate status are coded in `mkcadata.sh`.  There are sections of
-code for each type of EE cert followed by a  section of code that revokes certain certs
-that we want to be revoked for test purposes.
+serial numbers and certificate status are extracted from the certs and added to the appropriate
+CA database file. 
+
+There are sections of code for each type of EE cert followed by a section of code that revokes
+certain certs that we want to be revoked for test purposes.
 
 Certs are revoked in by the `revoke.sh` scriptlet.  Inside of `revoke.sh`, the `openssl ca -revoke`
 command revokes the certs.  The appropriate CRL is updated so that the CA database and
 CRLs stay in sync.
+
+Finally, all of the artifacts are gathered up into two tarballs and placed into the `responder`
+directory where they can be installed using the `install-responder.sh` script.
 
 #### ocsptest.sh
 
