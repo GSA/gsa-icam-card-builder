@@ -152,9 +152,9 @@ reindex() {
 
 	pushd ../cards/ICAM_Card_Objects >/dev/null 2>&1
 		echo "Creating index for Gen1-2 PIV certs..."
-		for D in 01 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 23 24
+		for D in $(ls -d 01_* 03_* 04_* 05_* 06_* 07_* 08_* 09_* 10_* 11_* 12_* 13_* 14_* 15_* 16_* 17_* 18_* 23_* 24_*)
 		do
-			pushd ${D}_* >/dev/null 2>&1
+			pushd $D >/dev/null 2>&1
 				pwd
 				F="3 - ICAM_PIV_Auth_SP_800-73-4.p12"
 				G=$(basename "$F" .p12).crt
@@ -196,9 +196,9 @@ reindex() {
 		done
 
 		echo "Creating index for Gen1-2 PIV-I certs (in piv-gen1-2 index)..."
-		for D in 02 19 20 21 22
+		for D in $(ls -d 02_* 19_* 20_* 21_* 22_*)
 		do
-			pushd ${D}_* >/dev/null 2>&1
+			pushd $D >/dev/null 2>&1
 				pwd
 				F="3 - ICAM_PIV_Auth_SP_800-73-4.p12"
 				G=$(basename "$F" .p12).crt
@@ -235,9 +235,9 @@ reindex() {
 		done
 
 		echo "Creating index for Gen3 PIV certs..."
-		for D in 25 26 27 28 37 38 41 42 43 44 45 46 47 48 49 50 51 52 53 55
+		for D in $(ls -d 25_* 26_* 27_* 28_* 37_* 38_* 41_* 42_* 43_* 44_* 45_* 46_* 47_* 48_* 49_* 50_* 51_* 52_* 53_* 55_*)
 		do
-			pushd ${D}_* >/dev/null 2>&1
+			pushd $D >/dev/null 2>&1
 				pwd
 				F="3 - ICAM_PIV_Auth_SP_800-73-4.p12"
 				G=$(basename "$F" .p12).crt
@@ -274,9 +274,9 @@ reindex() {
 		done
 
 		echo "Creating index for Gen3 PIV-I certs..."
-		for D in 39 54
+		for D in $(ls -d 39_* 54_*)
 		do
-			pushd ${D}_* >/dev/null 2>&1
+			pushd $D >/dev/null 2>&1
 				pwd
 				F="3 - ICAM_PIV_Auth_SP_800-73-4.p12"
 				G=$(basename "$F" .p12).crt
@@ -313,9 +313,9 @@ reindex() {
 		done
 
 		echo "Creating index for RSA 2048 PIV certs..."
-		for D in 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103
+		for D in $(ls -d 80_* 81_* 82_* 83_* 84_* 85_* 86_* 87_* 88_* 89_* 90_* 91_* 92_* 93_* 94_* 95_* 96_* 97_* 98_* 99_* 100_* 101_* 102_* 103_*)
 		do
-			pushd ${D}_* >/dev/null 2>&1
+			pushd $D >/dev/null 2>&1
 				pwd
 				F="3 - ICAM_PIV_Auth_SP_800-73-4.p12"
 				G=$(basename "$F" .p12).crt
