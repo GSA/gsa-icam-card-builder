@@ -125,7 +125,10 @@ print "Validity Period......................$biosdate through $bioedate\n";
 print ">>> Error: Biometric is expired ($bioedate) <<<\n" if ($expires < $now);
 print "Biometric Type......................." . (($chars[$i++] << 16) | ($chars[$i++] << 8) | $chars[$i++]) . "\n";
 print "Biometric Data Type.................." . $chars[$i++] . "\n";
-print "Biometric Data Quality..............." . $chars[$i++] . "\n";
+no warnings;
+my $bdq = unpack "c1", pack "c", $chars[$i++];
+use warnings;
+print "Biometric Data Quality..............." . $bdq . "\n";
 print "Creator..............................";
 for ($j = 0; $j < 18; $j++, $i++) {
 	if ($chars[$i] != 0) {
@@ -203,16 +206,22 @@ for ($view = 0; $view < $nfv; $view++) {
 	my $minutiae_count = $chars[$i];
 	print "Number of Minutiae..................." . $chars[$i++] . "\n";
 
-	print "\n*** Minutiae ***\n";
-	my $min_type;
-	for ($j = 0; $j < $minutiae_count; $j++, $i += 6) {
-		$min_type = (($chars[$i] & 0xC0) >> 6);
-		printf "%6s %3d %3d %3d %3d\n",
-			($min_type == 0) ? "Other" : ($min_type == 1) ? "Ridge" : "Bifur",
-			((($chars[$i] & ~0xC0) << 2) | ($chars[$i + 1])),
-			(($chars[$i + 2] << 8) | $chars[$i + 3]),
-			$chars[$i + 4],
-			$chars[$i + 5];
+	if ($minutiae_count > 0) {
+		print "\n*** Minutiae ***\n";
+		my $min_type;
+		for ($j = 0; $j < $minutiae_count; $j++, $i += 6) {
+			$min_type = (($chars[$i] & 0xC0) >> 6);
+			printf "%6s %3d %3d %3d %3d\n",
+				($min_type == 0) ? "Other" : ($min_type == 1) ? "Ridge" : "Bifur",
+				((($chars[$i] & ~0xC0) << 2) | ($chars[$i + 1])),
+				(($chars[$i + 2] << 8) | $chars[$i + 3]),
+				$chars[$i + 4],
+				$chars[$i + 5];
+		}
+	} else {
+		if ($bdq != -2) {
+			print ">>> Error: No minutiae defined but Biometric Data Quality is not -2 ($bdq). <<<" . "\n";
+		}
 	}
 
 	print "\n";
