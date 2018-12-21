@@ -610,24 +610,6 @@ revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN3CRL $END
 if [ $? -gt 0 ]; then exit 1; fi
 cp -p data/database/$(basename $PIVGEN3_LOCAL) .
 
-
-## Empty CRL for Gen3 CA
-mkunique $PIVGEN3_LOCAL
-cp -p $PIVGEN3_LOCAL data/database
-
-grep ^V $PIVGEN3_LOCAL | head -n 1 > data/database/piv-gen3-empty-index.txt
-echo "Empty Gen3 CA CRL..."
-SUBJ=""
-
-export CN="ICAM Test Card Signing CA"
-ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3
-CONFIG=${CWD}/icam-piv-signing-ca-gen3-empty.cnf
-CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardGen3SigningCA.crl
-END=$(date -d"$(openssl x509 -in data/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt -enddate -noout | sed s/^.*=//g)" +%Y-%m-%d)
-revoke "$SUBJ" $ISSUER $CONFIG pem $CRL $GEN3CRL $END
-if [ $? -gt 0 ]; then exit 1; fi
-cp -p data/database/$(basename $PIVGEN3_LOCAL) .
-
 ### Gen1-2 Content Signing Cert using Gen1-2 CA
 mkunique $PIVGEN1_LOCAL
 cp -p $PIVGEN1_LOCAL data/database
