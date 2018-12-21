@@ -68,9 +68,6 @@ mkdir -p $TMP
 cp -p piv-gen3-index.txt $TMP
 cp -p piv-gen3-crlnumber.txt $TMP
 
-grep ^V piv-gen3-index.txt | head -n 2 > $TMP/piv-gen3-empty-index.txt
-cp -p piv-gen3-empty-crlnumber.txt $TMP
-
 grep ^V piv-gen3-index.txt | head -n 2 > $TMP/piv-gen1-3-root-empty-index.txt
 cp -p piv-gen1-3-root-empty-crlnumber.txt $TMP
 
@@ -90,7 +87,7 @@ echo "Gen3 CRL using Gen3 signing CA..."
 export CN="ICAM Test Card Signing CA"
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3
 CRL=ICAMTestCardGen3SigningCA.crl
-refresh $ISSUER $CONFIG piv_gen3_empty $TMP $CRL $END
+refresh $ISSUER $CONFIG piv_gen3 $TMP $CRL $END
 if [ $? -gt 0 ]; then exit $?; fi
 
 # Gen1-2 Content Signing Cert using Gen1-2 CA
