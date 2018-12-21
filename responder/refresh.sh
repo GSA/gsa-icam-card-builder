@@ -86,12 +86,7 @@ cp -p pivi-gen3-crlnumber.txt $TMP
 CONFIG=${CWD}/refresh.cnf
 END=$(date --date "2 days" +%Y-%m-%d)
 
-# Empty CRL for Gen3 CA.  Note that the two OCSP response signer certs 
-# revoked above have a different CRL DP but are signed by the Gen3 Signing CA.
-# Here, we filter the revoked certs out by only looking for Valid entries in the 
-# index.
-
-echo "Empty Gen3 CRL using Gen3 signing CA..."
+echo "Gen3 CRL using Gen3 signing CA..."
 export CN="ICAM Test Card Signing CA"
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3
 CRL=ICAMTestCardGen3SigningCA.crl
