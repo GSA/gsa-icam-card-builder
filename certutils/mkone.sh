@@ -64,7 +64,57 @@ cp -p ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/*.p12 data
 #cp -p data/ICAM_Test_Card_PIV*SP_800-73-4_Missing_SO.p12 "$DEST"
 #cp -p data/pem/ICAM_Test_Card_PIV*SP_800-73-4_Missing_SO.crt "$DEST"
 #renameIn "$DEST" 1 1
-#
+
+## OCSP response signer certs ##
+
+# Gen3 OCSP expired signer using RSA 2048 (Gen 3 PIV Signing CA)
+SUBJ=ICAM_Test_Card_PIV_OCSP_Expired_Signer_gen3 
+sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -t piv-ocsp-expired -r 2048 --cakey rsa2048 -x 171202000000Z || exit $?
+DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
+cp -p data/$SUBJ.p12 "$DEST"
+cp -p data/pem/$SUBJ.crt "$DEST"
+
+# Gen3 OCSP revoked signer with id-pkix-ocsp-nocheck present using RSA 2048 (Gen 3 PIV Signing CA)
+SUBJ=ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Present_gen3 
+sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -t piv-ocsp-revoked-nocheck-present -r 2048 --cakey rsa2048 || exit $?
+DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
+cp -p data/$SUBJ.p12 "$DEST"
+cp -p data/pem/$SUBJ.crt "$DEST"
+
+# Gen3 OCSP revoked signer with id-pkix-ocsp-nocheck NOT present using RSA 2048 (Gen 3 PIV Signing CA)
+SUBJ=ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Not_Present_gen3 
+sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -t piv-ocsp-revoked-nocheck-not-present -r 2048 --cakey rsa2048 || exit $?
+DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
+cp -p data/$SUBJ.p12 "$DEST"
+cp -p data/pem/$SUBJ.crt "$DEST"
+
+# Gen3 OCSP invalid signature using RSA 2048 (Gen 3 PIV Signing CA)
+SUBJ=ICAM_Test_Card_PIV_OCSP_Invalid_Sig_Signer_gen3
+NAME=$(echo $SUBJ | sed 's/[&_]/ /g')
+sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -t piv-ocsp-invalid-sig -r 2048 --cakey rsa2048 || exit $?
+
+# Extract private/publilc keys from the .p12
+openssl pkcs12 -in data/$SUBJ.p12 -nocerts -nodes -passin pass: -passout pass: -out data/pem/$SUBJ.private.pem 
+openssl pkcs12 -in data/$SUBJ.p12 -clcerts -passin pass: -nokeys -out data/pem/$SUBJ.crt
+
+# Manipulate the cert
+SIZE=$(du -b data/pem/$SUBJ.crt | awk '{ print $1 }')
+P1=$(expr $SIZE - 35)
+P3=$(expr $P1 + 1)
+dd if=data/pem/$SUBJ.crt bs=1 count=$P1 >/tmp/p1
+echo -n -e "\x39" >/tmp/p2
+dd if=data/pem/$SUBJ.crt bs=1 skip=$P3 >/tmp/p3
+cat /tmp/p1 /tmp/p2 /tmp/p3 >data/pem/$SUBJ.crt
+cat data/pem/$SUBJ.private.pem data/pem/$SUBJ.crt >data/pem/$SUBJ.combined.pem
+
+# Put the .p12 back together
+openssl pkcs12 -export -name "$NAME" -passout pass: -in data/pem/$SUBJ.combined.pem -macalg sha256 -out data/$SUBJ.p12
+DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
+cp -p data/$SUBJ.p12 "$DEST"
+cp -p data/pem/$SUBJ.crt "$DEST"
+rm -f data/pem/$SUBJ.combined.pem
+rm -f data/pem/$SUBJ.private.pem
+
 ## Gen1-2 OCSP valid signer using RSA 2048 (RSA 2048 CA)
 #SUBJ=ICAM_Test_Card_PIV_OCSP_Valid_Signer_gen1-2
 #sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -t piv-ocsp-valid-gen1-2 -r 2048 --cakey rsa2048 || exit $?
@@ -385,57 +435,6 @@ cp -p ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/*.p12 data
 #cp -p data/ICAM_*_$T.p12 "$DEST"
 #cp -p data/pem/ICAM_*_$T.crt "$DEST"
 #renameIn "$DEST" 1 1
-
-
-
-## Gen3 OCSP expired signer using RSA 2048 (Gen 3 PIV Signing CA)
-#SUBJ=ICAM_Test_Card_PIV_OCSP_Expired_Signer_gen3 
-#sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -t piv-ocsp-expired -r 2048 --cakey rsa2048 -x 171202000000Z || exit $?
-#DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
-#cp -p data/$SUBJ.p12 "$DEST"
-#cp -p data/pem/$SUBJ.crt "$DEST"
-
-## Gen3 OCSP revoked signer with id-pkix-ocsp-nocheck present using RSA 2048 (Gen 3 PIV Signing CA)
-SUBJ=ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Present_gen3 
-sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -t piv-ocsp-revoked-nocheck-present -r 2048 --cakey rsa2048 || exit $?
-DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
-cp -p data/$SUBJ.p12 "$DEST"
-cp -p data/pem/$SUBJ.crt "$DEST"
-
-## Gen3 OCSP revoked signer with id-pkix-ocsp-nocheck NOT present using RSA 2048 (Gen 3 PIV Signing CA)
-#SUBJ=ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Not_Present_gen3 
-#sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -t piv-ocsp-revoked-nocheck-not-present -r 2048 --cakey rsa2048 || exit $?
-#DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
-#cp -p data/$SUBJ.p12 "$DEST"
-#cp -p data/pem/$SUBJ.crt "$DEST"
-
-## Gen3 OCSP invalid signature using RSA 2048 (Gen 3 PIV Signing CA)
-#SUBJ=ICAM_Test_Card_PIV_OCSP_Invalid_Sig_Signer_gen3
-#NAME=$(echo $SUBJ | sed 's/[&_]/ /g')
-#sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -t piv-ocsp-invalid-sig -r 2048 --cakey rsa2048 || exit $?
-
-## Extract private/publilc keys from the .p12
-#openssl pkcs12 -in data/$SUBJ.p12 -nocerts -nodes -passin pass: -passout pass: -out data/pem/$SUBJ.private.pem 
-#openssl pkcs12 -in data/$SUBJ.p12 -clcerts -passin pass: -nokeys -out data/pem/$SUBJ.crt
-
-## Manipulate the cert
-#SIZE=$(du -b data/pem/$SUBJ.crt | awk '{ print $1 }')
-#P1=$(expr $SIZE - 35)
-#P3=$(expr $P1 + 1)
-#dd if=data/pem/$SUBJ.crt bs=1 count=$P1 >/tmp/p1
-#echo -n -e "\x39" >/tmp/p2
-#dd if=data/pem/$SUBJ.crt bs=1 skip=$P3 >/tmp/p3
-#cat /tmp/p1 /tmp/p2 /tmp/p3 >data/pem/$SUBJ.crt
-#cat data/pem/$SUBJ.private.pem data/pem/$SUBJ.crt >data/pem/$SUBJ.combined.pem
-
-## Put the .p12 back together
-#openssl pkcs12 -export -name "$NAME" -passout pass: -in data/pem/$SUBJ.combined.pem -macalg sha256 -out data/$SUBJ.p12
-#DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
-#cp -p data/$SUBJ.p12 "$DEST"
-#cp -p data/pem/$SUBJ.crt "$DEST"
-#rm -f data/pem/$SUBJ.combined.pem
-#rm -f data/pem/$SUBJ.private.pem
-
 
 ## Card 42
 #sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Auth_SP_800-73-4_OCSP_Expired -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 42 -t piv-auth || exit $?
