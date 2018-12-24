@@ -290,18 +290,23 @@ public class ContentSignerTool {
 			desiredContainerId = PivContainers.cccContainerId;
 			break;
 		case discoveryObjectTag:
+		case doPcaaTag:
 			// Not a signed object
-			LinkedHashMap<Integer, byte[]> doContainer;
 			LinkedHashMap<Integer, byte[]> doChildren;
+			LinkedHashMap<Integer, byte[]> doContainer;
 			// Map the values to the tags that were found in the container
-			if ((doContainer = getDoContents(contentFileBytes)) == null) {
-				System.out.println("Empty container\n");
+			if ((doContainer = getDoContents(contentFileBytes)) != null) {
+				if (tag == doPcaaTag) {
+					doContainer = new LinkedHashMap<Integer, byte[]>();
+					doContainer.put(discoveryObjectTag, contentFileBytes);
+				}
+				doChildren = getDoContents(doContainer.get(discoveryObjectTag));
+			} else {
+				System.out.println("Empty Discovery Object container\n");
 				Gui.progress.setValue(0);
 				return;
 			}
-
-			doChildren = getDoContents(doContainer.get(discoveryObjectTag));
-
+			
 			if (pinUsagePolicy != null && pinUsagePolicy.length() != 0) {
 				try {
 					if (pivCardApplicationAid.length() > 0 && pinUsagePolicy.length() > 0) {
@@ -326,22 +331,23 @@ public class ContentSignerTool {
 				}
 				contentBytes = Utils.valuesToBytes(doChildren, "Discovery Object PCA & PUP", 0);
 				doContainer.replace(discoveryObjectTag, contentBytes);
-				contentBytes = Utils.valuesToBytes(doContainer, "Discovery Object", 0);
 			} else {
 				// An empty PIN usage policy indicates to clear the Discovery
 				// Object (and remove the SO hash)
 				clearDoHash = true;
 				doContainer.replace(discoveryObjectTag, new byte[0]);
-				contentBytes = Utils.valuesToBytes(doContainer, "Discovery Object", 0);
 			}
+			contentBytes = Utils.valuesToBytes((tag == doPcaaTag) ? doChildren : doContainer, "Discovery Object", 0);
 			desiredContainerId = PivContainers.discoveryObjectContainerId;
 			containerBufferBytes = writeDoContainer(contentFile, contentBytes);
 			/*
 			 * This is a real hack. The Security Object hash for Discovery
-			 * Object must not include the 7e tag and length.
+			 * Object must not include the 7e tag and length. Certain vendor(s)
+			 * expect it.
 			 */
-			byte temp[] = new byte[containerBufferBytes.length - 2];
-			System.arraycopy(containerBufferBytes, 2, temp, 0, containerBufferBytes.length - 2);
+			int offset = (tag == doPcaaTag) ? 0 : 2;
+			byte temp[] = new byte[containerBufferBytes.length - offset];
+			System.arraycopy(containerBufferBytes, offset, temp, 0, containerBufferBytes.length - offset);
 			containerBufferBytes = temp;
 			break;
 		case chuidFascnTag:
@@ -477,7 +483,7 @@ public class ContentSignerTool {
 			// is needed by CBEFF headers. Chicken/egg problem.
 			signedFakeBytes = createDetachedSignature("FAKE".getBytes(), idPivBiometricContentTypeOid, false);
 
-			if (signedFakeBytes == null) {
+			if (null == signedFakeBytes) {
 				Gui.errors = true;
 				System.out.println("Error creating CMS\n");
 				Gui.progress.setValue(0);
