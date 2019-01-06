@@ -1,0 +1,1 @@
+This card's CHUID signing certificate is revoked.

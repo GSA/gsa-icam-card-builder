@@ -1,0 +1,1 @@
+This card tests whether the Card Authentication certificate is validated during registration or during re-validation.

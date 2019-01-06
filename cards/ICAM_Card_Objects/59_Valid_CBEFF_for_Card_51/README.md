@@ -1,0 +1,1 @@
+This card contains the same FASC-N as Card 51 but doesn't have an expired CBEFF.  It is used to test time of access testing for expired CBEFFs.
