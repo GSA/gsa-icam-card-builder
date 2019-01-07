@@ -63,6 +63,6 @@ certificatePolicies=ia5org,2.16.840.1.101.3.2.1.48.9
 subjectAltName = @subjectAltName_sect
 
 [ subjectAltName_sect ]
-otherName = 2.16.840.1.101.3.6.6;FORMAT:HEX,OCT:D1:38:10:D8:28:AF:2C:10:84:35:0D:A1:68:58:28:AF:02:10:86:A1:84:E7:39:C3:EB
+otherName = 2.16.840.1.101.3.6.6;FORMAT:HEX,OCT:D1:38:10:D8:28:AF:2C:10:84:35:15:A1:68:58:28:AF:02:10:86:A2:84:E7:39:C3:F3
 URI = urn:uuid:465f10f6-98b1-43dd-96c1-8e813c590503
 email = icam.test.cards@gsa.gov
