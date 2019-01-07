@@ -1,3 +1,8 @@
+Bag Attributes
+    localKeyID: CF 7D DF 31 DD 56 FB 46 93 63 F7 EB B7 65 C7 89 68 73 C3 B0 
+    friendlyName: ICAM Test Card PIV RSA 2048 Signing CA - gold gen3
+subject=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV RSA 2048 Signing CA
+issuer=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Root CA
 -----BEGIN CERTIFICATE-----
 MIIF3jCCBEagAwIBAgIJAPqud8TWpGrrMA0GCSqGSIb3DQEBCwUAMGIxCzAJBgNV
 BAYTAlVTMRgwFgYDVQQKEw9VLlMuIEdvdmVybm1lbnQxGDAWBgNVBAsTD0lDQU0g

@@ -628,7 +628,8 @@ cp -p data/database/$(basename $PIVGEN3_LOCAL) .
 mkunique $PIVGEN3_LOCAL
 cp -p $PIVGEN3_LOCAL data/database
 echo "Card 58 Card Authentication Certificate..."
-SUBJ='6 - ICAM_Test_Card_PIV_Card_Auth_SP_800-73-4_Revoked_Card_Auth_Cert.p12'
+#cp '../cards/ICAM_Card_Objects/58_Revoked_Card_Auth_Cert/6 - ICAM_Test_Card_PIV_Card_Auth_SP_800-73-4_Revoked_Card_Auth_Cert.p12' /tmp/$$.p12
+SUBJ=ICAM_Test_Card_PIV_Card_Auth_SP_800-73-4_Revoked_Card_Auth_Cert
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3
 CONFIG=${CWD}/icam-piv-card-auth-c58.cnf
 CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardGen3SigningCA.crl

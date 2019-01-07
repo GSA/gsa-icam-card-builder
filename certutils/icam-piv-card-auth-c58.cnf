@@ -27,7 +27,6 @@ emailAddress = optional
 
 [ crl_ext ]
 authorityKeyIdentifier=keyid:always,issuer:always
-serialNumber = optional
 
 [ req ]
 prompt = yes
