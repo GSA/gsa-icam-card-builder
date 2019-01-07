@@ -1,0 +1,68 @@
+[ ca ]
+default_ca = ca_default
+
+[ ca_default ]
+dir = .
+database = ${dir}/database/piv-gen3-index.txt 
+unique_subject = no
+new_certs_dir = .
+private_key = ${dir}/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.private.pem 
+certificate = ${dir}/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt 
+name_opt = ca_default
+x509_extensions = ee_ext
+default_days = 2190 
+default_md = sha256
+serial = ${dir}/database/piv-gen3-serial
+policy = policy_match
+email_in_dn = no
+crl_extensions = crl_ext
+string_mask = nombstr
+
+[ policy_match ]
+C = match
+O = optional
+OU = optional
+CN = optional
+emailAddress = optional
+
+[ crl_ext ]
+authorityKeyIdentifier=keyid:always,issuer:always
+serialNumber = optional
+
+[ req ]
+prompt = yes
+string_mask = nombstr
+distinguished_name = req_distinguished_name
+attributes = req_attributes
+req_extensions = v3_req
+
+[ req_distinguished_name ]
+C = Country Name
+C_default = US
+O = Organization
+O_default = U.S. Government 
+OU = Organizational Unit
+OU_default = ICAM Test Cards
+serialNumber = 200-bit FASC-N (if Card Auth)
+serialNumber_default = D13810D828AF2C1084350DA1685828AF021086A184E739C3EB
+
+[ req_attributes ]
+
+[ v3_req ]
+basicConstraints = CA:FALSE
+subjectKeyIdentifier = hash
+
+[ ee_ext ]
+authorityKeyIdentifier = keyid:issuer
+subjectKeyIdentifier = hash
+keyUsage = critical, digitalSignature
+extendedKeyUsage = critical,2.16.840.1.101.3.6.8
+authorityInfoAccess = caIssuers;URI:http://http.apl-test.cite.fpki-lab.gov/aia/certsIssuedToICAMTestCardSigningCA.p7c, OCSP;URI:http://ocspGen3.apl-test.cite.fpki-lab.gov
+crlDistributionPoints = URI:http://http.apl-test.cite.fpki-lab.gov/crls/ICAMTestCardGen3SigningCA.crl
+2.16.840.1.101.3.6.9.1 = DER:01:01:00
+certificatePolicies = ia5org,2.16.840.1.101.3.2.1.48.13
+subjectAltName = @subjectAltName_sect
+
+[ subjectAltName_sect ]
+otherName = 2.16.840.1.101.3.6.6;FORMAT:HEX,OCT:D1:38:10:D8:28:AF:2C:10:84:35:0D:A1:68:58:28:AF:02:10:86:A1:84:E7:39:C3:EB
+URI = urn:uuid:465f10f6-98b1-43dd-96c1-8e813c590503

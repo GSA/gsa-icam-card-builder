@@ -1,0 +1,68 @@
+[ ca ]
+default_ca = ca_default
+
+[ ca_default ]
+dir = .
+database = ${dir}/database/piv-gen3-index.txt 
+unique_subject = no
+new_certs_dir = .
+private_key = ${dir}/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.private.pem 
+certificate = ${dir}/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt 
+name_opt = ca_default
+x509_extensions = ee_ext
+default_days = 2190 
+default_md = sha256
+serial = ${dir}/database/piv-gen3-serial
+policy = policy_match
+email_in_dn = no
+crl_extensions = crl_ext
+string_mask = nombstr
+
+[ policy_match ]
+C = match
+O = optional
+OU = optional
+CN = optional
+emailAddress = optional
+
+[ crl_ext ]
+authorityKeyIdentifier=keyid:always,issuer:always
+
+[ req ]
+prompt = yes
+string_mask = nombstr
+distinguished_name = req_distinguished_name
+attributes = req_attributes
+req_extensions = v3_req
+
+[ req_distinguished_name ]
+C = Country Name
+C_default = US
+O = Organization
+O_default = U.S. Government 
+OU = Organizational Unit
+OU_default = ICAM Test Cards
+CN = Common Name
+CN_default = ICAM Test Card Key Mgmt SP 800-73-4 Revoked CHUID Cert
+emailAddress = E-Mail Address
+emailAddress_default = icam.test.cards@gsa.gov
+
+[ req_attributes ]
+
+[ v3_req ]
+basicConstraints = CA:FALSE
+subjectKeyIdentifier = hash
+
+[ ee_ext ]
+authorityKeyIdentifier = keyid:issuer
+subjectKeyIdentifier = hash
+keyUsage = critical, keyEncipherment
+authorityInfoAccess = caIssuers;URI:http://http.apl-test.cite.fpki-lab.gov/aia/certsIssuedToICAMTestCardSigningCA.p7c, OCSP;URI:http://ocspGen3.apl-test.cite.fpki-lab.gov
+crlDistributionPoints = URI:http://http.apl-test.cite.fpki-lab.gov/crls/ICAMTestCardGen3SigningCA.crl
+certificatePolicies=ia5org,2.16.840.1.101.3.2.1.48.9
+subjectAltName = @subjectAltName_sect
+
+[ subjectAltName_sect ]
+otherName = 2.16.840.1.101.3.6.6;FORMAT:HEX,OCT:D1:38:10:D8:28:AF:2C:10:84:35:15:A1:68:58:28:AF:02:10:86:A2:84:E7:39:C3:F3
+URI = urn:uuid:1aa1ca48-7c74-46b0-bc08-79b31e87e3bd
+email = icam.test.cards@gsa.gov
