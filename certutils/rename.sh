@@ -35,7 +35,7 @@ KEY_HIST_5_P12_NAME="18 - ICAM_PIV_Key_Hist5_SP_800-73-4_PPS.p12"
 KEY_HIST_5_CERT_NAME="18 - ICAM_PIV_Key_Hist5_SP_800-73-4_PPS.crt"
 
 renameIn () {
-	pushd "$1" || exit 10
+	pushd "$1" >/dev/null 2>&1 || exit 10
 		if [ $DEBUG -eq 1 ]; then set -x; fi
 		MOVE=1
 		if [ z"$2" != "z" ]; then
@@ -70,23 +70,28 @@ renameIn () {
 		if [ $RES -eq 0 -a $MOVE -eq 1 ]; then mv $F "5 - $F"; fi
 		if [ $RES -eq 0 -a $COPY -eq 1 ]; then cp -p "5 - $F" "$KEY_MGMT_CERT_NAME"; fi
 
-		F=$(ls ICAM*Card_Auth_*.p12 2>/dev/null)
+    # Card auth first unless you want F to end up like this (which you don't):
+    # ls ICAM_Test_Card_PIV_Auth_SP_800-73-4_Revoked_Card_Auth_Cert.p12 ICAM_Test_Card_PIV_Card_Auth_SP_800-73-4_Revoked_Card_Auth_Cert.p12
+
+		F=$(ls ICAM_Test_Card_PIV_*Card_Auth*.p12 2>/dev/null | egrep -v "PIV_Auth|PIV-I_Auth")
 		RES=$?
 		if [ $RES -eq 0 -a $MOVE -eq 1 ]; then mv $F "6 - $F"; fi
 		if [ $RES -eq 0 -a $COPY -eq 1 ]; then cp -p "6 - $F" "$CARD_AUTH_P12_NAME"; fi
-		F=$(ls ICAM*Card_Auth_*.crt 2>/dev/null)
+		F=$(ls ICAM_Test_Card_PIV_*Card_Auth*.crt 2>/dev/null | egrep -v "PIV_Auth|PIV-I_Auth")
 		RES=$?
 		if [ $RES -eq 0 -a $MOVE -eq 1 ]; then mv $F "6 - $F"; fi
 		if [ $RES -eq 0 -a $COPY -eq 1 ]; then cp -p "6 - $F" "$CARD_AUTH_CERT_NAME"; fi
 
-		F=$(ls ICAM*PIV*_Auth_*.p12 2>/dev/null | egrep "PIV_Auth|PIV-I_Auth")
+
+		F=$(ls ICAM_Test_Card_PIV_Auth*.p12 2>/dev/null | egrep "PIV_Auth|PIV-I_Auth")
 		RES=$?
 		if [ $RES -eq 0 -a $MOVE -eq 1 ]; then mv $F "3 - $F"; fi
 		if [ $RES -eq 0 -a $COPY -eq 1 ]; then cp -p "3 - $F" "$PIV_AUTH_P12_NAME"; fi
-		F=$(ls ICAM*PIV*_Auth_*.crt 2>/dev/null | egrep "PIV_Auth|PIV-I_Auth")
+		F=$(ls ICAM_Test_Card_PIV_Auth*.crt 2>/dev/null | egrep "PIV_Auth|PIV-I_Auth")
 		RES=$?
 		if [ $RES -eq 0 -a $MOVE -eq 1 ]; then mv $F "3 - $F"; fi
 		if [ $RES -eq 0 -a $COPY -eq 1 ]; then cp -p "3 - $F" "$PIV_AUTH_CERT_NAME"; fi
+
 
 		X=1
 		# Key History starts at 14
@@ -114,5 +119,5 @@ renameIn () {
 			fi
 			X=$(expr $X + 1)
 		done
- 	popd
+ 	popd >/dev/null 2>&1
 }

@@ -22,6 +22,13 @@ DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
 cp -p data/$SUBJ.p12 "$DEST"
 cp -p data/pem/$SUBJ.crt "$DEST"
 
+## Gen3 Revoked Content Signer
+SUBJ=ICAM_Test_Card_PIV_Revoked_Content_Signer_gen3
+sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -t piv-content-signer-gen3-rsa -r 2048 --cakey rsa2048 || exit $?
+DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
+cp -p data/$SUBJ.p12 "$DEST"
+cp -p data/pem/$SUBJ.crt "$DEST"
+
 ## Gen3 Early expiring PIV Content signer using RSA 2048 (RSA 2048 CA) not a permanent ICAM test card
 SUBJ=ICAM_Test_Card_PIV_Content_Signer_Expiring_-_gold_gen3 
 sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -t piv-content-signer-gen3-rsa -r 2048 --cakey rsa2048 -x 201202000000Z || exit $?
@@ -590,4 +597,31 @@ sh mkcert.sh -w -b -s "ICAM_Test_Card_PIV_Card_Auth_SP_800-73-4_$T" -i ICAM_Test
 DEST="../cards/ICAM_Card_Objects/56_FIPS_201-2_Signer_Expires"
 cp -p data/ICAM_Test_Card*_$T.p12 "$DEST"
 cp -p data/pem/ICAM_Test_Card*_$T.crt "$DEST"
+renameIn "$DEST" 1 1
+
+## Gen3 Revoked CHUID Signer cert
+SUBJ=ICAM_Test_Card_PIV_Revoked_CHUID_Signer_Cert_gen3
+sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -t piv-content-signer-gen3-rsa -r 2048 --cakey rsa2048 || exit $?
+DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
+cp -p data/$SUBJ.p12 "$DEST"
+cp -p data/pem/$SUBJ.crt "$DEST"
+
+## Card 57 depends on revoked CHUID Signer cert
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Auth_SP_800-73-4_Revoked_CHUID_Cert -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 57 -t piv-auth || exit $?
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Dig_Sig_SP_800-73-4_Revoked_CHUID_Cert -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 57 -t piv-dig-sig || exit $?
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Key_Mgmt_SP_800-73-4_Revoked_CHUID_Cert -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 57 -t piv-key-mgmt || exit $?
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Card_Auth_SP_800-73-4_Revoked_CHUID_Cert -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 57 -t piv-card-auth || exit $?
+DEST="../cards/ICAM_Card_Objects/57_Revoked_CHUID_Cert"
+cp -p data/ICAM_Test_Card_PIV_*SP_800-73-4_Revoked_CHUID_Cert.p12 "$DEST"
+cp -p data/pem/ICAM_Test_Card_PIV_*SP_800-73-4_Revoked_CHUID_Cert.crt "$DEST"
+renameIn "$DEST" 1 1
+
+## Card 58
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Auth_SP_800-73-4_Revoked_Card_Auth_Cert -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 58 -t piv-auth || exit $?
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Dig_Sig_SP_800-73-4_Revoked_Card_Auth_Cert -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 58 -t piv-dig-sig || exit $?
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Key_Mgmt_SP_800-73-4_Revoked_Card_Auth_Cert -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 58 -t piv-key-mgmt || exit $?
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Card_Auth_SP_800-73-4_Revoked_Card_Auth_Cert -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 58 -t piv-card-auth || exit $?
+DEST="../cards/ICAM_Card_Objects/58_Revoked_Card_Auth_Cert"
+cp -p data/ICAM_Test_Card_PIV_*SP_800-73-4_Revoked_Card_Auth_Cert.p12 "$DEST"
+cp -p data/pem/ICAM_Test_Card_PIV_*SP_800-73-4_Revoked_Card_Auth_Cert.crt "$DEST"
 renameIn "$DEST" 1 1

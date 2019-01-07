@@ -235,7 +235,7 @@ reindex() {
 		done
 
 		echo "Creating index for Gen3 PIV certs..."
-		for D in $(ls -d 25_* 26_* 27_* 28_* 37_* 38_* 41_* 42_* 43_* 44_* 45_* 46_* 47_* 48_* 49_* 50_* 51_* 52_* 53_* 55_*)
+		for D in $(ls -d 25_* 26_* 27_* 28_* 37_* 38_* 41_* 42_* 43_* 44_* 45_* 46_* 47_* 48_* 49_* 50_* 51_* 52_* 53_* 55_* 57_* 58_* 59_*)
 		do
 			pushd $D >/dev/null 2>&1
 				pwd
@@ -523,7 +523,8 @@ CONTP12S="ICAM_Test_Card_PIV_Content_Signer_-_expired_gen1-2.p12 \
 	ICAM_Test_Card_PIV_RSA_Issued_Intermediate_CVC_Signer.p12 \
 	ICAM_Test_Card_PIV-I_P-256_SM_Certifiate_Signer.p12 \
 	ICAM_Test_Card_PIV-I_Content_Signer_-_gold_gen1-2.p12 \
-	ICAM_Test_Card_PIV-I_Content_Signer_-_gold_gen3.p12"
+	ICAM_Test_Card_PIV-I_Content_Signer_-_gold_gen3.p12 \
+  ICAM_Test_Card_PIV_Revoked_CHUID_Signer_Cert_gen3.p12"
 
 OCSPP12S="ICAM_Test_Card_PIV_OCSP_Expired_Signer_gen3.p12 \
 	ICAM_Test_Card_PIV_OCSP_Invalid_Sig_Signer_gen3.p12 \
@@ -604,6 +605,32 @@ echo "OCSP revoked signer with id-pkix-ocsp-nocheck NOT present using Gen3 CA...
 SUBJ=ICAM_Test_Card_PIV_OCSP_Revoked_Signer_No_Check_Not_Present_gen3 
 ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3
 CONFIG=${CWD}/icam-piv-ocsp-revoked-nocheck-not-present.cnf
+CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardGen3SigningCA.crl
+END=$(date -d"$(openssl x509 -in data/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt -enddate -noout | sed s/^.*=//g)" +%Y-%m-%d)
+revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN3CRL $END
+if [ $? -gt 0 ]; then exit 1; fi
+cp -p data/database/$(basename $PIVGEN3_LOCAL) .
+
+## Card 57 CHUID Signe
+mkunique $PIVGEN3_LOCAL
+cp -p $PIVGEN3_LOCAL data/database
+echo "Card 57 CHUID signer certificate..."
+SUBJ=ICAM_Test_Card_PIV_Revoked_CHUID_Signer_Cert_gen3
+ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3
+CONFIG=${CWD}/icam-piv-content-signer-gen3-rsa.cnf
+CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardGen3SigningCA.crl
+END=$(date -d"$(openssl x509 -in data/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt -enddate -noout | sed s/^.*=//g)" +%Y-%m-%d)
+revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN3CRL $END
+if [ $? -gt 0 ]; then exit 1; fi
+cp -p data/database/$(basename $PIVGEN3_LOCAL) .
+
+## Card 58 Card Auth
+mkunique $PIVGEN3_LOCAL
+cp -p $PIVGEN3_LOCAL data/database
+echo "Card 58 Card Authentication Certificate..."
+SUBJ='6 - ICAM_Test_Card_PIV_Card_Auth_SP_800-73-4_Revoked_Card_Auth_Cert.p12'
+ISSUER=ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3
+CONFIG=${CWD}/icam-piv-card-auth-c58.cnf
 CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardGen3SigningCA.crl
 END=$(date -d"$(openssl x509 -in data/pem/ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt -enddate -noout | sed s/^.*=//g)" +%Y-%m-%d)
 revoke $SUBJ $ISSUER $CONFIG pem $CRL $GEN3CRL $END
