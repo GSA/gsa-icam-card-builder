@@ -60,7 +60,7 @@ test cards, which are referred to as *Gen 3*:
 | 53 | FIPS 201-2 Large Card Auth Cert (2160 bytes) |
 | 54 | Golden FIPS 201-2 NFI PIV-I (Replaces Card 2) |
 | 55 | FIPS 201-2 PIV Missing Security Object |
-| 57 | Revoked CHUID signer cert |
+| 57 | Revoked CHUID Signer Cert |
 | 58 | Revoked Card Authentication Cert |
 | 59 | Valid Card to Simulate Card 51 at Time of Access |
 
