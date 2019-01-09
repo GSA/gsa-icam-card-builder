@@ -312,7 +312,7 @@ reindex() {
 			popd >/dev/null 2>&1
 		done
 
-		if [ -d 80_Test ]; then
+		if [ $EXTRACARDS -eq 1 ]; then
 			echo "Creating index for RSA 2048 PIV certs..."
 			for D in $(ls -d 80_* 81_* 82_* 83_* 84_* 85_* 86_* 87_* 88_* 89_* 90_* 91_* 92_* 93_* 94_* 95_* 96_* 97_* 98_* 99_* 100_* 101_* 102_* 103_*)
 			do
@@ -420,8 +420,10 @@ reindex() {
 
 			cp $F ..
 
-			process "$T-$G" $STATUS $Y $X
-			cp -p $F ..
+			if [ "$T-$G" != "piv-rsa-2048" ] || [ $EXTRACARDS -eq 1 ]; then
+				process "$T-$G" $STATUS $Y $X
+				cp -p $F ..
+			fi
 		done
 
 		echo "Extracting certs from signing CA .p12 files..."
@@ -467,6 +469,11 @@ export GEN1CRL=1
 export GEN3CRL=1
 
 CWD=$(pwd)
+EXTRACARDS=0
+if [ -d ../cards/ICAM_Card_Objects/80_Test ]; then
+	EXTRACARDS=1
+fi
+
 PIVGEN1_DEST=$CWD/data/database/piv-gen1-2-index.txt
 PIVGEN3_DEST=$CWD/data/database/piv-gen3-index.txt
 PIVIGEN1_DEST=$CWD/data/database/pivi-gen1-2-index.txt
