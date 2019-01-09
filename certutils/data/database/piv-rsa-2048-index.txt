@@ -1,6 +1,7 @@
 V	321230235959Z		A0000000000000000001	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV RSA Issued Intermediate CVC Signer
 V	321231235959Z		A0000000000000000002	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV Content Signer RSA 2048 gen3
 V	321230235959Z		A0000000000000000003	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV OCSP RSA 2048 Valid Signer gen3
+<<<<<<< HEAD
 V	240531000000Z		A0000000000000000004	unknown	/C=US/O=CertiPath LLC/OU=Agency 1399 Test Cards/CN=Agency 1399 Card 01 PIV Authentication
 V	240531000000Z		A0000000000000000005	unknown	/C=US/O=CertiPath LLC/OU=Agency 1399 Test Cards/CN=Agency 1399 Card 01 Digital Signature
 V	240531000000Z		A0000000000000000006	unknown	/C=US/O=CertiPath LLC/OU=Agency 1399 Test Cards/CN=Agency 1399 Card 01 Key Management
@@ -97,4 +98,6 @@ R	240531000000Z	190107163250Z,cessationOfOperation	A0000000000000000060	unknown	
 R	240531000000Z	190107163250Z,cessationOfOperation	A0000000000000000061	unknown	/C=US/O=CertiPath LLC/OU=Agency 9199 Test Cards/CN=Agency 9199 Card 04 Digital Signature
 R	240531000000Z	190107163250Z,cessationOfOperation	A0000000000000000062	unknown	/C=US/O=CertiPath LLC/OU=Agency 9199 Test Cards/CN=Agency 9199 Card 04 Key Management
 R	240531000000Z	190107163250Z,cessationOfOperation	A0000000000000000063	unknown	/C=US/O=CertiPath LLC/OU=Agency 9199 Test Cards/serialNumber=D4E139D8286C2C10842125A16858286C0810842124E139C3E7
+=======
+>>>>>>> 679e932249f6d3b55ab86bef0f827318cbbb2dcf
 V	321230235959Z		A0000000000000000064	unknown	/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV Content Signer RSA 2048 gen3 no ocsp

@@ -312,44 +312,46 @@ reindex() {
 			popd >/dev/null 2>&1
 		done
 
-		echo "Creating index for RSA 2048 PIV certs..."
-		for D in $(ls -d 80_* 81_* 82_* 83_* 84_* 85_* 86_* 87_* 88_* 89_* 90_* 91_* 92_* 93_* 94_* 95_* 96_* 97_* 98_* 99_* 100_* 101_* 102_* 103_*)
-		do
-			pushd $D >/dev/null 2>&1
-				pwd
-				F="3 - ICAM_PIV_Auth_SP_800-73-4.p12"
-				G=$(basename "$F" .p12).crt
-				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
-				X=$(openssl x509 -serial -subject -in "$G" -noout) 
-				Y=$(openssl x509 -in "$G" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
-				STATUS=V
-				process piv-rsa-2048 $STATUS $Y $X
+		if [ $EXTRACARDS -eq 1 ]; then
+			echo "Creating index for RSA 2048 PIV certs..."
+			for D in $(ls -d 80_* 81_* 82_* 83_* 84_* 85_* 86_* 87_* 88_* 89_* 90_* 91_* 92_* 93_* 94_* 95_* 96_* 97_* 98_* 99_* 100_* 101_* 102_* 103_*)
+			do
+				pushd $D >/dev/null 2>&1
+					pwd
+					F="3 - ICAM_PIV_Auth_SP_800-73-4.p12"
+					G=$(basename "$F" .p12).crt
+					if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
+					X=$(openssl x509 -serial -subject -in "$G" -noout) 
+					Y=$(openssl x509 -in "$G" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME | tail -n 1 | awk '{ print $7 }' | sed 's/[:\r]//g')
+					STATUS=V
+					process piv-rsa-2048 $STATUS $Y $X
 
-				F="4 - ICAM_PIV_Dig_Sig_SP_800-73-4.p12"
-				G=$(basename "$F" .p12).crt
-				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
-				X=$(openssl x509 -serial -subject -in '4 - ICAM_PIV_Dig_Sig_SP_800-73-4.crt' -noout)
-				Y=$(openssl x509 -in "$G" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
-				STATUS=V
-				process piv-rsa-2048 $STATUS $Y $X
+					F="4 - ICAM_PIV_Dig_Sig_SP_800-73-4.p12"
+					G=$(basename "$F" .p12).crt
+					if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
+					X=$(openssl x509 -serial -subject -in '4 - ICAM_PIV_Dig_Sig_SP_800-73-4.crt' -noout)
+					Y=$(openssl x509 -in "$G" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
+					STATUS=V
+					process piv-rsa-2048 $STATUS $Y $X
 
-				F="5 - ICAM_PIV_Key_Mgmt_SP_800-73-4.p12"
-				G=$(basename "$F" .p12).crt
-				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
-				X=$(openssl x509 -serial -subject -in "$G" -noout)
-				Y=$(openssl x509 -in "$G" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
-				STATUS=V
-				process piv-rsa-2048 $STATUS $Y $X
-
-				F="6 - ICAM_PIV_Card_Auth_SP_800-73-4.p12"
-				G=$(basename "$F" .p12).crt
-				if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
-				X=$(openssl x509 -serial -subject -in "$G" -noout)
-				Y=$(openssl x509 -in "$G" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
-				STATUS=V
-				process piv-rsa-2048 $STATUS $Y $X
-			popd >/dev/null 2>&1
-		done
+					F="5 - ICAM_PIV_Key_Mgmt_SP_800-73-4.p12"
+					G=$(basename "$F" .p12).crt
+					if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
+					X=$(openssl x509 -serial -subject -in "$G" -noout)
+					Y=$(openssl x509 -in "$G" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
+					STATUS=V
+					process piv-rsa-2048 $STATUS $Y $X
+	
+					F="6 - ICAM_PIV_Card_Auth_SP_800-73-4.p12"
+					G=$(basename "$F" .p12).crt
+					if [ ! -f "$G" ]; then p12tocert "$F" "$G"; fi
+					X=$(openssl x509 -serial -subject -in "$G" -noout)
+					Y=$(openssl x509 -in "$G" -outform der 2>&10 | openssl asn1parse -inform der | grep UTCTIME  | tail -n 1| awk '{ print $7 }' | sed 's/[:\r]//g')
+					STATUS=V
+					process piv-rsa-2048 $STATUS $Y $X
+				popd >/dev/null 2>&1
+			done
+		fi
 	popd 
 
 	echo "Adding OCSP response, content signing certs to indices..."
@@ -418,8 +420,10 @@ reindex() {
 
 			cp $F ..
 
-			process "$T-$G" $STATUS $Y $X
-			cp -p $F ..
+			if [ "$T-$G" != "piv-rsa-2048" ] || [ $EXTRACARDS -eq 1 ]; then
+				process "$T-$G" $STATUS $Y $X
+				cp -p $F ..
+			fi
 		done
 
 		echo "Extracting certs from signing CA .p12 files..."
@@ -465,6 +469,11 @@ export GEN1CRL=1
 export GEN3CRL=1
 
 CWD=$(pwd)
+EXTRACARDS=0
+if [ -d ../cards/ICAM_Card_Objects/80_Test ]; then
+	EXTRACARDS=1
+fi
+
 PIVGEN1_DEST=$CWD/data/database/piv-gen1-2-index.txt
 PIVGEN3_DEST=$CWD/data/database/piv-gen3-index.txt
 PIVIGEN1_DEST=$CWD/data/database/pivi-gen1-2-index.txt
@@ -697,42 +706,43 @@ cp -p data/database/$(basename $PIVGEN1_LOCAL) .
 
 for F in 83 87 91 95 99 103
 do
-	cp -p ../cards/ICAM_Card_Objects/${F}_Test/3\ -\ ICAM_PIV_Auth_SP_800-73-4.crt data/pem/ICAM_Test_Card_${F}_PIV_Auth.crt
-	cp -p ../cards/ICAM_Card_Objects/${F}_Test/3\ -\ ICAM_PIV_Auth_SP_800-73-4.p12 data/pem/ICAM_Test_Card_${F}_PIV_Auth.p12
-	SUBJ=ICAM_Test_Card_${F}_PIV_Auth
-	ISSUER=ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3
-	CONFIG=${CWD}/icam-piv-rsa-2048-piv-auth.cnf
-	CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardRSA2048PIVSigningCA.crl
-	revoke $SUBJ $ISSUER $CONFIG pem $CRL 1
-	if [ $? -gt 0 ]; then exit 1; fi
+	if [ -d ../cards/ICAM_Card_Objects/${F}_Test ]; then
+		cp -p ../cards/ICAM_Card_Objects/${F}_Test/3\ -\ ICAM_PIV_Auth_SP_800-73-4.crt data/pem/ICAM_Test_Card_${F}_PIV_Auth.crt
+		cp -p ../cards/ICAM_Card_Objects/${F}_Test/3\ -\ ICAM_PIV_Auth_SP_800-73-4.p12 data/pem/ICAM_Test_Card_${F}_PIV_Auth.p12
+		SUBJ=ICAM_Test_Card_${F}_PIV_Auth
+		ISSUER=ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3
+		CONFIG=${CWD}/icam-piv-rsa-2048-piv-auth.cnf
+		CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardRSA2048PIVSigningCA.crl
+		revoke $SUBJ $ISSUER $CONFIG pem $CRL 1
+		if [ $? -gt 0 ]; then exit 1; fi
 
-	cp -p ../cards/ICAM_Card_Objects/${F}_Test/4\ -\ ICAM_PIV_Dig_Sig_SP_800-73-4.crt data/pem/ICAM_Test_Card_${F}_PIV_Dig_Sig.crt
-	cp -p ../cards/ICAM_Card_Objects/${F}_Test/4\ -\ ICAM_PIV_Dig_Sig_SP_800-73-4.p12 data/pem/ICAM_Test_Card_${F}_PIV_Dig_Sig.p12
-	SUBJ=ICAM_Test_Card_${F}_PIV_Dig_Sig
-	ISSUER=ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3
-	CONFIG=${CWD}/icam-piv-rsa-2048-piv-auth.cnf
-	CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardRSA2048PIVSigningCA.crl
-	revoke $SUBJ $ISSUER $CONFIG pem $CRL 1
-	if [ $? -gt 0 ]; then exit 1; fi
+		cp -p ../cards/ICAM_Card_Objects/${F}_Test/4\ -\ ICAM_PIV_Dig_Sig_SP_800-73-4.crt data/pem/ICAM_Test_Card_${F}_PIV_Dig_Sig.crt
+		cp -p ../cards/ICAM_Card_Objects/${F}_Test/4\ -\ ICAM_PIV_Dig_Sig_SP_800-73-4.p12 data/pem/ICAM_Test_Card_${F}_PIV_Dig_Sig.p12
+		SUBJ=ICAM_Test_Card_${F}_PIV_Dig_Sig
+		ISSUER=ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3
+		CONFIG=${CWD}/icam-piv-rsa-2048-piv-auth.cnf
+		CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardRSA2048PIVSigningCA.crl
+		revoke $SUBJ $ISSUER $CONFIG pem $CRL 1
+		if [ $? -gt 0 ]; then exit 1; fi
 
-	cp -p ../cards/ICAM_Card_Objects/${F}_Test/5\ -\ ICAM_PIV_Key_Mgmt_SP_800-73-4.crt data/pem/ICAM_Test_Card_${F}_PIV_Key_Mgmt.crt
-	cp -p ../cards/ICAM_Card_Objects/${F}_Test/5\ -\ ICAM_PIV_Key_Mgmt_SP_800-73-4.p12 data/pem/ICAM_Test_Card_${F}_PIV_Key_Mgmt.p12
-	SUBJ=ICAM_Test_Card_${F}_PIV_Key_Mgmt
-	ISSUER=ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3
-	CONFIG=${CWD}/icam-piv-rsa-2048-piv-auth.cnf
-	CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardRSA2048PIVSigningCA.crl
-	revoke $SUBJ $ISSUER $CONFIG pem $CRL 1
-	if [ $? -gt 0 ]; then exit 1; fi
+		cp -p ../cards/ICAM_Card_Objects/${F}_Test/5\ -\ ICAM_PIV_Key_Mgmt_SP_800-73-4.crt data/pem/ICAM_Test_Card_${F}_PIV_Key_Mgmt.crt
+		cp -p ../cards/ICAM_Card_Objects/${F}_Test/5\ -\ ICAM_PIV_Key_Mgmt_SP_800-73-4.p12 data/pem/ICAM_Test_Card_${F}_PIV_Key_Mgmt.p12
+		SUBJ=ICAM_Test_Card_${F}_PIV_Key_Mgmt
+		ISSUER=ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3
+		CONFIG=${CWD}/icam-piv-rsa-2048-piv-auth.cnf
+		CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardRSA2048PIVSigningCA.crl
+		revoke $SUBJ $ISSUER $CONFIG pem $CRL 1
+		if [ $? -gt 0 ]; then exit 1; 	fi
 
-	cp -p ../cards/ICAM_Card_Objects/${F}_Test/6\ -\ ICAM_PIV_Card_Auth_SP_800-73-4.crt data/pem/ICAM_Test_Card_${F}_PIV_Card_Auth.crt
-	cp -p ../cards/ICAM_Card_Objects/${F}_Test/6\ -\ ICAM_PIV_Card_Auth_SP_800-73-4.p12 data/pem/ICAM_Test_Card_${F}_PIV_Card_Auth.p12
-	SUBJ=ICAM_Test_Card_${F}_PIV_Card_Auth
-	ISSUER=ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3
-	CONFIG=${CWD}/icam-piv-rsa-2048-piv-auth.cnf
-	CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardRSA2048PIVSigningCA.crl
-	revoke $SUBJ $ISSUER $CONFIG pem $CRL 1
-	if [ $? -gt 0 ]; then exit 1; fi
-
+		cp -p ../cards/ICAM_Card_Objects/${F}_Test/6\ -\ ICAM_PIV_Card_Auth_SP_800-73-4.crt data/pem/ICAM_Test_Card_${F}_PIV_Card_Auth.crt
+		cp -p ../cards/ICAM_Card_Objects/${F}_Test/6\ -\ ICAM_PIV_Card_Auth_SP_800-73-4.p12 data/pem/ICAM_Test_Card_${F}_PIV_Card_Auth.p12
+		SUBJ=ICAM_Test_Card_${F}_PIV_Card_Auth
+		ISSUER=ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3
+		CONFIG=${CWD}/icam-piv-rsa-2048-piv-auth.cnf
+		CRL=${CWD}/../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/crls/ICAMTestCardRSA2048PIVSigningCA.crl
+		revoke $SUBJ $ISSUER $CONFIG pem $CRL 1
+		if [ $? -gt 0 ]; then exit 1; fi
+	fi
 done
 cp -p data/database/$(basename $PIVRSA2048_LOCAL) .
 
