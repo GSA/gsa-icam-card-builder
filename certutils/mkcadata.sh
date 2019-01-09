@@ -146,9 +146,12 @@ reindex() {
 	>$PIVGEN3_LOCAL
 	>$PIVIGEN1_LOCAL
 	>$PIVIGEN3_LOCAL
-	>$PIVRSA2048_LOCAL
 	>$PIVGEN3P384_LOCAL
 	>$PIVGEN3P256_LOCAL
+
+	if [ $EXTRACARDS -eq 1 ]; then
+		>$PIVRSA2048_LOCAL
+	fi
 
 	pushd ../cards/ICAM_Card_Objects >/dev/null 2>&1
 		echo "Creating index for Gen1-2 PIV certs..."
