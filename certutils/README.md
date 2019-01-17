@@ -190,6 +190,21 @@ an ability to create customized certificates for each certificate and card type
 (PIV or PIV-I). The goal here is to create `.p12` files for each certificate you
 plan to load on to the smart card.
 
+### Policy OID Configuration
+For FIPS 201 testing, a FICAM PACS must support the ability to configure multiple
+certificate policy OIDs per card type/certificate type combination.
+For both PIV and PIV-I card types, there are three required certificates:
+
+* PIV Authentication Certificate
+* Card Authentication Certificate
+* Content Signing Certificate
+
+A minimum of six user-initial-policy-sets, therefore, are configured by the lab in
+a "set and forget" manner, simulating field deployment. Because a PACS PIV card
+population can include multiple certificate policy OIDs for a particular certificate
+type, a FICAM PACS is required to determine which certificate policy OID(s) should be
+passed to the PDVAL processor for any given certificate on any given card.
+
 ### NIST Test Certificate Policy OIDS
 The certificate policies OIDS for FIPS 201-2 PIV cards that this project uses are 
 below.  They use the NIST test OIDs that are designated to mimic production OIDs.
