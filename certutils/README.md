@@ -205,12 +205,15 @@ population can include multiple certificate policy OIDs for a particular certifi
 type, a FICAM PACS is required to determine which certificate policy OID(s) should be
 passed to the PDVAL processor for any given certificate on any given card.
 
-### NIST Test Certificate Policy OIDS
+The next sub-sections define all of the certificate policy and extended key usage
+keyUsageId OIDs used in FIPS 201 FICAM testing.
+
+#### NIST Test Certificate Policy OIDS
 The certificate policies OIDS for FIPS 201-2 PIV cards that this project uses are 
 below.  They use the NIST test OIDs that are designated to mimic production OIDs.
 Validation systems should configure their initial policy sets as follows:
 
-#### PIV Card Certificate Policy Test OIDs<a name="piv_test_oids"></a>
+##### PIV Card Certificate Policy Test OIDs<a name="piv_test_oids"></a>
 |Certificate Name|EE Certificate Policy OID|
 |----------------|-------------------------|
 |PIV Authentication|2.16.840.1.101.3.2.1.48.11|
@@ -223,7 +226,7 @@ Validation systems should configure their initial policy sets as follows:
 
 \* Older ICAM Test Cards 1-24 erroneously use 2.16.840.1.101.3.2.1.48.9 as the content signing certificate OID. This was corrected for ICAM Test Cards re-encoded in May 2018.
 
-#### PIV-I Card Certificate Policy Test OIDs<a name="pivi_test_oids"></a>
+##### PIV-I Card Certificate Policy Test OIDs<a name="pivi_test_oids"></a>
 The certificate policies for PIV-I cards that this project uses are below.  With 
 PIV-I cards, the certificate policies on the certificates must correctly map
 to an initial policy on the validation system.  The PIV-I Signing CA cert contains
@@ -246,13 +249,13 @@ initial policy set.*
 
 The normative reference for these policies can be found at [FPKI CITE](https://www.idmanagement.gov/wp-content/uploads/sites/1171/uploads/fpki-cite-participation-guide.pdf).
 
-### Production PIV and PIV-I Card Certificate Policy OIDs
+#### Production PIV and PIV-I Card Certificate Policy OIDs
 The certificate policy OIDs used by the Federal Government are found
 on Federally-issued PIV cards. The certificate bundles and CRLs needed
 in your computer's trust store in order to validate PIV cards can be
 downloaded from [Federal Public Key Infrastructure Guides->Certificates and CRLs](https://fpki.idmanagement.gov/crls/).
 
-#### PIV Card Certificate Policy OIDs<a name="piv_production_oids"></a>
+##### PIV Card Certificate Policy OIDs<a name="piv_production_oids"></a>
 |Certificate Name|EE Certificate Policy OID|
 |----------------|-------------------------|
 |PIV Authentication|2.16.840.1.101.3.2.1.3.13|
@@ -268,7 +271,7 @@ downloaded from [Federal Public Key Infrastructure Guides->Certificates and CRLs
 2.16.840.1.101.3.2.1.3.7 (id-fpki-common-hardware)
 2.16.840.1.101.3.2.1.3.16 (id-fpki-common-High)
 
-#### PIV-I Card Certificate Policy OIDs<a name="pivi_production_oids"></a>
+##### PIV-I Card Certificate Policy OIDs<a name="pivi_production_oids"></a>
 Certificate policies for PIV-I cards are below.  With PIV-I cards, the 
 certificate policies on the certificates must correctly map to an 
 initial policy on the relying party validation system.  The PIV-I 
