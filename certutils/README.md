@@ -1,11 +1,11 @@
-## Certificate Utilities
+# Certificate Utilities
 There are multiple utilities in this directory.  The purpose, usage instructions and
 other information is provided in the following sections. 
 
 These utilities are to be run in a RHEL/CentOS Linux, MAC OS X, or Cygwin environment only.
 There is currently no DOS Command Window or Windows Power Shell equivalent.
 
-### Purpose
+## Purpose
 In order to customize the certificates to create certain test case scenarios,
 we need a way to configure and generate them. There are 3 types of End Entity
 (EE) certificates.
@@ -20,7 +20,7 @@ to be written to the corresponding container.  If on-card key generation is used
 then these utilities are not needed.  Key injection is a way to expedite test card
 population.  It should *never* be used to create production cards.
 
-### Batch Mode Generation
+## Batch Mode Generation
 A batch-mode utility, `makeall.sh` creates the four certificates for all ICAM
 test cards that use the SP 800-73-4 (FIPS 201-2) data model, starting with Card 25. 
 It creates the PKCS12 `.p12` files and copies them into the appropriate "cards/ICAM_Card_Objects"
@@ -31,12 +31,12 @@ Certificates that are supposed to be revoked as part of a test case are first
 created, and then revoked using OpenSSL's `openssl ca` command.  See the `mkcadata.sh`
 further down this page.
 
-### Single Certificate Generation
+## Single Certificate Generation
 The `certutils` directory contains a bash script, `mkcert.sh` that uses command
 line options to select an OpenSSL `.cnf` file that can request and sign private keys
 for any of the four certificates on a PIV or PIV-I card.
 
-#### mkcert.sh
+### mkcert.sh
 
 The `mkcert.sh` script creates the `.p12` files used by a smart card population
 tool that supports off-card key generation and key injection.  
@@ -122,11 +122,11 @@ By studying the command structure, you can tailor additional certificates by cre
 your own  OpenSSL configuration files and executing your customized `mkcert.sh` 
 command line.
 
-### Multiple Certificate Generation with Copy
+## Multiple Certificate Generation with Copy
 
 For the FIPS 201-2 cards in this project, a convenience utility has been developed.
 
-#### mkall.sh
+### mkall.sh
 
 The `mkall.sh` script creates certificates for all of the FIPS 201-2 cards using
 the existing OpenSSL configuration files.  It runs in `mkcert.sh` in batch mode, so
@@ -142,7 +142,7 @@ to generate its own key pairs, in which case, the process described thus far may
 need to be updated to reflect on-card key generation and signing by a CA that you
 maintain.
 
-#### mkcadata.sh
+### mkcadata.sh
 
 The `mkcadata.sh` script traverses all of the card directories as well as the
 content and OCSP signing directories to re-index the CA database and collect all
@@ -173,7 +173,7 @@ CRLs stay in sync.
 Finally, all of the artifacts are gathered up into two tarballs and placed into the `responder`
 directory where they can be installed using the `install-responder.sh` script.
 
-#### ocsptest.sh
+### ocsptest.sh
 
 The `ocsptest.sh` script script traverses all of the card directories and matches
 certificates' AIA URI fields with a known responder. Because the response signing
@@ -184,13 +184,13 @@ which results in a "good", "revoked", or "unknown" status.
 The `openssl ocsp` command is used.  Note that `openssl` versions prior to 1.1 
 do not support the necessary `-header` option needed to make the query.
 
-### OpenSSL Configuration Files
+## OpenSSL Configuration Files
 Each certificate on each card has its own OpenSSL configuration file, providing
 an ability to create customized certificates for each certificate and card type
 (PIV or PIV-I). The goal here is to create `.p12` files for each certificate you
 plan to load on to the smart card.
 
-### Policy OID Configuration
+## Policy OID Configuration
 For FIPS 201 testing, a FICAM PACS must support the ability to configure multiple
 certificate policy OIDs per card type/certificate type combination.
 For both PIV and PIV-I card types, there are three required certificates:
@@ -208,12 +208,12 @@ passed to the PDVAL processor for any given certificate on any given card.
 The next sub-sections define all of the certificate policy and extended key usage
 keyUsageId OIDs used in FIPS 201 FICAM testing.
 
-#### NIST Test Certificate Policy OIDS
+### NIST Test Certificate Policy OIDS
 The certificate policies OIDS for FIPS 201-2 PIV cards that this project uses are 
 below.  They use the NIST test OIDs that are designated to mimic production OIDs.
 Validation systems should configure their initial policy sets as follows:
 
-##### PIV Card Certificate Policy Test OIDs<a name="piv_test_oids"></a>
+#### PIV Card Certificate Policy Test OIDs<a name="piv_test_oids"></a>
 |Certificate Name|EE Certificate Policy OID|
 |----------------|-------------------------|
 |PIV Authentication|2.16.840.1.101.3.2.1.48.11|
@@ -226,7 +226,7 @@ Validation systems should configure their initial policy sets as follows:
 
 \* Older ICAM Test Cards 1-24 erroneously use 2.16.840.1.101.3.2.1.48.9 as the content signing certificate OID. This was corrected for ICAM Test Cards re-encoded in May 2018.
 
-##### PIV-I Card Certificate Policy Test OIDs<a name="pivi_test_oids"></a>
+#### PIV-I Card Certificate Policy Test OIDs<a name="pivi_test_oids"></a>
 The certificate policies for PIV-I cards that this project uses are below.  With 
 PIV-I cards, the certificate policies on the certificates must correctly map
 to an initial policy on the validation system.  The PIV-I Signing CA cert contains
@@ -249,13 +249,13 @@ initial policy set.*
 
 The normative reference for these policies can be found at [FPKI CITE](https://www.idmanagement.gov/wp-content/uploads/sites/1171/uploads/fpki-cite-participation-guide.pdf).
 
-#### Production PIV and PIV-I Card Certificate Policy OIDs
+### Production PIV and PIV-I Card Certificate Policy OIDs
 The certificate policy OIDs used by the Federal Government are found
 on Federally-issued PIV cards. The certificate bundles and CRLs needed
 in your computer's trust store in order to validate PIV cards can be
 downloaded from [Federal Public Key Infrastructure Guides->Certificates and CRLs](https://fpki.idmanagement.gov/crls/).
 
-##### PIV Card Certificate Policy OIDs<a name="piv_production_oids"></a>
+#### PIV Card Certificate Policy OIDs<a name="piv_production_oids"></a>
 |Certificate Name|EE Certificate Policy OID|
 |----------------|-------------------------|
 |PIV Authentication|2.16.840.1.101.3.2.1.3.13|
@@ -271,7 +271,7 @@ downloaded from [Federal Public Key Infrastructure Guides->Certificates and CRLs
 2.16.840.1.101.3.2.1.3.7 (id-fpki-common-hardware)
 2.16.840.1.101.3.2.1.3.16 (id-fpki-common-High)
 
-##### PIV-I Card Certificate Policy OIDs<a name="pivi_production_oids"></a>
+#### PIV-I Card Certificate Policy OIDs<a name="pivi_production_oids"></a>
 Certificate policies for PIV-I cards are below.  With PIV-I cards, the 
 certificate policies on the certificates must correctly map to an 
 initial policy on the relying party validation system.  The PIV-I 
