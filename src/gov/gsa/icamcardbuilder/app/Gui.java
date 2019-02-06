@@ -70,11 +70,12 @@ import javax.swing.JComboBox;
 import javax.swing.JTextPane;
 import java.awt.Component;
 import javax.swing.DropMode;
+import javax.swing.JToggleButton;
 
 public class Gui extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	protected final static String version = "1.8.73";
+	protected final static String version = "1.8.74";
 	protected static String cardsDirectory = null;
 	private static String cardsDirectoryArg = null;
 	protected static boolean debug = true;
@@ -163,6 +164,8 @@ public class Gui extends JPanel {
 	protected File propertiesFiles[];
 	protected String digestAlgorithm = null;
 	protected String signatureAlgorithm = null;
+	protected static boolean useAppPin = true;
+
 	protected static String currentDirectory = null;
 	protected static String expirationDate = null;
 	protected static String piName = null;
@@ -671,11 +674,11 @@ public class Gui extends JPanel {
 
 		frame.setJMenuBar(menuBar);
 		
-		// card specific stuff is in a separate class. Make sure it's instantiated before creating the panel.
+		// Card specific stuff is in a separate class. Make sure it's instantiated before creating the panel.
 		cardCommunicationController = new CardCommunicationController();
 		cardCommunicationController.initLibrary();
 		logger.debug("Added card communication controller");
-		JComponent panel1 = makeTextPanel("Card encoding controls go here.");
+		JComponent panel1 = makeTextPanel("Card utility controls go here.");
 		tabbedPane.addTab("Card Utilities", null, panel1, "Card utilities");
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
 
@@ -696,8 +699,6 @@ public class Gui extends JPanel {
 		setLayout(groupLayout);
 
 		logger.debug("Finished GUI creation");
-		
-		
 	}
 	
 	private void clearForm() throws InterruptedException {
@@ -1050,10 +1051,12 @@ public class Gui extends JPanel {
 		lblGpKey.setHorizontalAlignment(SwingConstants.RIGHT);
 		
 		pinTextField = new JPasswordField();
+		pinTextField.setToolTipText("Enter a 6 to 8 digit PIN for this card");
 		
 		gpKeyTextField = new JTextField();
 		
 		readerComboBox = new JComboBox<String>();
+		readerComboBox.setToolTipText("Select the reader to use for these operations");
 		readerComboBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String readerName = (String) readerComboBox.getSelectedItem();
@@ -1072,6 +1075,7 @@ public class Gui extends JPanel {
 		JButton btnLogin = new JButton("Login");
 		
 		JButton btnRefresh = new JButton("Refresh");
+		btnRefresh.setToolTipText("Click to refresh the list of readers attached to this computer");
 		btnRefresh.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				readerComboBox.removeAllItems();
@@ -1099,50 +1103,54 @@ public class Gui extends JPanel {
 		JTextPane txtpnOutput = new JTextPane();
 		txtpnOutput.setText("");
 		
-		JButton btnRetryCountglobal = new JButton("Retry Count (Global)");
-		btnRetryCountglobal.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int result = cardCommunicationController.getGlobalRetries();
-				if(result != -1) {
-					txtpnOutput.setText(String.format("%d attempts remain for global PIN", result));
-				} else {
-					txtpnOutput.setText("Failed to retrieve attempts remaining for global PIN");
-				}
-			}
-		});
-		
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				boolean rv = cardCommunicationController.performLogin(pinTextField.getPassword());
-				if(rv) {
-					txtpnOutput.setText("Login successful.");
-				} else {
-					StringBuilder messageBuilder = new StringBuilder();
-					int triesRemaining = cardCommunicationController.getLastLoginResult();
-					messageBuilder.append("Login failed.\n");
-					if(triesRemaining > 0) {
-						messageBuilder.append(triesRemaining + " attempts remaining.\n");
+				try {
+					boolean rv = cardCommunicationController.performLogin(pinTextField.getPassword(), useAppPin);
+					if(rv) {
+						txtpnOutput.setText("Login successful.");
+					} else {
+						StringBuilder messageBuilder = new StringBuilder();
+						int triesRemaining = cardCommunicationController.getLastLoginResult();
+						messageBuilder.append("Login failed.\n");
+						if(triesRemaining > 0) {
+							messageBuilder.append(triesRemaining + " attempts remaining.\n");
+						}
+						txtpnOutput.setText(messageBuilder.toString());
 					}
-					txtpnOutput.setText(messageBuilder.toString());
+				} catch (Exception ex) {
+					txtpnOutput.setText(ex.getLocalizedMessage());
 				}
 			}
 		});
 		
 		
-		JButton btnRetryCountpiv = new JButton("Retry Count (PIV)");
-		btnRetryCountpiv.addActionListener(new ActionListener() {
+		JButton btnRetryCounts = new JButton("Retry Counts");
+		btnRetryCounts.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int result = cardCommunicationController.getPIVRetries();
-				if(result != -1) {
-					txtpnOutput.setText(String.format("%d attempts remain for PIV application PIN", result));
+				int encodedResult = cardCommunicationController.getEncodedRetries();
+				if(encodedResult != -1) {
+					txtpnOutput.setText(String.format("Application PIN retries: %d\nGlobal PIN retries: %d\n", (encodedResult & 0xf0) >> 4, encodedResult & 0xf));
 				} else {
-					txtpnOutput.setText("Failed to retrieve attempts remaining for PIV application PIN");
+					txtpnOutput.setText("Failed to retrieve remaining attempts.  See log for details.");
 				}
 			}
 		});
+		
+		JToggleButton tglbtnPinTypeToggleButton = new JToggleButton("PIV PIN");
+		tglbtnPinTypeToggleButton.setSelected(useAppPin);
+		tglbtnPinTypeToggleButton.setToolTipText("Click to toggle states between PIV and Global PIN when logging in");		
+		tglbtnPinTypeToggleButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// Toggle the application (PIV) PIN flag
+				useAppPin = (useAppPin) ? false : true;
+				tglbtnPinTypeToggleButton.setText((useAppPin) ? "PIV PIN" : "Global PIN");
+			}
+		});
+				
 		GroupLayout gl_cardEncoderPanel = new GroupLayout(cardUtilitiesPanel);
 		gl_cardEncoderPanel.setHorizontalGroup(
-			gl_cardEncoderPanel.createParallelGroup(Alignment.LEADING)
+			gl_cardEncoderPanel.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_cardEncoderPanel.createSequentialGroup()
 					.addGroup(gl_cardEncoderPanel.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_cardEncoderPanel.createSequentialGroup()
@@ -1151,30 +1159,31 @@ public class Gui extends JPanel {
 								.addComponent(lblApdu)
 								.addComponent(lblGpKey)))
 						.addGroup(gl_cardEncoderPanel.createSequentialGroup()
-							.addContainerGap()
+							.addContainerGap(23, Short.MAX_VALUE)
 							.addGroup(gl_cardEncoderPanel.createParallelGroup(Alignment.TRAILING)
-								.addComponent(lblPin)
-								.addComponent(lblReader))))
-					.addGap(21)
+								.addComponent(lblReader)
+								.addComponent(lblPin))))
+					.addGap(102)
 					.addGroup(gl_cardEncoderPanel.createParallelGroup(Alignment.LEADING)
-						.addGroup(Alignment.TRAILING, gl_cardEncoderPanel.createSequentialGroup()
-							.addComponent(apduTextField, GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
-							.addGap(27)
-							.addComponent(btnSend))
-						.addGroup(Alignment.TRAILING, gl_cardEncoderPanel.createSequentialGroup()
-							.addComponent(readerComboBox, 0, 507, Short.MAX_VALUE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnRefresh))
-						.addComponent(btnEstablishSecureChannel, Alignment.TRAILING)
-						.addComponent(txtpnOutput, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 584, Short.MAX_VALUE)
-						.addGroup(gl_cardEncoderPanel.createSequentialGroup()
-							.addComponent(pinTextField, GroupLayout.PREFERRED_SIZE, 78, GroupLayout.PREFERRED_SIZE)
-							.addGap(26)
-							.addComponent(btnLogin))
-						.addComponent(gpKeyTextField, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 584, Short.MAX_VALUE)
-						.addGroup(gl_cardEncoderPanel.createParallelGroup(Alignment.TRAILING, false)
-							.addComponent(btnRetryCountpiv, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-							.addComponent(btnRetryCountglobal, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+						.addComponent(btnRetryCounts)
+						.addGroup(Alignment.TRAILING, gl_cardEncoderPanel.createParallelGroup(Alignment.TRAILING)
+							.addGroup(gl_cardEncoderPanel.createSequentialGroup()
+								.addComponent(apduTextField, GroupLayout.DEFAULT_SIZE, 417, Short.MAX_VALUE)
+								.addGap(27)
+								.addComponent(btnSend))
+							.addGroup(gl_cardEncoderPanel.createSequentialGroup()
+								.addComponent(readerComboBox, 0, 424, Short.MAX_VALUE)
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addComponent(btnRefresh))
+							.addComponent(btnEstablishSecureChannel)
+							.addComponent(txtpnOutput, GroupLayout.DEFAULT_SIZE, 501, Short.MAX_VALUE)
+							.addComponent(gpKeyTextField, GroupLayout.DEFAULT_SIZE, 501, Short.MAX_VALUE)
+							.addGroup(Alignment.LEADING, gl_cardEncoderPanel.createSequentialGroup()
+								.addComponent(pinTextField, GroupLayout.PREFERRED_SIZE, 78, GroupLayout.PREFERRED_SIZE)
+								.addGap(27)
+								.addComponent(tglbtnPinTypeToggleButton)
+								.addGap(18)
+								.addComponent(btnLogin))))
 					.addContainerGap())
 		);
 		gl_cardEncoderPanel.setVerticalGroup(
@@ -1186,17 +1195,14 @@ public class Gui extends JPanel {
 						.addComponent(btnRefresh)
 						.addComponent(readerComboBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(18)
-					.addGroup(gl_cardEncoderPanel.createParallelGroup(Alignment.LEADING)
+					.addGroup(gl_cardEncoderPanel.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblPin)
-						.addGroup(gl_cardEncoderPanel.createSequentialGroup()
-							.addGroup(gl_cardEncoderPanel.createParallelGroup(Alignment.BASELINE)
-								.addComponent(pinTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(btnLogin))
-							.addGap(18)
-							.addComponent(btnRetryCountglobal)))
+						.addComponent(pinTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tglbtnPinTypeToggleButton)
+						.addComponent(btnLogin))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(btnRetryCountpiv)
-					.addGap(81)
+					.addComponent(btnRetryCounts)
+					.addGap(122)
 					.addGroup(gl_cardEncoderPanel.createParallelGroup(Alignment.BASELINE)
 						.addComponent(gpKeyTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblGpKey))
@@ -1473,8 +1479,5 @@ public class Gui extends JPanel {
 				createAndShowGUI();
 			}
 		});
-	}
-	protected JComboBox<String> getReaderComboBox() {
-		return readerComboBox;
 	}
 }

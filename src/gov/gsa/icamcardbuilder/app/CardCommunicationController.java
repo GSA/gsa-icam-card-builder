@@ -1,11 +1,9 @@
 package gov.gsa.icamcardbuilder.app;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.smartcardio.CardException;
 import javax.smartcardio.CardTerminal;
-import javax.smartcardio.TerminalFactory;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,7 +17,6 @@ import gov.gsa.pivconformance.card.client.MiddlewareStatus;
 import gov.gsa.pivconformance.card.client.PIVAuthenticators;
 import gov.gsa.pivconformance.card.client.PIVMiddleware;
 import gov.gsa.pivconformance.utils.PCSCUtils;
-
 
 public class CardCommunicationController {
 	CardTerminal m_terminal;
@@ -57,7 +54,7 @@ public class CardCommunicationController {
 	
 	// log into the card using the PIN from the GUI. This currently assumes the application PIN
 	// but will likely get a checkbox and a flag to use global
-	public boolean performLogin(char[] pin)
+	public boolean performLogin(char[] pin, boolean useAppPin)
 	{
 		if(m_terminal == null) return false;
 		try {
@@ -70,7 +67,12 @@ public class CardCommunicationController {
 			return false;
 		}
 		PIVAuthenticators pivAuthenticators = new PIVAuthenticators();
-		pivAuthenticators.addApplicationPin(new String(pin));
+		if (useAppPin) {
+			pivAuthenticators.addApplicationPin(new String (pin));
+		} else {
+			pivAuthenticators.addGlobalPin(new String(pin));
+		}
+
 		ConnectionDescription cd = ConnectionDescription.createFromTerminal(m_terminal);
 		CardHandle ch = new CardHandle();
 		MiddlewareStatus result = PIVMiddleware.pivConnect(false, cd, ch);
@@ -104,43 +106,14 @@ public class CardCommunicationController {
 		return "80 00";
 	}
 	
-	// get the global PIN retry counter. needs more logging/error reporting but is functional for the first swipe
-	public int getGlobalRetries()
+	/*
+	 * Gets the Global and Application (PIV) PIN retry counts
+	 * returns the number of retries or -1 if an error occurs
+	 */
+	public int getEncodedRetries()
 	{
-		if(m_terminal == null) return -1;
-		try {
-			if(!m_terminal.isCardPresent()) {
-				m_logger.error("No card present in {}", m_terminal.getName());
-				return -1;
-			}
-		} catch (CardException e) {
-			m_logger.error("Exception when querying terminal for card", e);
-			return -1;
-		}
-		PIVAuthenticators pivAuthenticators = new PIVAuthenticators();
-		pivAuthenticators.addGlobalPin("");
-		ConnectionDescription cd = ConnectionDescription.createFromTerminal(m_terminal);
-		CardHandle ch = new CardHandle();
-		MiddlewareStatus result = PIVMiddleware.pivConnect(false, cd, ch);
-		if(result != MiddlewareStatus.PIV_OK) return -1;
-		DefaultPIVApplication piv = new DefaultPIVApplication();
-        ApplicationProperties cardAppProperties = new ApplicationProperties();
-		ApplicationAID aid = new ApplicationAID();
-		result = piv.pivSelectCardApplication(ch, aid, cardAppProperties);
-		if(result != MiddlewareStatus.PIV_OK) return -1;
-		result = piv.pivLogIntoCardApplication(ch, pivAuthenticators.getBytes());
-		if(result == MiddlewareStatus.PIV_AUTHENTICATION_FAILURE) {
-			int rv = PCSCUtils.StatusWordsToRetries(piv.getLastResponseAPDUBytes());
-			m_logger.info("Global PIN: {} retries remain", rv);
-			return rv;
-		}
-		return -1;
+		int rv = -1;
 		
-	}
-	
-	// get the application PIN retry counter. needs more logging/error reporting but is functional for the first swipe
-	public int getPIVRetries()
-	{
 		if(m_terminal == null) return -1;
 		try {
 			if(!m_terminal.isCardPresent()) {
@@ -152,31 +125,49 @@ public class CardCommunicationController {
 			return -1;
 		}
 		
-		PIVAuthenticators pivAuthenticators = new PIVAuthenticators();
-		pivAuthenticators.addApplicationPin("");
 		ConnectionDescription cd = ConnectionDescription.createFromTerminal(m_terminal);
 		CardHandle ch = new CardHandle();
 		MiddlewareStatus result = PIVMiddleware.pivConnect(false, cd, ch);
+
 		try {
-			// make sure we're logged out, as this call doesn't work if logged in
-			ch.getCard().disconnect(true);
-			result = PIVMiddleware.pivConnect(false, cd, ch);
-		} catch (CardException e) {
-			m_logger.debug("Attempt at card reset failed. Trying to proceed.");
-		}
-		if(result != MiddlewareStatus.PIV_OK) return -1;
-		DefaultPIVApplication piv = new DefaultPIVApplication();
-        ApplicationProperties cardAppProperties = new ApplicationProperties();
-		ApplicationAID aid = new ApplicationAID();
-		result = piv.pivSelectCardApplication(ch, aid, cardAppProperties);
-		if(result != MiddlewareStatus.PIV_OK) return -1;
-		result = piv.pivLogIntoCardApplication(ch, pivAuthenticators.getBytes());
-		if(result == MiddlewareStatus.PIV_AUTHENTICATION_FAILURE) {
-			int rv = PCSCUtils.StatusWordsToRetries(piv.getLastResponseAPDUBytes());
-			m_logger.info("Application PIN: {} retries remain", rv);
+			if(result != MiddlewareStatus.PIV_OK)
+				return -1;
+			
+			try {
+				// Make sure we're logged out, as this call doesn't work if logged in
+				ch.getCard().disconnect(true);
+				result = PIVMiddleware.pivConnect(false, cd, ch);
+			} catch (CardException e) {
+				m_logger.debug("Attempt at card reset failed. Trying to proceed.");
+			}
+		
+			DefaultPIVApplication piv = new DefaultPIVApplication();
+	        ApplicationProperties cardAppProperties = new ApplicationProperties();
+			ApplicationAID aid = new ApplicationAID();
+			result = piv.pivSelectCardApplication(ch, aid, cardAppProperties);
+			if(result != MiddlewareStatus.PIV_OK)
+				return -1;
+			
+			PIVAuthenticators pivAuthenticators = new PIVAuthenticators();
+			
+			pivAuthenticators.addApplicationPin("");
+			result = piv.pivLogIntoCardApplication(ch, pivAuthenticators.getBytes());
+			if(result == MiddlewareStatus.PIV_AUTHENTICATION_FAILURE) {
+				rv = (PCSCUtils.StatusWordsToRetries(piv.getLastResponseAPDUBytes()) & 0xf) << 4;
+			}
+
+			pivAuthenticators = new PIVAuthenticators();
+			
+			pivAuthenticators.addGlobalPin("");
+			result = piv.pivLogIntoCardApplication(ch, pivAuthenticators.getBytes());
+			if(result == MiddlewareStatus.PIV_AUTHENTICATION_FAILURE) {
+				rv |= PCSCUtils.StatusWordsToRetries(piv.getLastResponseAPDUBytes()) & 0xf;
+				m_logger.info("Global PIN: {} retries remain", rv);
+			}
 			return rv;
+		} catch (Exception ex) {
+			m_logger.error("Error: {}", ex.getLocalizedMessage());
 		}
-		return -1;
+		return rv;
 	}
-	
 }
