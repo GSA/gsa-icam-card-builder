@@ -106,6 +106,31 @@ public class CardCommunicationController {
 		return "80 00";
 	}
 	
+	public byte[] getATR()
+	{
+		if(m_terminal == null) {
+			m_logger.error("No card reader found.");
+			return null;
+		}
+		try {
+			if(!m_terminal.isCardPresent()) {
+				m_logger.error("No card is available in the selected reader");
+				return null;
+			}
+		} catch (CardException e) {
+			m_logger.error("Unable to communicate with card.", e);
+			return null;
+		}
+		ConnectionDescription cd = ConnectionDescription.createFromTerminal(m_terminal);
+		CardHandle ch = new CardHandle();
+		MiddlewareStatus result = PIVMiddleware.pivConnect(false, cd, ch);
+		if(result != MiddlewareStatus.PIV_OK) {
+			m_logger.error("PIV connection error");
+			return null;
+		}
+		return ch.getCard().getATR().getBytes();
+	}
+	
 	/*
 	 * Gets the Global and Application (PIV) PIN retry counts
 	 * returns the number of retries or -1 if an error occurs

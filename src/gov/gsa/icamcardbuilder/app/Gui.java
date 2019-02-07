@@ -61,6 +61,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 
+import org.apache.commons.codec.binary.Hex;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -186,6 +187,7 @@ public class Gui extends JPanel {
 	
 	private CardCommunicationController cardCommunicationController;
 	private JComboBox<String> readerComboBox;
+	private JButton btnGetAtr;
 
 	public Gui(JFrame frame) {
 		setPreferredSize(new Dimension(680, 800));
@@ -1147,6 +1149,19 @@ public class Gui extends JPanel {
 				tglbtnPinTypeToggleButton.setText((useAppPin) ? "PIV PIN" : "Global PIN");
 			}
 		});
+		
+		btnGetAtr = new JButton("Get ATR");
+		btnGetAtr.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				byte[] atrBytes = cardCommunicationController.getATR();
+				if(atrBytes == null) {
+					txtpnOutput.setText(String.format("Unable to read ATR from card"));
+					return;
+				}
+				String atr = Hex.encodeHexString(atrBytes);
+				txtpnOutput.setText(String.format("ATR: %s", atr));
+			}
+		});
 				
 		GroupLayout gl_cardEncoderPanel = new GroupLayout(cardUtilitiesPanel);
 		gl_cardEncoderPanel.setHorizontalGroup(
@@ -1166,19 +1181,20 @@ public class Gui extends JPanel {
 					.addGap(102)
 					.addGroup(gl_cardEncoderPanel.createParallelGroup(Alignment.LEADING)
 						.addComponent(btnRetryCounts)
-						.addGroup(Alignment.TRAILING, gl_cardEncoderPanel.createParallelGroup(Alignment.TRAILING)
+						.addGroup(Alignment.TRAILING, gl_cardEncoderPanel.createParallelGroup(Alignment.LEADING)
+							.addComponent(btnGetAtr)
 							.addGroup(gl_cardEncoderPanel.createSequentialGroup()
-								.addComponent(apduTextField, GroupLayout.DEFAULT_SIZE, 417, Short.MAX_VALUE)
+								.addComponent(apduTextField, GroupLayout.DEFAULT_SIZE, 389, Short.MAX_VALUE)
 								.addGap(27)
 								.addComponent(btnSend))
 							.addGroup(gl_cardEncoderPanel.createSequentialGroup()
-								.addComponent(readerComboBox, 0, 424, Short.MAX_VALUE)
+								.addComponent(readerComboBox, 0, 393, Short.MAX_VALUE)
 								.addPreferredGap(ComponentPlacement.RELATED)
 								.addComponent(btnRefresh))
 							.addComponent(btnEstablishSecureChannel)
-							.addComponent(txtpnOutput, GroupLayout.DEFAULT_SIZE, 501, Short.MAX_VALUE)
-							.addComponent(gpKeyTextField, GroupLayout.DEFAULT_SIZE, 501, Short.MAX_VALUE)
-							.addGroup(Alignment.LEADING, gl_cardEncoderPanel.createSequentialGroup()
+							.addComponent(txtpnOutput, GroupLayout.DEFAULT_SIZE, 485, Short.MAX_VALUE)
+							.addComponent(gpKeyTextField, GroupLayout.DEFAULT_SIZE, 485, Short.MAX_VALUE)
+							.addGroup(gl_cardEncoderPanel.createSequentialGroup()
 								.addComponent(pinTextField, GroupLayout.PREFERRED_SIZE, 78, GroupLayout.PREFERRED_SIZE)
 								.addGap(27)
 								.addComponent(tglbtnPinTypeToggleButton)
@@ -1202,7 +1218,9 @@ public class Gui extends JPanel {
 						.addComponent(btnLogin))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addComponent(btnRetryCounts)
-					.addGap(122)
+					.addGap(91)
+					.addComponent(btnGetAtr)
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_cardEncoderPanel.createParallelGroup(Alignment.BASELINE)
 						.addComponent(gpKeyTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblGpKey))
