@@ -1,6 +1,6 @@
 # gsa-icam-card-builder
 
-## Announcment
+## Announcement
 
 Starting with Release 1.8.74, you can run the card builder tool's `.jar` file via `start-signer.sh` or `start-signer.bat`. When the GUI appears, flip to the second tab called "Card Utilities" and use the PIN *Retry Counts* button to check the number of retries for both PINs.  You can do this without having to provide a PIN. That prevents the retry counter from decrementing just to learn the number of retries.
 
