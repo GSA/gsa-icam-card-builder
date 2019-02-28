@@ -1,4 +1,16 @@
 # gsa-icam-card-builder
+
+## Announcment
+
+Starting with Release 1.8.74, you can run the card builder tool's `.jar` file via `start-signer.sh` or `start-signer.bat`. When the GUI appears, flip to the second tab called "Card Utilities" and use the PIN *Retry Counts* button to check the number of retries for both PINs.  You can do this without having to provide a PIN. That prevents the retry counter from decrementing just to learn the number of retries.
+
+To reset the retry counters to the card's max retries for the Global and PIV PINs, enter the PIN for the PIV or Global PIN and click the *PIV PIN* button to toggle between PIV and Global so that it matches the type of PIN you are going to send to the card.  Then, click *Login*.  If the PIN and PIN type are correct, the retry counter for that PIN type will be reset.  Repeat for both PIN types to reset both counters.
+
+This functionality is designed to streamline Discovery Object testing and replace the JSmartCardBuilder.jar that we documented in the [FRTC 1.3.3 PIN Usage Policy Addendum](https://www.idmanagement.gov/pacs-frtc-v1-3-3-pin-usage-policy-addendum/).
+
+## Introduction
+
+* * * * * * * * * * *
 The GSA-ICAM-Card-Builder signs CHUID and CBEFF containers and updates Security Object containers 
 for FIPS 201-2 PIV and PIV-I cards.  This software was originally derived from the GSA PKCS7
 signing tool.  The  original work was unable to:
