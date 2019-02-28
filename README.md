@@ -105,10 +105,10 @@ Next, it's time to create the CHUID and CBEFF objects, which also updates the
 Security Object as described below.
 
 ### Usage
-Change directory to the directory created by the GSA-PIV-Signer-vX.x.x ZIP file and 
+Change directory to the directory created by unpacking the gsa-icam-card-builder.zip file and 
 run the following command:
 
-`java -classpath lib -jar GSA-ICAM-Card-Builder.jar gov.gsa.icamcardbuilder.app.Gui`
+`java -classpath lib -jar gsa-icam-card-builder.jar gov.gsa.icamcardbuilder.app.Gui`
 
 The scripts `start-signer.bat` and `start-signer.sh` will do this for you.
 
