@@ -52,7 +52,7 @@ cp -p data/pem/$SUBJ.crt "$DEST"
 
 ## Gen3 OCSP valid signer using RSA 2048 (RSA 2048 CA)
 SUBJ=ICAM_Test_Card_OCSP_PIV_RSA_2048_Valid_Signer_gen3
-sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3 -t icam-piv-ocsp-valid-rsa-2048 -r rsa2048 --cakey piv-rsa-2048 || exit $?
+sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3 -t icam-piv-ocsp-valid-rsa-2048 -r rsa2048 --cakey rsa2048 || exit $?
 DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
 cp -p data/$SUBJ.p12 "$DEST"
 cp -p data/pem/$SUBJ.crt "$DEST"
@@ -285,7 +285,7 @@ cp -p data/pem/ICAM_*_$T.crt "$DEST"
 renameIn "$DEST" 1 1
 
 ## Card 16
-T=Card_Authent_FASCN_mismatch
+T=Card_Authentication_FASCN_mismatch
 sh mkcert.sh -w -b -s "ICAM_Test_Card_PIV_Dig_Sig_SP_800-73-4_$T" -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -n 16 -t piv-dig-sig || exit $?
 sh mkcert.sh -w -b -s "ICAM_Test_Card_PIV_Key_Mgmt_SP_800-73-4_$T" -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2 -n 16 -t piv-key-mgmt || exit $?
 DEST="../cards/ICAM_Card_Objects/16_$T"
