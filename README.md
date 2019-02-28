@@ -81,12 +81,16 @@ directory.  The objects in each card's subdirectory can be encoded directly on
 to a PIV card.  It may be necessary to precede the object files with a container-
 specific TLV as described in SP 800-73-4's data model.  This system does not
 current supply a method for doing this if your card data populator doesn't handle
- if for you.
+ it for you.
 
-This project consists of two main processes:
+This project consists of several related functions:
 
   1. Create certificates to encode on ICAM Test cards
   2. Adjust and sign CHUID, CBEFF, and Security Object containers to comply with SP 800-73-4
+  3. Utilities to check and set card retry counters
+  4. Encode PIV and PIV-I test cards with default or user-supplied data objects and certificates
+
+As of 3/1/2019, (4) above is in development and is not displayed on the GSA ICAM Card Builder GUI.
 
 ## Certificate Generation
 The `certutils` directory contains a bash script, `mkcert.sh` that uses command
