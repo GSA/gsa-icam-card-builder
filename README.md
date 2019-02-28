@@ -41,11 +41,9 @@ Oracle since a lot of code broke.  If using an earlier JDK, insert the
 issue.  The risk is that the bytecode isn't being verified.
 
 ### Extracting the tools
-To use the tools, unzip the ZIP file `GSA-PIV-Signer-vX.x.x.zip` containing
-the scripts, signing application, libraries, configuration files and artifacts.
+To use the tools, click Releases on the main repo page, download and unzip the latest ZIP file, `gsa-icam-card-builder-vM.m.b.zip` containing the scripts, signing application, libraries, configuration files and artifacts. If you'd like to hack around in the source of the signing tool, download the `-devel` version of the same release.
 
-In conjunction with the signing tool,  we created the objects for eight new ICAM
-test cards, which are referred to as *Gen 3*:
+In conjunction with the signing tool,  we created the objects for eight new ICAM test cards, which are referred to as *Gen 3*:
 
 |Card Number|Description|
 |:--:|:------------------------|
