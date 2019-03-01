@@ -52,7 +52,7 @@ cp -p data/pem/$SUBJ.crt "$DEST"
 
 ## Gen3 OCSP valid signer using RSA 2048 (RSA 2048 CA)
 SUBJ=ICAM_Test_Card_OCSP_PIV_RSA_2048_Valid_Signer_gen3
-sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3 -t icam-piv-ocsp-valid-rsa-2048 -r rsa2048 --cakey rsa2048 || exit $?
+sh mkcert.sh -b -s $SUBJ -i ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3 -t piv-ocsp-valid-rsa-2048 -r rsa2048 --cakey rsa2048 || exit $?
 DEST="../cards/ICAM_Card_Objects/ICAM_CA_and_Signer"
 cp -p data/$SUBJ.p12 "$DEST"
 cp -p data/pem/$SUBJ.crt "$DEST"
