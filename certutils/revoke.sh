@@ -42,7 +42,7 @@ revoke() {
 		if [ $? -ne 0 ]; then popd >/dev/null 2>&1; return 5; fi
 		rm -f $SRCDIR/$BN.crl.pem
 		rm -f $SRCDIR/$ISSUER.private.pem
-		rm -f $CRL.crl
+		rm -f $CRL
 	popd >/dev/null 2>&1
 	return 0
 }

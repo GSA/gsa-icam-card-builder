@@ -1,3 +1,8 @@
+Bag Attributes
+    localKeyID: 43 B7 69 D6 14 6A 73 0A 40 4E C9 C8 57 47 37 2E 03 5D 7B F0 
+    friendlyName: ICAM Test Card PIV ECC Issued P-256 SM Certificate Signer 2
+subject=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV ECC Issued P-256 SM Certificate Signer 2
+issuer=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV P-384 Signing CA
 -----BEGIN CERTIFICATE-----
 MIIDqTCCAzCgAwIBAgIKcAAAAAAAAAAAGTAKBggqhkjOPQQDAjBvMQswCQYDVQQG
 EwJVUzEYMBYGA1UEChMPVS5TLiBHb3Zlcm5tZW50MRgwFgYDVQQLEw9JQ0FNIFRl

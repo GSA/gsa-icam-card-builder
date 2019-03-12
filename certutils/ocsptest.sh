@@ -46,7 +46,7 @@ prepreq() {
 				CA_CERT=../ICAM_CA_and_Signer/ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.crt
 				;;
 			http://ocspGen3p384.apl-test.cite.fpki-lab.gov)
-			CA_CERT=../ICAM_CA_and_Signer/ICAM_Test_Card_PIV_P-384_Signing_CA_gold_gen3.crt
+			CA_CERT=../ICAM_CA_and_Signer/ICAM_Test_Card_PIV_P-384_Signing_CA_-_gold_gen3.crt
 				;;
 			*)
 				echo "Cannot get issuer for $EE_CERT"

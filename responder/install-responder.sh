@@ -147,7 +147,10 @@ chmod 600 *.key
 mv ICAM_Test_Card_PIV_Signing_CA_-_gold_gen1-2.crt PIV_Signing_CA_gen1-2.crt
 mv ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3.crt PIV_Signing_CA_gen3.crt
 mv ICAM_Test_Card_PIV-I_Signing_CA_-_gold_gen3.crt PIV-I_Signing_CA_gen3.crt
-mv ICAM_Test_Card_PIV_P-384_Signing_CA_gold_gen3.crt PIV_Signing_CA_gen3_p384.crt
+mv ICAM_Test_Card_PIV_P-384_Signing_CA_-_gold_gen3.crt PIV_Signing_CA_gen3_p384.crt
+# Uncomment these when we have responders for them
+#mv ICAM_Test_Card_PIV_RSA_2048_Signing_CA_-_gold_gen3.crt PIV_Signing_CA_gen3_rsa_2048.crt
+#mv ICAM_Test_Card_PIV_P-256_Signing_CA_gold_gen3.crt PIV_Signing_CA_gen3_p256.crt
 
 systemctl stop ocspd.service
 systemctl disable ocspd.service
@@ -229,8 +232,7 @@ fi
 
 $INSTALLER install $IPTABLES -y
 
-firewall-cmd --permanent --add-port=80/tcp
-firewall-cmd --permanent --add-port=443/tcp
+firewall-cmd --permanent --zone=trusted --add-port=80/tcp
 firewall-cmd --permanent --zone=trusted --add-interface=lo
 firewall-cmd --permanent --zone=trusted --add-port=2560/tcp
 firewall-cmd --permanent --zone=trusted --add-port=2561/tcp
@@ -240,6 +242,8 @@ firewall-cmd --permanent --zone=trusted --add-port=2564/tcp
 firewall-cmd --permanent --zone=trusted --add-port=2565/tcp
 firewall-cmd --permanent --zone=trusted --add-port=2566/tcp
 firewall-cmd --permanent --zone=trusted --add-port=2567/tcp
+firewall-cmd --direct --permanent --add-rule ipv4 filter INPUT_direct 0 -p tcp --dport 80 -m state --state NEW -m recent --set
+firewall-cmd --direct --permanent --add-rule ipv4 filter INPUT_direct 1 -p tcp --dport 80 -m state --state NEW -m recent --update --seconds 15 --hitcount 30 -j DROP
 firewall-cmd --reload
 
 # $HTTP, openssl

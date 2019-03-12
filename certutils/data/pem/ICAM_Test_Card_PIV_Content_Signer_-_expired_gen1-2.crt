@@ -1,3 +1,8 @@
+Bag Attributes
+    localKeyID: 42 75 33 4E 7D E2 D2 FE 65 D8 99 74 F8 97 70 D8 76 9F B3 91 
+    friendlyName: ICAM Test Card PIV Content Signer - expired gen1-2
+subject=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM PIV Content Signer
+issuer=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Signing CA
 -----BEGIN CERTIFICATE-----
 MIIFUTCCA7mgAwIBAgIKWFPM4lIYAUEgAzANBgkqhkiG9w0BAQsFADBlMQswCQYD
 VQQGEwJVUzEYMBYGA1UEChMPVS5TLiBHb3Zlcm5tZW50MRgwFgYDVQQLEw9JQ0FN

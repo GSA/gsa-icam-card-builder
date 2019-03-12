@@ -14,7 +14,7 @@ public class DgMap {
 	 * Constructor for initializing a DgMap object
 	 */
 	protected DgMap() {
-		init(null);
+		initDgMap(null);
 	}
 
 	/**
@@ -25,7 +25,7 @@ public class DgMap {
 	 */
 	protected DgMap(byte[] fileBytes) {
 		byte[] mapping = getSoMapping(fileBytes);
-		init(mapping);
+		initDgMap(mapping);
 	}
 
 	/**
@@ -35,7 +35,7 @@ public class DgMap {
 	 * @param mapping
 	 *            byte array containing the value of the DG Map tag.
 	 */
-	private void init(byte[] mapping) {
+	private void initDgMap(byte[] mapping) {
 		dgMap = new LinkedHashMap<Short, Byte>(16);
 		if (mapping != null) {
 			for (int i = 0; i < mapping.length; i += 3) {
@@ -155,7 +155,7 @@ public class DgMap {
 	
 	/**
 	 * Decrements the mapping size byte
-	 * 
+	 *
 	 * @param desiredContainerId tell SP 800-73-4 DG container ID
 	 * 
 	 * @return the value of the container ID or null if not found

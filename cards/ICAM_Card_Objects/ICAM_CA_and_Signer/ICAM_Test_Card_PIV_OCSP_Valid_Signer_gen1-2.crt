@@ -1,3 +1,8 @@
+Bag Attributes
+    localKeyID: AF 96 AF A8 B6 38 ED 39 3E E7 8A EE E7 75 04 74 C7 5A 47 F3 
+    friendlyName: ICAM Test Card PIV OCSP Valid Signer gen1-2
+subject=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV OCSP Valid Signer gen1-2
+issuer=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Signing CA
 -----BEGIN CERTIFICATE-----
 MIIFYzCCA8ugAwIBAgIKWQAAAAAAAAAACDANBgkqhkiG9w0BAQsFADBlMQswCQYD
 VQQGEwJVUzEYMBYGA1UEChMPVS5TLiBHb3Zlcm5tZW50MRgwFgYDVQQLEw9JQ0FN

@@ -5,6 +5,7 @@ import static gov.gsa.icamcardbuilder.app.Gui.logger;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.LinkedHashMap;
+import java.util.ListIterator;
 
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -24,19 +25,14 @@ public class DgHashMap {
 	private LDSSecurityObject ldsso = null;
 
 	/**
-	 * Constructor for initializing a DgMap object
-	 */
-	public DgHashMap() {
-		init(null);
-	}
-
-	/**
 	 * Constructor for creating a DgMap object from raw bytes
 	 * 
 	 * @param containerBytes
-	 *            byte array containing Security Object from file or card\
+	 *            byte array containing Security Object from file or card
+	 * @param initSo
+	 *            flag to indicate to clear out the existing hashes and mappings
 	 */
-	public DgHashMap(byte[] containerBytes) {
+	public DgHashMap(byte[] containerBytes, boolean initSo) {
 
 		byte[] so = this.getSoSecurityObject(containerBytes);
 		this.dgMap = new DgMap(containerBytes);
@@ -60,13 +56,15 @@ public class DgHashMap {
 			soSeq = (ASN1Sequence) asn1is.readObject();
 			asn1is.close();
 			ldsso = LDSSecurityObject.getInstance(soSeq);
-			init(ldsso.getDatagroupHash());
+			if (ldsso.getDatagroupHash().length * 3 != dgMap.getDgMapByteLength()) {
+				logger.warn(String.format("DgMap map contains %d entries, number of DataGroup hashes is %d", (dgMap.getDgMapByteLength() / 3), ldsso.getDatagroupHash().length));
+			}
+			initDgHash((initSo) ? null : ldsso.getDatagroupHash());
 			in.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		this.sync();
 	}
 
 	/**
@@ -76,7 +74,7 @@ public class DgHashMap {
 	 * @param dgHashArray
 	 *            array of Bouncy Castle DataGroupHashes
 	 */
-	private void init(DataGroupHash[] dgHashArray) {
+	private void initDgHash(DataGroupHash[] dgHashArray) {
 		this.dgHashMap = new LinkedHashMap<Integer, DataGroupHash>(16);
 		logger.debug("Security Object hash count = " + ((dgHashArray == null) ? "0" : dgHashArray.length));
 		if (dgHashArray != null) {
@@ -84,6 +82,9 @@ public class DgHashMap {
 				Byte dgNumber = (byte) dgHashArray[i].getDataGroupNumber();
 				this.dgHashMap.put((Integer) (int) dgNumber, dgHashArray[i]);
 			}
+		} else {
+			// Initialize the DG Map
+			this.dgMap = new DgMap();
 		}
 	}
 
@@ -102,9 +103,11 @@ public class DgHashMap {
 		Byte dgNumber = 0;
 		// If the container is already there, remove it
 		logger.debug("addDgHash(" + containerId + ", " + Utils.bytesToHex(hash) + ")");
-		if (this.dgMap.containsContainerId(containerId)) {
-			dgNumber = this.dgMap.removeMapping(containerId);
-			this.dgHashMap.remove((Integer) (int) dgNumber);
+		if (this.dgMap != null) {
+			if (this.dgMap.containsContainerId(containerId)) {
+				dgNumber = this.dgMap.removeMapping(containerId);
+				this.dgHashMap.remove((Integer) (int) dgNumber);
+			}
 		}
 
 		// Add the mapping to the mapping object
@@ -152,7 +155,6 @@ public class DgHashMap {
 		} else {
 			logger.warn(String.format("DG map does not contain entry for %04X", desiredContainerId));
 		}
-		
 	}
 
 	/**
@@ -169,7 +171,7 @@ public class DgHashMap {
 	/**
 	 * Synchronizes the DG hashes with the DG Map.
 	 */
-	public void sync() {
+	protected void syncDgHashMap() {
 
 		logger.debug("Syncing DG hashes with the DG map");
 		// First check for orphaned hashes

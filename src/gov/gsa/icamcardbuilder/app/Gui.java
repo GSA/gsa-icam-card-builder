@@ -67,7 +67,7 @@ import javax.swing.JCheckBox;
 public class Gui extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	protected final static String version = "1.8.46";
+	protected final static String version = "1.8.49";
 	protected static String cardsDirectory = null;
 	private static String cardsDirectoryArg = null;
 	protected static boolean debug = true;
@@ -293,7 +293,7 @@ public class Gui extends JPanel {
 		});
 
 		initSecurityObjectCheckbox = new JCheckBox("Initialize Security Object");
-		initSecurityObjectCheckbox.setToolTipText("Check if you wish to clear the Security Object's DG table");
+		initSecurityObjectCheckbox.setToolTipText("Check if you wish to clear the Security Object's DG hash table");
 		initSecurityObjectCheckbox.setSelected(false);
 		initSecurityObjectCheckbox.addActionListener(new ActionListener() {
 			@Override

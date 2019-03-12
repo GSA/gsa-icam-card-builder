@@ -1,3 +1,8 @@
+Bag Attributes
+    localKeyID: AA 14 33 B8 4F 47 E6 F7 1B 96 0F E5 D0 39 88 58 CF C2 0C A8 
+    friendlyName: ICAM Test Card PIV Signing CA - expired gen1-2
+subject=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Signing CA - Expired
+issuer=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Root CA
 -----BEGIN CERTIFICATE-----
 MIIF3jCCBEagAwIBAgIJAPdNOCYRM2MLMA0GCSqGSIb3DQEBCwUAMGIxCzAJBgNV
 BAYTAlVTMRgwFgYDVQQKEw9VLlMuIEdvdmVybm1lbnQxGDAWBgNVBAsTD0lDQU0g

@@ -1,3 +1,8 @@
+Bag Attributes
+    localKeyID: 63 CF F6 13 D1 76 34 92 EB BF EF C2 3D 44 D6 5B 18 21 30 F1 
+    friendlyName: ICAM Test Card PIV P-256 Signing CA - gold gen3
+subject=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card PIV P-256 Signing CA
+issuer=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Root CA
 -----BEGIN CERTIFICATE-----
 MIIEdzCCAt+gAwIBAgIJAPqud8TWpGrqMA0GCSqGSIb3DQEBDAUAMGIxCzAJBgNV
 BAYTAlVTMRgwFgYDVQQKEw9VLlMuIEdvdmVybm1lbnQxGDAWBgNVBAsTD0lDQU0g
