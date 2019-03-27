@@ -72,7 +72,7 @@ In conjunction with the signing tool,  we created the objects for eight new ICAM
 | 55 | FIPS 201-2 PIV Missing Security Object |
 | 57 | Revoked CHUID Signer Cert |
 | 58 | Revoked Card Authentication Cert |
-| 59 | Valid Card to Simulate Card 51 at Time of Access |
+| ~59~ | ~Valid Card to Simulate Card 51 at Time of Access~ |
 
 The artifacts used to create these cards are included beneath the `cards` 
 directory.  The objects in each card's subdirectory can be encoded directly on 
