@@ -72,7 +72,7 @@ In conjunction with the signing tool,  we created the objects for eight new ICAM
 | 55 | FIPS 201-2 PIV Missing Security Object |
 | 57 | Revoked CHUID Signer Cert |
 | 58 | Revoked Card Authentication Cert |
-| 59 | Valid Card to Simulate Card 51 at Time of Access |
+| ~59~ | ~Valid Card to Simulate Card 51 at Time of Access~ |
 
 The artifacts used to create these cards are included beneath the `cards` 
 directory.  The objects in each card's subdirectory can be encoded directly on 
@@ -105,10 +105,10 @@ Next, it's time to create the CHUID and CBEFF objects, which also updates the
 Security Object as described below.
 
 ### Usage
-Change directory to the directory created by the GSA-PIV-Signer-vX.x.x ZIP file and 
+Change directory to the directory created by unpacking the gsa-icam-card-builder.zip file and 
 run the following command:
 
-`java -classpath lib -jar GSA-ICAM-Card-Builder.jar gov.gsa.icamcardbuilder.app.Gui`
+`java -classpath lib -jar gsa-icam-card-builder.jar gov.gsa.icamcardbuilder.app.Gui`
 
 The scripts `start-signer.bat` and `start-signer.sh` will do this for you.
 
