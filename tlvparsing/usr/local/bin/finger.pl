@@ -118,7 +118,13 @@ print "BDB Format Type......................" . (($chars[$i++] << 8) | $chars[$i
 printf "Biometric Creation Date..............%02d%02d%02d%02d%02d%02d%02d%c\n", $chars[$i++], $chars[$i++], $chars[$i++], $chars[$i++], $chars[$i++], $chars[$i++], $chars[$i++], $chars[$i++];
 my $biosdate = sprintf "%02d%02d%02d%02d%02d%02d%02d%c", $chars[$i++], $chars[$i++], $chars[$i++], $chars[$i++], $chars[$i++], $chars[$i++], $chars[$i++], $chars[$i++];
 my $bioedate = sprintf "%02d%02d%02d%02d%02d%02d%02d%c", $chars[$i++], $chars[$i++], $chars[$i++], $chars[$i++], $chars[$i++], $chars[$i++], $chars[$i++], $chars[$i++];
-my $expires = Mktime (unpack ("A4A2A2A2A2A2", $bioedate));
+my $expires = "";
+eval {
+	$expires = Mktime (unpack ("A4A2A2A2A2A2", $bioedate));
+} or do {
+	my $error = $@ || 'Unknown failure';
+	print ">>> Error: $error reading dates <<<\n";
+};
 my $now = scalar time();
 
 print "Validity Period......................$biosdate through $bioedate\n";
@@ -177,8 +183,10 @@ print "Length of Record....................." . (($chars[$i++] << 8) | $chars[$i
 printf "CBEFF Product Identifier.............Vendor %d Version %d\n", ($chars[$i++] << 8) | $chars[$i++], ($chars[$i++] << 8) | $chars[$i++];
 print "Capture Equipment Compliance........." . (($chars[$i] & 0xF0) >> 4) . "\n";
 print "Capture Equipment...................." . ((($chars[$i++] & 0x0F) << 8) | $chars[$i++]) . "\n";
-print "Size of Scanned Image in x Direction." . (($chars[$i++] << 8) | $chars[$i++]) . "\n";
-print "Size of Scanned Image in y Direction." . (($chars[$i++] << 8) | $chars[$i++]) . "\n";
+my $xpixels = (($chars[$i++] << 8) | $chars[$i++]);
+print "Size of Scanned Image in x Direction." . $xpixels . "\n";
+my $ypixels = (($chars[$i++] << 8) | $chars[$i++]);
+print "Size of Scanned Image in y Direction." . $ypixels . "\n";
 print "Horizontal Resolution................" . (($chars[$i++] << 8) | $chars[$i++]) . "\n";
 print "Vertical Resolution.................." . (($chars[$i++] << 8) | $chars[$i++]) . "\n";
 my $nfv = $chars[$i++];
@@ -217,6 +225,16 @@ for ($view = 0; $view < $nfv; $view++) {
 				(($chars[$i + 2] << 8) | $chars[$i + 3]),
 				$chars[$i + 4],
 				$chars[$i + 5];
+
+				if (((($chars[$i] & ~0xC0) << 2) | ($chars[$i + 1])) > $xpixels) {
+					print ">>> Error: X value greater than X dimension <<<\n";
+				}
+				if ((($chars[$i + 2] << 8) | $chars[$i + 3]) > $ypixels) {
+					print ">>> Error: Y value greater than Y dimension <<<\n";
+				}
+				if ($chars[$i + 4] > 180) {
+					print ">>> Error: Angle greater than 180<<<\n";
+				}
 		}
 	} else {
 		if ($bdq != -2) {
