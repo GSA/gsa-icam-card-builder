@@ -171,7 +171,6 @@ sub main() {
 
     if ( ( $high & 0x02 ) != 0 ) {
 
-      #print "TB(" . $tc . ") \$chars[$idx]:\n";
       if ( $tc > 2 ) {
         my ( $cwi, $bwi ) = byte2nibbles( $chars[$idx] );
 
@@ -233,7 +232,9 @@ cont:
     printf "HB(%d): 0x%02x\n", $j, $chars[$i];
   }
 
-  my $hw = ( $chars[14] & 0xff );
+  my $index = (($chars[12] & 0xff) == 0xcb) ? 13 : 14;
+  my $hw = 0;
+  $hw = $chars[$index] & 0xff;
 
   my %configs = (
     0x11 => "HW = 0F, FW = 5601 (Cosmo V8.0 R2)",
@@ -241,6 +242,7 @@ cont:
     0x31 => "HW = 40, FW = 5F01 (Cosmo V8.1 R1)",
     0x41 => "HW = 30, FW = 5F02 (Cosmo V8.1 R2)",
     0x51 => "HW = 30, FW = 6F01 (Cosmo V8.2 R1)",
+    # v7 cards don't have the previous byte
     0xcb => "HW = B0, FW = FC10 (Cosmo V7.0)"
   );
 
@@ -248,10 +250,11 @@ cont:
     print "Hardware Stock Description: " . $configs{$hw} . "\n";
   }
   else {
-    printf "Unknown Hardware Stock Description: %02x\n", $hw;
+    printf "Unknown Hardware Stock Description: %02x (Unknown)\n", $hw;
   }
 
-  my $index = ( $hw == 0xcb ) ? 14 : 15;
+  # v8 cards have a card service byte, after their H3 (really H2).
+  $index = ( $hw == 0xcb ) ? 14 : 15;
 
   my $fw  = $chars[$index] & 0xff;
   my $aid = ( $fw & 0xf0 ) >> 4;
@@ -267,18 +270,16 @@ cont:
     print "AID: " . $aids{$aid} . "\n";
   }
   else {
-    print "Unkonwn AID: " . $aid . "\n";
+    printf "AID: %02x (Unknown)\n", $aid;
   }
 
-  my $appconf = $hw & 0x06;
+  my $appconf = (( $fw & 0x0f ) & 0x0c) >> 2;
 
   my %appconfs = (
     0x00 => "CIV Configuration FIPS 140-2 Level 2 Validated",
     0x01 => "SPE and SPE-EP Configurations FIPS 140-2 level 3 Validated",
     0x02 => "NPIVP (PIV/PIV-I) Configuration FIPS 140-2 Level 2 Validated",
-    0x04 => "NPIVP (PIV/PIV-I) Configuration FIPS 140-2 Level 2 Validated",
-    0x0B => "NPIVP (PIV/PIV-I) Configuration FIPS 140-2 Level 2 Validated",
-    0x10 => "NPIVP (PIV/PIV-I) Configuration FIPS 140-2 Level 2 Validated"
+    0x03 => "RFU"
   );
 
   if ( defined $appconfs{$appconf} ) {
@@ -290,7 +291,7 @@ cont:
 
   my $applet = $hw & 0x03;
 
-  $applet = 0x99 if ( $index == 14 );
+  $applet = 0x99 if ( $index == 14 ); # Just make one up, since v7 didn't have this
 
   my %applets = (
     0x00 => "ID-One PIV applet version 2.3.5",
