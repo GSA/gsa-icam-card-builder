@@ -173,7 +173,8 @@ for ($j = 0; $j < 4; $j++, $i++) {
 }
 print "\n";
 
-print "Length of Record....................." .  (($chars[$i++] << 24) | ($chars[$i++] << 16) | ($chars[$i++] << 8) | $chars[$i++]) . "\n"; 
+my $lor = (($chars[$i++] << 24) | ($chars[$i++] << 16) | ($chars[$i++] << 8) | $chars[$i++]);
+print "Length of Record....................." . $lor . "\n"; 
 print "Number of Faces......................" . (($chars[$i++] << 8) | $chars[$i++]) . "\n";
 print "\n";
 print "***** Facial Data Record *****\n";
