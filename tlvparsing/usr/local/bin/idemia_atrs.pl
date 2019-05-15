@@ -289,7 +289,7 @@ cont:
     print "Unkonwn Applicaton Configuration: " . $appconf . "\n";
   }
 
-  my $applet = $hw & 0x03;
+  my $applet = $fw & 0x03;
 
   $applet = 0x99 if ( $index == 14 ); # Just make one up, since v7 didn't have this
 
