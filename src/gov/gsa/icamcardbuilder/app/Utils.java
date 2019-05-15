@@ -24,6 +24,12 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 public class Utils {
+	
+	public enum OS {
+		WINDOWS,
+		OSX,
+		LINUX
+	}
 
 	/**
 	 * Gets the contents from a File object
@@ -517,5 +523,21 @@ public class Utils {
 					Utils.class.getName());
 		}
 		return (byte) (idType & 0xff);
+	}
+	
+	public static OS getOs() {
+		OS rv = OS.LINUX;
+		String osName = System.getProperty("os.name");
+		logger.debug("OS = " + osName);
+
+		if (osName.toLowerCase().contains("windows")) {
+			rv = OS.WINDOWS;
+		} else if (osName.toLowerCase().startsWith("mac")) {
+			rv = OS.OSX;
+		} else if (osName.toLowerCase().contains("linux")) {
+			rv = OS.LINUX;
+		}
+
+		return rv;
 	}
 }
