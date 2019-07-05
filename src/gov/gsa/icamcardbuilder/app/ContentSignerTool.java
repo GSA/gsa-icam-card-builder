@@ -271,6 +271,7 @@ public class ContentSignerTool {
 
 		// What kind of file is this?
 		int tag = Utils.getTag(contentFileBytes, 0);
+		boolean emptyContainer = (tag < 0) ? true : false;
 		byte[] signedFakeBytes;
 		byte[] contentBytes = null;
 		Gui.status.append(dateFormat.format(new Date())
@@ -477,6 +478,7 @@ public class ContentSignerTool {
 			desiredContainerId = PivContainers.printedInformationContainerId;
 			containerBufferBytes = writePiContainer(contentFile, contentBytes);
 			break;
+
 		case biometricObjectTag: // BiometricObject
 	
 			// We do this fakery to get the size of the signature block, which
@@ -612,6 +614,44 @@ public class ContentSignerTool {
 			Gui.progress.setValue(50);
 			break;
 
+		case -1: // Special empty facial image container
+			
+			// We do this fakery to get the size of the signature block, which
+			// is needed by CBEFF headers. Chicken/egg problem.
+			signedFakeBytes = createDetachedSignature("".getBytes(), idPivBiometricContentTypeOid, false);
+
+			if (null == signedFakeBytes) {
+				Gui.errors = true;
+				System.out.println("Error creating CMS\n");
+				Gui.progress.setValue(0);
+				return;
+			}
+
+			containerBufferBytes = new byte[0];
+			origSbSize = 0;
+			newSbSize = (short) signedFakeBytes.length;
+			nbytesToSign = 0;
+
+			Gui.status.append(dateFormat.format(new Date()) + " - Original signature size: " + origSbSize + " bytes\n");
+			Gui.status.append(
+					dateFormat.format(new Date()) + " - New signature size: " + signedFakeBytes.length + " bytes\n");
+
+			Gui.progress.setValue(10);
+
+			signedCbData = new byte[0];
+			sdbb = ByteBuffer.wrap(signedCbData);
+
+			Gui.progress.setValue(20);
+			cbContentBytes = new byte[nbytesToSign];
+			cbContentBytes = sdbb.array();
+
+			// Build a new Content Info (content, contentType) and authenticated
+			// attributes byte array
+			signatureBytes = createDetachedSignature(cbContentBytes, idPivBiometricContentTypeOid, false);
+			desiredContainerId = PivContainers.facialImageContainerId;
+			Gui.progress.setValue(50);
+			break;
+			
 		default:
 			logger.fatal("Unrecognized tag in byte[0] of file");
 			Gui.status.append(dateFormat.format(new Date())

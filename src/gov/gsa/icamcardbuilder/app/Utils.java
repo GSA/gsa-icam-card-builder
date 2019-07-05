@@ -470,16 +470,19 @@ public class Utils {
 	 *            the bytes in a BER-TLV byte arraye
 	 * @param pos
 	 *            the position in the byte array to look for the tag
-	 * @return the tag
+	 * @return the tag or -1 if the byte array is empty
 	 */
 
 	public static int getTag(byte[] bytes, int pos) {
-		int tag = bytes[0] & 0x000000ff;
-		int i = pos;
-		if ((tag & 0x1f) == 0x1f) {
-			do {
-				tag |= (tag << 8) | (bytes[++i] & 0xff);
-			} while ((bytes[i] & 0x80) == 0x80);
+		int tag = -1;
+		if (bytes != null && bytes.length > 0) {
+			tag = bytes[0] & 0x000000ff;
+			int i = pos;
+			if ((tag & 0x1f) == 0x1f) {
+				do {
+					tag |= (tag << 8) | (bytes[++i] & 0xff);
+				} while ((bytes[i] & 0x80) == 0x80);
+			}
 		}
 		return tag;
 	}

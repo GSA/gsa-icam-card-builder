@@ -75,7 +75,7 @@ import javax.swing.JToggleButton;
 public class Gui extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	protected final static String version = "1.8.75";
+	protected final static String version = "1.8.76";
 	protected static String cardsDirectory = null;
 	private static String cardsDirectoryArg = null;
 	protected static boolean debug = true;

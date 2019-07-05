@@ -617,3 +617,24 @@ cp -p ../cards/ICAM_Card_Objects/ICAM_CA_and_Signer/*.p12 data
 #cp -p data/ICAM_Test_Card_PIV_*SP_800-73-4_Revoked_Card_Auth_Cert.p12 "$DEST"
 #cp -p data/pem/ICAM_Test_Card_PIV_*SP_800-73-4_Revoked_Card_Auth_Cert.crt "$DEST"
 #renameIn "$DEST" 1 1
+
+## Card 46 ICI 8
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Auth_SP_800-73-4_ICI_8 -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 46 -t piv-auth-ici-8 || exit $?
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Dig_Sig_SP_800-73-4_ICI_8 -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 46 -t piv-dig-sig-ici-8 || exit $?
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Key_Mgmt_SP_800-73-4_ICI_8 -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 46 -t piv-key-mgmt-ici-8 || exit $?
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Card_Auth_SP_800-73-4_ICI_8 -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 46 -t piv-card-auth-ici-8 || exit $?
+DEST="../cards/ICAM_Card_Objects/46_Golden_FIPS_201-2_PIV_ICI_8"
+cp -p data/ICAM_Test_Card_PIV_*SP_800-73-4_ICI_8.p12 "$DEST"
+cp -p data/pem/ICAM_Test_Card_PIV_*SP_800-73-4_ICI_8.crt "$DEST"
+renameIn "$DEST" 1 1
+
+## Card 46 ICI 9
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Auth_SP_800-73-4_ICI_9 -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 46 -t piv-auth-ici-9 || exit $?
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Dig_Sig_SP_800-73-4_ICI_9 -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 46 -t piv-dig-sig-ici-9 || exit $?
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Key_Mgmt_SP_800-73-4_ICI_9 -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 46 -t piv-key-mgmt-ici-9 || exit $?
+sh mkcert.sh -w -b -s ICAM_Test_Card_PIV_Card_Auth_SP_800-73-4_ICI_9 -i ICAM_Test_Card_PIV_Signing_CA_-_gold_gen3 -n 46 -t piv-card-auth-ici-9 || exit $?
+DEST="../cards/ICAM_Card_Objects/46_Golden_FIPS_201-2_PIV_ICI_9"
+cp -p data/ICAM_Test_Card_PIV_*SP_800-73-4_ICI_9.p12 "$DEST"
+cp -p data/pem/ICAM_Test_Card_PIV_*SP_800-73-4_ICI_9.crt "$DEST"
+renameIn "$DEST" 1 1
+
