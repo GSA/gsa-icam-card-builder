@@ -1,10 +1,8 @@
 Bag Attributes
     localKeyID: BC E6 98 A0 53 94 39 32 BF 70 5A AB A3 6B B6 BA 66 B8 A3 33 
     friendlyName: ICAM Test Card PIV Signing CA - gold gen3
-subject=C = US, O = U.S. Government, OU = ICAM Test Cards, CN = ICAM Test Card Signing CA
-
-issuer=C = US, O = U.S. Government, OU = ICAM Test Cards, CN = ICAM Test Card Root CA
-
+subject=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Signing CA
+issuer=/C=US/O=U.S. Government/OU=ICAM Test Cards/CN=ICAM Test Card Root CA
 -----BEGIN CERTIFICATE-----
 MIIF4TCCBEmgAwIBAgIIa3/4hwoWC4MwDQYJKoZIhvcNAQELBQAwYjELMAkGA1UE
 BhMCVVMxGDAWBgNVBAoTD1UuUy4gR292ZXJubWVudDEYMBYGA1UECxMPSUNBTSBU
