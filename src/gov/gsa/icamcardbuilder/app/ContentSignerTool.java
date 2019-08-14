@@ -928,6 +928,8 @@ public class ContentSignerTool {
 		// Digest of content
 		MessageDigest messageDigest;
 		try {
+			logger.debug("Content bytes = " + Utils.bytesToHex(contentBytes));
+
 			messageDigest = MessageDigest.getInstance(digestAlgorithmName);
 			byte[] digestBytes = messageDigest.digest(contentBytes);
 			logger.debug("Message digest = " + Utils.bytesToHex(digestBytes));
