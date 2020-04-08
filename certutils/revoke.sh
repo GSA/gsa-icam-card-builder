@@ -38,7 +38,7 @@ revoke() {
 
     if [ z$SUBJ != "z" ]; then
 		  # Revoke
-  		ALREADY=$(openssl ca -config $CONFIG -keyfile $SRCDIR/$ISSUER.private.pem -cert $SRCDIR/$ISSUER.crt -revoke $SRCDIR/$SUBJ.crt -crl_reason cessationOfOperation 2>&1)
+  		ALREADY=$(openssl ca -config $CONFIG -keyfile $SRCDIR/$ISSUER.private.pem -cert $SRCDIR/$ISSUER.crt -revoke $SRCDIR/$SUBJ.crt -crl_reason cessationOfOperation 2>&1 | grep -vi using)
   		RESULT2=$?
   		if [ $RESULT2 -ne 0 -a $(expr "$ALREADY" : ".*Already.*$") -lt 7 ]; then
   			popd >/dev/null 2>&1; return 3
