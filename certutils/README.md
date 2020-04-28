@@ -328,19 +328,19 @@ V^I201202000000Z^I^I600000000000000000CB^Iunknown^I$
 V^I321230235959Z^I^I600000000000000000CD^Iunknown^I$
 ```
 
-To change attributes of a cert whose serial number is, for example, 600000000000000000CB, first delete the line containing that serial number.  
+To change attributes of a cert whose serial number is, for example, `600000000000000000CB`, first delete the line containing that serial number.  
 
-Next, open the corresponding certs next serial number file.  If the index file is `piv-rsa-2048-index.txt`, then the serial number file is `piv-rsa-2048-serial`, noting that there is no file name extension.  OpenSSL uses the serial number in that file when generating the next certificate.  If the updated cert is successfully created, OpenSSL will later increment the next serial number in preparation for the next certificate.  
+Next, open the corresponding cert's next serial number file.  If the index file is `piv-rsa-2048-index.txt`, then the serial number file is `piv-rsa-2048-serial`, noting that there is no file name extension.  OpenSSL uses the serial number in that file when generating the next certificate.  If the updated cert is successfully created, OpenSSL will later increment the next serial number in preparation for the next certificate.  
 
-Note: Before you rewind the serial number to 600000000000000000CB, note the current value because youll need to restore the value to that file after generating the single cert.  
+Note: Before you rewind the serial number to `600000000000000000CB`, note the current value because you'll need to restore the value to that file after generating the single cert.  
 
-After you've set the serial number to 600000000000000000CB, save the file and change directories up two levels:
+After you've set the serial number to `600000000000000000CB`, save the file and change directories up two levels:
 
 ```
 cd ../..
 ```
 
-To create a single cert, we use a wrapper script, mkone.sh.  This script is functionally the same as mkall.sh except that it should only be used to generate one certificate at a time.  After youve updated the index.txt and serial files, uncomment the 5 or 6 lines corresponding to the cert you want to replace, save the file, and run:
+To create a single cert, we use a wrapper script, `mkone.sh`.  This script is functionally the same as `mkall.sh` except that it should only be used to generate one certificate at a time.  After you've updated the index.txt and serial files, uncomment the 5 or 6 lines corresponding to the cert you want to replace, save the file, and run:
 
 ```
 sh mkone.sh.  
