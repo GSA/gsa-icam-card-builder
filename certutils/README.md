@@ -304,7 +304,7 @@ more information.
 ## How to Update an ICAM Test Card Certificate
 
 Change to the database directory and open the index file corresponding to the CA that 
-issues the certificate.  In this example, we’re going to update a certificate issued by
+issues the certificate.  In this example, we're going to update a certificate issued by
 ICAM Test Card RSA 2048 Signing CA.
 
 ```
@@ -317,10 +317,10 @@ Note the columns of a CA index (*-index.txt) file:
 * Expiration date in YYMMDDHHMMSSZ format
 * Revocation date in YYMMDDHHMMSSZ[,reason] format. Empty (^I) if not revoked.
 * Serial number in hex.
-* Filename or literal string ‘unknown’.
+* Filename or literal string `unknown`.
 * Distinguished name.  Empty (^I) if unavailable
 
-Here is an example of a snippet from a CA index file viewed in “vi”, showing tab characters as “^I” (you can show whitespace using the :set list command in vi).
+Here is an example of a snippet from a CA index file viewed in `vi`, showing tab characters as `^I` (you can show whitespace using the :set list command in `vi`).
 
 ```
 V^I321230235959Z^I^I600000000000000000CA^Iunknown^I$
@@ -330,21 +330,21 @@ V^I321230235959Z^I^I600000000000000000CD^Iunknown^I$
 
 To change attributes of a cert whose serial number is, for example, 600000000000000000CB, first delete the line containing that serial number.  
 
-Next, open the corresponding cert’s next serial number file.  If the index file is `piv-rsa-2048-index.txt`, then the serial number file is `piv-rsa-2048-serial`, noting that there is no file name extension.  OpenSSL uses the serial number in that file when generating the next certificate.  If the updated cert is successfully created, OpenSSL will later increment the next serial number in preparation for the next certificate.  
+Next, open the corresponding certÂ’s next serial number file.  If the index file is `piv-rsa-2048-index.txt`, then the serial number file is `piv-rsa-2048-serial`, noting that there is no file name extension.  OpenSSL uses the serial number in that file when generating the next certificate.  If the updated cert is successfully created, OpenSSL will later increment the next serial number in preparation for the next certificate.  
 
-Note: Before you rewind the serial number to 600000000000000000CB, note the current value because you’ll need to restore the value to that file after generating the single cert.  
+Note: Before you rewind the serial number to 600000000000000000CB, note the current value because youÂ’ll need to restore the value to that file after generating the single cert.  
 
-After you’ve set the serial number to 600000000000000000CB, save the file and change directories up two levels:
+After you've set the serial number to 600000000000000000CB, save the file and change directories up two levels:
 
 ```
 cd ../..
 ```
 
-To create a single cert, we use a wrapper script, mkone.sh.  This script is functionally the same as mkall.sh except that it should only be used to generate one certificate at a time.  After you’ve updated the index.txt and serial files, uncomment the 5 or 6 lines corresponding to the cert you want to replace, save the file, and run:
+To create a single cert, we use a wrapper script, mkone.sh.  This script is functionally the same as mkall.sh except that it should only be used to generate one certificate at a time.  After youÂ’ve updated the index.txt and serial files, uncomment the 5 or 6 lines corresponding to the cert you want to replace, save the file, and run:
 
 ```
 sh mkone.sh.  
 ```
 
-When the cert generation is complete, restore the original “next” serial number to the appropriate *-serial file in `data/databases`.
+When the cert generation is complete, restore the original `next` serial number to the appropriate *-serial file in `data/databases`.
 
